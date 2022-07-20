@@ -13,5 +13,7 @@ namespace CurrencyExchange2.Data
 
         public DbSet<UserToken> UserTokens { get; set; }
 
+        public DbSet<PasswordInfo> PasswordInfos { get; set; }
+
 }
 }

@@ -2,16 +2,13 @@
 
 namespace CurrencyExchange2.Model.Authentication
 {
-    public class User
+    public class PasswordInfo
     {
         [Key]
-        public int UserId { get; set; }
-        [EmailAddress]
-        [Required(ErrorMessage = "User Name is required")]
-        public string? UserEmail { get; set; }
+        public string UserEmail { get; set; }
 
-        //public string IpAdress { get; set; }
-
+        public byte[] Password { get; set; }
+        public byte[] PasswordSalt { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
     }

@@ -10,6 +10,9 @@ namespace CurrencyExchange2.Model.Authentication
 
         public string? Token { get; set; }
 
-        //public DateTime ExpDate { get; set; } = DateTime.Now.AddMonths(1);
+        public DateTime ExpDate { get; set; }
+
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
     }
 }

@@ -15,6 +15,7 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
     public class AuthenticationController : ControllerBase
     {
         public static User user = new User();
+        public static PasswordInfo userPassword = new PasswordInfo();
         public static UserToken UserToken = new UserToken();
 
         private readonly ApplicationDbContext _context;
@@ -26,8 +27,6 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
         }
 
 
-        // GET: api/<AuthenticationController>
-
         [HttpGet]
         public async Task<ActionResult<List<User>>> Get()
         {
@@ -35,31 +34,23 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
 
         }
 
-        // POST api/<AuthenticationController>
         [HttpPost]
         [Route("register")]
         public async Task<ActionResult<List<User>>> Register([FromBody] UserDto userDto)
         {
-            var userExists = await _context.Users.SingleOrDefaultAsync(mytable => mytable.Email == userDto.Email);
+            var userExists = await _context.Users.SingleOrDefaultAsync(mytable => mytable.UserEmail == userDto.Email);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode=400, Status = "Error", Message = "User already exists!" });
+           
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            user.Email = userDto.Email;
-            user.Password = passwordHash;
-            user.PasswordSalt = passwordSalt;
-            
+            user.UserEmail = userDto.Email;
 
+            userPassword.Password = passwordHash;
+            userPassword.PasswordSalt = passwordSalt;
+            userPassword.UserEmail = userDto.Email;
             _context.Users.Add(user);
-
-            var newUser = await _context.Users.SingleOrDefaultAsync(mytable => mytable.Email == userDto.Email);
-            
-            string token = CreateToken(newUser);
-
-            UserToken.Token = token;
-            UserToken.UserId = newUser.UserId;
-            _context.UserTokens.Add(UserToken);
+            _context.PasswordInfos.Add(userPassword);
             await _context.SaveChangesAsync();
-
             return Ok(new Response {StatusCode=200, Status = "Success", Message = "User created successfully!" });
         }
 
@@ -67,12 +58,30 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
         [Route("login")]
         public async Task<ActionResult<List<User>>> Login([FromBody] UserDto userDto)
         {
-            var user_param = await _context.Users.SingleOrDefaultAsync(mytable => mytable.Email == userDto.Email);
+            var user_param = await _context.PasswordInfos.SingleOrDefaultAsync(p => p.UserEmail == userDto.Email);
             if (user_param == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Username or password is incorrect" });
             if (VerifyPasswordHash(userDto.Password, user_param.Password, user_param.PasswordSalt))
             {
-                return Ok(new Response {StatusCode=200, Status = "Success", Message = "Login Succesfull" });
+                var loginUser = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == userDto.Email);
+                string token = CreateToken(loginUser);
+
+                var controlToken = await _context.UserTokens.SingleOrDefaultAsync(p => p.UserId == loginUser.UserId);
+                if (controlToken == null)
+                {
+                    UserToken.Token = token;
+                    UserToken.UserId = loginUser.UserId;
+                    UserToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
+                    _context.UserTokens.Add(UserToken);
+                }
+                else
+                {
+                    controlToken.Token = token;
+                    controlToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
+                    controlToken.ModifiedDate = DateTime.UtcNow;
+                }
+                await _context.SaveChangesAsync();
+                return Ok(new LoginResponse {StatusCode=200, Status = "Success", Message = "Login Succesfull", Token = token });
             }
             else
             {
@@ -103,7 +112,7 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email)
+                new Claim(ClaimTypes.Name, user.UserEmail)
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
                 _configuration.GetSection("AppSettings:Token").Value));
@@ -116,7 +125,7 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
                 signingCredentials: creds
                 );
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
+           
             return jwt;
         }
     }
