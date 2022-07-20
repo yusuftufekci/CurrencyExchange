@@ -43,8 +43,10 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode=400, Status = "Error", Message = "User already exists!" });
            
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            user.UserEmail = userDto.Email;
+            var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
+            user.UserEmail = userDto.Email;
+            user.IpAdress = remoteIpAddress;
             userPassword.Password = passwordHash;
             userPassword.PasswordSalt = passwordSalt;
             userPassword.UserEmail = userDto.Email;
@@ -65,8 +67,11 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
             {
                 var loginUser = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == userDto.Email);
                 string token = CreateToken(loginUser);
+                var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
 
                 var controlToken = await _context.UserTokens.SingleOrDefaultAsync(p => p.UserId == loginUser.UserId);
+                loginUser.IpAdress = remoteIpAddress;
                 if (controlToken == null)
                 {
                     UserToken.Token = token;
@@ -128,5 +133,7 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
            
             return jwt;
         }
+
+
     }
 }
