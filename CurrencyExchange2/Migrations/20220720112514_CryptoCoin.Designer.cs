@@ -4,6 +4,7 @@ using CurrencyExchange2.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurrencyExchange2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220720112514_CryptoCoin")]
+    partial class CryptoCoin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,72 +23,6 @@ namespace CurrencyExchange2.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("CurrencyExchange2.Model.Account.Account", b =>
-                {
-                    b.Property<int>("AccountId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AccountId"), 1L, 1);
-
-                    b.Property<string>("AccountName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("BalanceId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AccountId");
-
-                    b.ToTable("Accounts");
-                });
-
-            modelBuilder.Entity("CurrencyExchange2.Model.Account.Balance", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
-
-                    b.Property<double>("ARPA")
-                        .HasColumnType("float");
-
-                    b.Property<double>("BTC")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("DOGE")
-                        .HasColumnType("float");
-
-                    b.Property<double>("ETH")
-                        .HasColumnType("float");
-
-                    b.Property<double>("ICP")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("USDT")
-                        .HasColumnType("float");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Balances");
-                });
 
             modelBuilder.Entity("CurrencyExchange2.Model.Authentication.PasswordInfo", b =>
                 {

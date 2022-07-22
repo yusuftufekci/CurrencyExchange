@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CurrencyExchange2.Model.Authentication
+namespace CurrencyExchange2.Requests
 {
     public class UserDto
     {

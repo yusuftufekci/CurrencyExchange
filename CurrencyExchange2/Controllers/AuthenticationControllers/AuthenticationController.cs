@@ -1,5 +1,7 @@
 ﻿using CurrencyExchange2.Model.Authentication;
+using CurrencyExchange2.Requests;
 using CurrencyExchange2.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,7 +20,7 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
         public static PasswordInfo userPassword = new PasswordInfo();
         public static UserToken UserToken = new UserToken();
 
-        private readonly ApplicationDbContext _context;
+        public readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
         public AuthenticationController( ApplicationDbContext context, IConfiguration configuration)
         {
@@ -57,6 +59,7 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("login")]
         public async Task<ActionResult<List<User>>> Login([FromBody] UserDto userDto)
         {
@@ -72,6 +75,7 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
 
                 var controlToken = await _context.UserTokens.SingleOrDefaultAsync(p => p.UserId == loginUser.UserId);
                 loginUser.IpAdress = remoteIpAddress;
+                loginUser.ModifiedDate = DateTime.UtcNow;
                 if (controlToken == null)
                 {
                     UserToken.Token = token;
