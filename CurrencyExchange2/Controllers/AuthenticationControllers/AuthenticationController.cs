@@ -27,8 +27,7 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
             _configuration = configuration;
             _context = context;
         }
-
-
+   
         [HttpGet]
         public async Task<ActionResult<List<User>>> Get()
         {

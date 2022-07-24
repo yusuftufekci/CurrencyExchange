@@ -7,8 +7,9 @@ namespace CurrencyExchange2.Model.Account
         [Key]
         public int AccountId { get; set; }
         public string AccountName { get; set; }
-        public int? BalanceId { get; set; } = null;
         public int UserId { get; set; }
+        public ICollection<Balance> Balances { get; set; }
+
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
     }

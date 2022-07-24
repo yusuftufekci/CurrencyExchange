@@ -17,12 +17,13 @@ namespace CurrencyExchange2.Data
 
         public DbSet<PasswordInfo> PasswordInfos { get; set; }
 
-        public DbSet<CryptoCoin> CryptoCoins { get; set; }
+        public DbSet<CoinPrice> CryptoCoinPrices { get; set; }
 
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<Balance> Balances { get; set; }
 
+        public DbSet<CoinType> CoinTypes { get; set; }
 
     }
 }
