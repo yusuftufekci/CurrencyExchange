@@ -14,7 +14,7 @@ namespace CurrencyExchange2.Requests
         [Required(ErrorMessage = "Please enter the coin name you want to buy")]
         public string BuyWİthThisCoin { get; set; }
 
-        [Required(ErrorMessage = "User email is required")]
+        [Required(ErrorMessage = "Amount is required")]
         [RegularExpression(@"^\d+(.\d{1,2})?$")]
         public double Amount { get; set; }
 
