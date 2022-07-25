@@ -19,22 +19,14 @@ namespace CurrencyExchange2.Controllers.AccountControllers
             _context = context;
 
         }
-        // GET: AccountController
-        [HttpGet]
-        public async Task<ActionResult<List<Account>>> Get()
-        {
-            return Ok(await _context.Accounts.ToListAsync());
-
-        }
 
         [HttpPost]
         [Route("CreateAccount")]
-        public async Task<ActionResult<List<Account>>> CreateAccount([FromBody] CreateAccount account, [FromHeader] string token)
+        public async Task<ActionResult<List<Response>>> CreateAccount([FromBody] CreateAccount account, [FromHeader] string token)
         {
-            var tokenExist = await _context.UserTokens.SingleOrDefaultAsync(p => p.Token == token);
-            if (tokenExist == null)
+            if (await _context.UserTokens.SingleOrDefaultAsync(p => p.Token == token) == null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Invalid Token!" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 401, Status = "Error", Message = "Invalid Token!" });
             }
             var userExists = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == account.UserEmail);
             if (userExists == null)
@@ -49,11 +41,11 @@ namespace CurrencyExchange2.Controllers.AccountControllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Account created successfully!" });
+                return Ok(new Response { StatusCode = 201, Status = "Success", Message = "Account created successfully!" });
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Already Have An Account" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 409, Status = "Error", Message = "Already Have An Account" });
             }
 
         }
@@ -62,18 +54,18 @@ namespace CurrencyExchange2.Controllers.AccountControllers
 
         [HttpPost]
         [Route("DepositFunds")]
-        public async Task<ActionResult<List<Account>>> DepositFunds([FromBody] DepositFunds depositFund, [FromHeader] string token)
+        public async Task<ActionResult<List<Response>>> DepositFunds([FromBody] DepositFunds depositFund, [FromHeader] string token)
         {
             var tokenExist = await _context.UserTokens.SingleOrDefaultAsync(p => p.Token == token);
             if (tokenExist == null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Invalid Token!" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 401, Status = "Error", Message = "Invalid Token!" });
             }
 
             var userExists = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == depositFund.UserEmail);
             var accountExist = await _context.Accounts.SingleOrDefaultAsync(p => p.UserId == userExists.UserId);
             if (userExists == null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Account doesnt exist" }); 
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "Account doesnt exist" }); 
 
             var balanceExist = await _context.Balances.SingleOrDefaultAsync(p => p.Account == accountExist && p.CoinName=="USDT");
             if (balanceExist != null)

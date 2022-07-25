@@ -8,6 +8,8 @@ namespace CurrencyExchange2.Model.Account
         public int BalanceId { get; set; }
         public int CoinId { get; set; }
         public string CoinName { get; set; }
+
+        [RegularExpression(@"^\d+(.\d{1,2})?$")]
         public double TotalBalance { get; set; } = 0;
         public Account Account { get; set; }
 

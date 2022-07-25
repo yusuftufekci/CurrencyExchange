@@ -29,7 +29,7 @@ namespace CurrencyExchange2.Controllers.CoinControllers
 
         [HttpGet]
         [Route("CoinPrices")]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult<List<Response>>> CoinPrices()
         {
             var coinPrice = new CoinPrice();
 
@@ -49,6 +49,8 @@ namespace CurrencyExchange2.Controllers.CoinControllers
                         {
                             _context.CryptoCoinPrices.Add(item);
                         }
+                        await _context.SaveChangesAsync();
+                        return Ok(new Response { StatusCode = 201, Status = "Success", Message = "Coin List successfully added!" });
                     }
                     else
                     {
@@ -63,23 +65,24 @@ namespace CurrencyExchange2.Controllers.CoinControllers
                                 }     
                                 
                         }
+                        await _context.SaveChangesAsync();
+                        return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Coin List successfully added!" });
 
                     }      
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Can't Reach api" });
+                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 500 , Status = "Error", Message = "Can't Reach api" });
 
                 }
             }
-            await _context.SaveChangesAsync();
-            return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Coin List successfully added!" });
+            
 
         }
         [HttpGet]
         [Route("CoinList")]
 
-        public async Task<ActionResult> LoadCoin()
+        public async Task<ActionResult<List<Response>>> LoadCoin()
         {
             using (var client = new HttpClient())
             {
@@ -119,7 +122,7 @@ namespace CurrencyExchange2.Controllers.CoinControllers
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Can't Reach api" });
+                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 500, Status = "Error", Message = "Can't Reach api" });
 
                 }
                
@@ -127,31 +130,6 @@ namespace CurrencyExchange2.Controllers.CoinControllers
             await _context.SaveChangesAsync();
             return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Coin List successfully added!" });
         }
-
-
-        //// GET: Coin/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null || _context.CoinPrice == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var coinPrice = await _context.CoinPrice
-        //        .FirstOrDefaultAsync(m => m.CoinId == id);
-        //    if (coinPrice == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(coinPrice);
-        //}
-
-        //// GET: Coin/Create
-        //public IActionResult Create()
-        //{
-        //    return View();
-        //}
 
     }
 }

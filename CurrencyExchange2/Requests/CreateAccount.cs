@@ -4,7 +4,7 @@ namespace CurrencyExchange2.Requests
 {
     public class CreateAccount
     {
-        [Required]
+        [Required(ErrorMessage = "Account name is required")]
         public string AccountName { get; set; }
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress]

@@ -37,11 +37,11 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<ActionResult<List<User>>> Register([FromBody] UserDto userDto)
+        public async Task<ActionResult<List<Response>>> Register([FromBody] UserDto userDto)
         {
             var userExists = await _context.Users.SingleOrDefaultAsync(mytable => mytable.UserEmail == userDto.Email);
             if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode=400, Status = "Error", Message = "User already exists!" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode= 409, Status = "Error", Message = "User already exists!" });
            
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
             var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
@@ -54,13 +54,13 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
             _context.Users.Add(user);
             _context.PasswordInfos.Add(userPassword);
             await _context.SaveChangesAsync();
-            return Ok(new Response {StatusCode=200, Status = "Success", Message = "User created successfully!" });
+            return Ok(new Response {StatusCode= 201, Status = "Success", Message = "User created successfully!" });
         }
 
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public async Task<ActionResult<List<User>>> Login([FromBody] UserDto userDto)
+        public async Task<ActionResult<List<LoginResponse>>> Login([FromBody] UserDto userDto)
         {
             var user_param = await _context.PasswordInfos.SingleOrDefaultAsync(p => p.UserEmail == userDto.Email);
             if (user_param == null)
