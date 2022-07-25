@@ -15,50 +15,50 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
         }
         [HttpPost]
         [Route("BuyCoin")]
-        public async Task<ActionResult<List<Response>>> BuyCoin([FromBody] BuyCoin BuyCoins, [FromHeader] string token)
+        public async Task<ActionResult<List<Response>>> BuyCoin([FromBody] BuyCoin buyCoins, [FromHeader] string token)
         {
             if (await _context.UserTokens.SingleOrDefaultAsync(p => p.Token == token) == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 401, Status = "Error", Message = "Invalid Token!" });
             }
-            var userExist = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == BuyCoins.UserEmail);
+            var userExist = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == buyCoins.UserEmail);
 
             if (userExist == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "User doesnt exist" });
-            if (BuyCoins.Amount < 0.001)
+            if (buyCoins.Amount < 0.001)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "You cannot trade with this amount " });
 
             }
-            if (BuyCoins.Amount<=0)
+            if (buyCoins.Amount<=0)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Amount should be greater than 0" });
 
-            string symbolOfCoins = BuyCoins.CoinToBuy + BuyCoins.BuyWİthThisCoin;
+            string symbolOfCoins = buyCoins.CoinToBuy + buyCoins.BuyWİthThisCoin;
             if (await _context.CryptoCoinPrices.SingleOrDefaultAsync(p => p.symbol == symbolOfCoins) == null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "You cant buy " +BuyCoins.CoinToBuy +" with " + BuyCoins.BuyWİthThisCoin });
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "You cant buy " +buyCoins.CoinToBuy +" with " + buyCoins.BuyWİthThisCoin });
             }
             var accountExist = await _context.Accounts.SingleOrDefaultAsync(p => p.UserId == userExist.UserId);
             if (accountExist == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "Account Doesnt Exist" });
 
 
-            var balanceExist = await _context.Balances.SingleOrDefaultAsync(p => p.CoinName == BuyCoins.BuyWİthThisCoin && p.Account==accountExist);
+            var balanceExist = await _context.Balances.SingleOrDefaultAsync(p => p.CoinName == buyCoins.BuyWİthThisCoin && p.Account==accountExist);
             if (balanceExist == null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "You dont have any" + BuyCoins.BuyWİthThisCoin });
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "You dont have any" + buyCoins.BuyWİthThisCoin });
             }
             var coinTypeToBuy = await _context.CryptoCoinPrices.SingleOrDefaultAsync(p => p.symbol == symbolOfCoins);
             double coinPrice = Convert.ToDouble(coinTypeToBuy.price);
-            double totalAmount = coinPrice * BuyCoins.Amount;
+            double totalAmount = coinPrice * buyCoins.Amount;
             if (totalAmount <= 0.001)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "You can't buy this amount of coin" });
             if (totalAmount > balanceExist.TotalBalance)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "You dont have enough" + BuyCoins.BuyWİthThisCoin });
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "You dont have enough" + buyCoins.BuyWİthThisCoin });
             }
-            var balanceExistForBuyCoin = await _context.Balances.SingleOrDefaultAsync(p => p.Account == accountExist && p.CoinName == BuyCoins.CoinToBuy);
-            var coinToBuy = await _context.CoinTypes.SingleOrDefaultAsync(p => p.CoinName == BuyCoins.CoinToBuy);
+            var balanceExistForBuyCoin = await _context.Balances.SingleOrDefaultAsync(p => p.Account == accountExist && p.CoinName == buyCoins.CoinToBuy);
+            var coinToBuy = await _context.CoinTypes.SingleOrDefaultAsync(p => p.CoinName == buyCoins.CoinToBuy);
 
             if (balanceExistForBuyCoin == null)
             {
@@ -66,16 +66,16 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
 
 
                 balanceExist.TotalBalance -= totalAmount;
-                tempBalance.CoinName = BuyCoins.CoinToBuy;
+                tempBalance.CoinName = buyCoins.CoinToBuy;
                 tempBalance.Account = accountExist;
-                tempBalance.TotalBalance = BuyCoins.Amount;
+                tempBalance.TotalBalance = buyCoins.Amount;
                 tempBalance.CoinId = coinToBuy.CoinId;
                 _context.Balances.Add(tempBalance);
 
             }
             else
             {
-                balanceExistForBuyCoin.TotalBalance += BuyCoins.Amount;
+                balanceExistForBuyCoin.TotalBalance += buyCoins.Amount;
                 balanceExist.TotalBalance -= totalAmount;
                 balanceExist.ModifiedDate = DateTime.UtcNow;
             }
@@ -84,7 +84,7 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
 
            
             _context.SaveChanges();
-            return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Successfully Bought !" + BuyCoins.CoinToBuy });
+            return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Successfully Bought !" + buyCoins.CoinToBuy });
 
         }
 
