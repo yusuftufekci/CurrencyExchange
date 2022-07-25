@@ -50,14 +50,11 @@ namespace CurrencyExchange2.Controllers.AccountControllers
 
         }
 
-
-
         [HttpPost]
         [Route("DepositFunds")]
         public async Task<ActionResult<List<Response>>> DepositFunds([FromBody] DepositFunds depositFund, [FromHeader] string token)
         {
-            var tokenExist = await _context.UserTokens.SingleOrDefaultAsync(p => p.Token == token);
-            if (tokenExist == null)
+            if (await _context.UserTokens.SingleOrDefaultAsync(p => p.Token == token) == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 401, Status = "Error", Message = "Invalid Token!" });
             }

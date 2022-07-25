@@ -39,22 +39,28 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
         [Route("register")]
         public async Task<ActionResult<List<Response>>> Register([FromBody] UserDto userDto)
         {
-            var userExists = await _context.Users.SingleOrDefaultAsync(mytable => mytable.UserEmail == userDto.Email);
-            if (userExists != null)
+            if (await _context.Users.SingleOrDefaultAsync(mytable => mytable.UserEmail == userDto.Email) != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode= 409, Status = "Error", Message = "User already exists!" });
            
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
             var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            if (remoteIpAddress != null)
+            {
+                user.UserEmail = userDto.Email;
+                user.IpAdress = remoteIpAddress;
+                userPassword.Password = passwordHash;
+                userPassword.PasswordSalt = passwordSalt;
+                userPassword.UserEmail = userDto.Email;
+                _context.Users.Add(user);
+                _context.PasswordInfos.Add(userPassword);
+                await _context.SaveChangesAsync();
+                return Ok(new Response { StatusCode = 201, Status = "Success", Message = "User created successfully!" });
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Can't get user IpAddress" });
 
-            user.UserEmail = userDto.Email;
-            user.IpAdress = remoteIpAddress;
-            userPassword.Password = passwordHash;
-            userPassword.PasswordSalt = passwordSalt;
-            userPassword.UserEmail = userDto.Email;
-            _context.Users.Add(user);
-            _context.PasswordInfos.Add(userPassword);
-            await _context.SaveChangesAsync();
-            return Ok(new Response {StatusCode= 201, Status = "Success", Message = "User created successfully!" });
+            }
         }
 
         [HttpPost]
