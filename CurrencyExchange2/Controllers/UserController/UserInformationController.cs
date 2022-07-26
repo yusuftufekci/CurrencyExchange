@@ -43,9 +43,8 @@ namespace CurrencyExchange2.Controllers.UserController
 
             }
 
-            return Ok(new UserInformation { StatusCode = 200, Status = "Success", Message = "Login Succesfull", UserEmail = userEmailAddress, UserAccountName=userAccountName, UserBalances= userBalancesInfos });
+            return Ok(new UserInformation { StatusCode = 200, Status = "Success", Message = "Succesfull", UserEmail = userEmailAddress, UserAccountName=userAccountName, UserBalances= userBalancesInfos });
 
-            //Balance[] balances = new Balance[];
         }
     }
 }
