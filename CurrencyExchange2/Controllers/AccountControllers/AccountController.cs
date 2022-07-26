@@ -74,11 +74,17 @@ namespace CurrencyExchange2.Controllers.AccountControllers
 
             }
             Balance tempBalance = new Balance();
+            UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
+            tempUserBalanceHistory.Account = accountExist;
+            tempUserBalanceHistory.MessageForChanging = depositFund.TotalBalance + " USDT deposit into the account";
+            tempUserBalanceHistory.ChangedAmount = depositFund.TotalBalance;
+            tempUserBalanceHistory.ExchangedCoinName = "USDT";
             tempBalance.CoinName = "USDT";
             tempBalance.Account = accountExist;
             tempBalance.TotalBalance = depositFund.TotalBalance;
             tempBalance.CoinId = 3;
             _context.Balances.Add(tempBalance);
+            _context.UserBalanceHistories.Add(tempUserBalanceHistory);
 
             await _context.SaveChangesAsync();
             return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Deposit Funded successfully!" });

@@ -51,6 +51,7 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
             var coinTypeToBuy = await _context.CryptoCoinPrices.SingleOrDefaultAsync(p => p.symbol == symbolOfCoins);
             double coinPrice = Convert.ToDouble(coinTypeToBuy.price);
             double totalAmount = coinPrice * buyCoins.Amount;
+            totalAmount = Math.Round(totalAmount, 4);
             if (totalAmount <= 0.001)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "You can't buy this amount of coin" });
             if (totalAmount > balanceExist.TotalBalance)
@@ -63,6 +64,7 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
             if (balanceExistForBuyCoin == null)
             {
                 Balance tempBalance = new Balance();
+                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
 
 
                 balanceExist.TotalBalance -= totalAmount;
@@ -70,19 +72,40 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
                 tempBalance.Account = accountExist;
                 tempBalance.TotalBalance = buyCoins.Amount;
                 tempBalance.CoinId = coinToBuy.CoinId;
+
+                tempUserBalanceHistory.Account = accountExist;
+                tempUserBalanceHistory.MessageForChanging = buyCoins.Amount +" "+ buyCoins.CoinToBuy + " deposit into the account";
+                tempUserBalanceHistory.ChangedAmount = buyCoins.Amount;
+                tempUserBalanceHistory.ExchangedCoinName = buyCoins.CoinToBuy;
+
+
+                _context.UserBalanceHistories.Add(tempUserBalanceHistory);
                 _context.Balances.Add(tempBalance);
+
+
+
 
             }
             else
             {
+                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
+
                 balanceExistForBuyCoin.TotalBalance += buyCoins.Amount;
                 balanceExist.TotalBalance -= totalAmount;
                 balanceExist.ModifiedDate = DateTime.UtcNow;
+
+                tempUserBalanceHistory.Account = accountExist;
+                tempUserBalanceHistory.MessageForChanging = buyCoins.Amount + " " + buyCoins.CoinToBuy + " deposit into the account";
+                tempUserBalanceHistory.ChangedAmount = buyCoins.Amount;
+                tempUserBalanceHistory.ExchangedCoinName = buyCoins.CoinToBuy;
+                _context.UserBalanceHistories.Add(tempUserBalanceHistory);
+
+
             }
 
 
 
-           
+
             _context.SaveChanges();
             return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Successfully Bought !" + buyCoins.CoinToBuy });
 
@@ -129,6 +152,8 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
 
             double coinPrice = Convert.ToDouble(coinTypeToBuy.price);
             double totalAmount = BuyCoinsv2.Amount / coinPrice ;
+            totalAmount = Math.Round(totalAmount, 4);
+
             if (totalAmount <= 0.001)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "You can't buy this amount of coin" });
 
@@ -142,6 +167,7 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
             if (balanceExistForBuyCoin == null)
             {
                 Balance tempBalance = new Balance();
+                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
 
 
                 balanceExist.TotalBalance -= BuyCoinsv2.Amount;
@@ -149,22 +175,38 @@ namespace CurrencyExchange2.Controllers.TransactionControllers
                 tempBalance.Account = accountExist;
                 tempBalance.TotalBalance = totalAmount;
                 tempBalance.CoinId = coinToBuy.CoinId;
+
+                tempUserBalanceHistory.Account = accountExist;
+                tempUserBalanceHistory.MessageForChanging = totalAmount + " " + BuyCoinsv2.CoinToBuy + " deposit into the account";
+                tempUserBalanceHistory.ChangedAmount = totalAmount;
+                tempUserBalanceHistory.ExchangedCoinName = BuyCoinsv2.CoinToBuy;
+
+
+
                 _context.Balances.Add(tempBalance);
+                _context.UserBalanceHistories.Add(tempUserBalanceHistory);
+
 
             }
             else
             {
+                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
+
                 balanceExistForBuyCoin.TotalBalance += totalAmount;
                 balanceExist.TotalBalance -= BuyCoinsv2.Amount;
                 balanceExist.ModifiedDate = DateTime.UtcNow;
+
+
+                tempUserBalanceHistory.Account = accountExist;
+                tempUserBalanceHistory.MessageForChanging = totalAmount + " " + BuyCoinsv2.CoinToBuy + " deposit into the account";
+                tempUserBalanceHistory.ChangedAmount = totalAmount;
+                tempUserBalanceHistory.ExchangedCoinName = BuyCoinsv2.CoinToBuy;
+                _context.UserBalanceHistories.Add(tempUserBalanceHistory);
+
+
             }
-
-
-
-
             _context.SaveChanges();
             return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Successfully Bought !" + BuyCoinsv2.CoinToBuy });
-
         }
     
 }

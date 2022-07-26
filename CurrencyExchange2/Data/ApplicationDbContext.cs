@@ -22,8 +22,8 @@ namespace CurrencyExchange2.Data
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<Balance> Balances { get; set; }
-
         public DbSet<CoinType> CoinTypes { get; set; }
+        public DbSet<UserBalanceHistory> UserBalanceHistories { get; set; }
 
     }
 }

@@ -5,6 +5,7 @@ namespace CurrencyExchange2.Requests
     public class BuyCoin
     {
         [Required(ErrorMessage = "User email is required")]
+        [EmailAddress]
         public string UserEmail { get; set; }
 
 

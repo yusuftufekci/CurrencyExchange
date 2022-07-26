@@ -2,7 +2,7 @@
 
 namespace CurrencyExchange2.Model.Account
 {
-    public class UserBalancesInfo
+    public class UserBalances
     {
         public string CoinName { get; set; }
 

@@ -4,6 +4,7 @@ using CurrencyExchange2.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurrencyExchange2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220726103335_AddedUserBalanceHistoryTable")]
+    partial class AddedUserBalanceHistoryTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,35 +82,6 @@ namespace CurrencyExchange2.Migrations
                     b.HasIndex("AccountId");
 
                     b.ToTable("Balances");
-                });
-
-            modelBuilder.Entity("CurrencyExchange2.Model.Account.UserBalanceHistory", b =>
-                {
-                    b.Property<int>("BalanceHistoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BalanceHistoryId"), 1L, 1);
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("ChangedAmount")
-                        .HasColumnType("float");
-
-                    b.Property<string>("ExchangedCoinName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MessageForChanging")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("BalanceHistoryId");
-
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("UserBalanceHistories");
                 });
 
             modelBuilder.Entity("CurrencyExchange2.Model.Authentication.PasswordInfo", b =>
@@ -244,17 +217,6 @@ namespace CurrencyExchange2.Migrations
                 {
                     b.HasOne("CurrencyExchange2.Model.Account.Account", "Account")
                         .WithMany("Balances")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
-            modelBuilder.Entity("CurrencyExchange2.Model.Account.UserBalanceHistory", b =>
-                {
-                    b.HasOne("CurrencyExchange2.Model.Account.Account", "Account")
-                        .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
