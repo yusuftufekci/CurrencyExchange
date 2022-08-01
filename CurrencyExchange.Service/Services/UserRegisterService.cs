@@ -36,41 +36,47 @@ namespace CurrencyExchange.Service.Services
             var user = await _userRepository.Where(p=>p.UserEmail==userLoginRequest.Email).SingleOrDefaultAsync();
 
             var user_param = await _passwordRepository.Where(p => p.User == user).SingleOrDefaultAsync();
-            
-            if (PasswordHash.VerifyPasswordHash(userLoginRequest.Password, user_param.PasswordHash, user_param.PasswordSalt))
+
+            if (user_param != null)
             {
-
-                string token = CreateToken.GenerateToken(user);
-
-
-                var controlToken = await _tokenRepository.Where(p => p.UserId == user.Id).SingleOrDefaultAsync();
-                user.IpAddress = userLoginRequest.IpAdress;
-                user.ModifiedDate = DateTime.UtcNow;
-                if (controlToken == null)
+                if (PasswordHash.VerifyPasswordHash(userLoginRequest.Password, user_param.PasswordHash, user_param.PasswordSalt))
                 {
-                    UserToken userToken = new UserToken();
-                    userToken.Token = token;
-                    userToken.UserId = user.Id;
-                    userToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
-                    await _tokenRepository.AddAsync(userToken);
-                    await _UnitOfWork.CommitAsync();
 
-                    return CustomResponseDto<TokenDto>.Succes(201,new TokenDto { Token=token});
+                    string token = CreateToken.GenerateToken(user);
+
+
+                    var controlToken = await _tokenRepository.Where(p => p.UserId == user.Id).SingleOrDefaultAsync();
+                    user.IpAddress = userLoginRequest.IpAdress;
+                    user.ModifiedDate = DateTime.UtcNow;
+                    if (controlToken == null)
+                    {
+                        UserToken userToken = new UserToken();
+                        userToken.Token = token;
+                        userToken.UserId = user.Id;
+                        userToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
+                        await _tokenRepository.AddAsync(userToken);
+                        await _UnitOfWork.CommitAsync();
+
+                        return CustomResponseDto<TokenDto>.Succes(201, new TokenDto { Token = token });
+                    }
+                    else
+                    {
+                        controlToken.Token = token;
+                        controlToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
+                        controlToken.ModifiedDate = DateTime.UtcNow;
+
+                        await _UnitOfWork.CommitAsync();
+
+                        return CustomResponseDto<TokenDto>.Succes(201, new TokenDto { Token = token });
+
+                    }
                 }
-                else
-                {
-                    controlToken.Token = token;
-                    controlToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
-                    controlToken.ModifiedDate = DateTime.UtcNow;
-
-                    await _UnitOfWork.CommitAsync();
-
-                    return CustomResponseDto<TokenDto>.Succes(201, new TokenDto { Token = token });
-
-                }
+                return CustomResponseDto<TokenDto>.Fail(404, new List<string> { "Username or Password is wrong!" });
             }
-            return CustomResponseDto<TokenDto>.Fail(404, new List<string>{"Username or Password is wrong!"});
-
+            else
+            {
+                return CustomResponseDto<TokenDto>.Fail(404, new List<string> { "Username or Password is wrong!" });
+            }
         }
 
         public async Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest)

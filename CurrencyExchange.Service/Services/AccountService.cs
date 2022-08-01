@@ -1,5 +1,6 @@
 ﻿using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
+using CurrencyExchange.Core.Entities.CryptoCoins;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
@@ -21,9 +22,12 @@ namespace CurrencyExchange.Service.Services
         private readonly IAccountRepository _accountRepository;
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;
+        private readonly ICryptoCoinRepository _cryptoCoinRepository;
+
 
         public AccountService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
-            ITokenRepository tokenRepository, IUserBalanceHistoryRepository userBalanceHistoryRepository, IBalanceRepository balanceRepository)
+            ITokenRepository tokenRepository, IUserBalanceHistoryRepository userBalanceHistoryRepository,
+            IBalanceRepository balanceRepository, ICryptoCoinRepository cryptoCoinRepository)
         {
             _userRepository = repository;
             _UnitOfWork = unitOfWork;
@@ -31,11 +35,15 @@ namespace CurrencyExchange.Service.Services
             _tokenRepository = tokenRepository;
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
             _balanceRepository = balanceRepository;
+            _cryptoCoinRepository = cryptoCoinRepository;
         }
         public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest)
         {
             var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
-
+            if (userExist == null)
+            {
+                return CustomResponseDto<NoContentDto>.Fail(404,"Email address not found");
+            }
             Account tempAccount = new Account();
 
             tempAccount.AccountName = createAccountRequest.AccountName;
@@ -50,17 +58,26 @@ namespace CurrencyExchange.Service.Services
             Balance tempBalance = new Balance();
             UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
             var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
+            if (userExist == null)
+            {
+                return CustomResponseDto<NoContentDto>.Fail(404, "Email address not found");
+            }
             var accountExist = await _accountRepository.Where(p => p.UserId == userExist.Id).SingleOrDefaultAsync();
-
+            if (accountExist == null)
+            {
+                return CustomResponseDto<NoContentDto>.Fail(404, "Account Not found");
+            }
             tempUserBalanceHistory.Account = accountExist;
             tempUserBalanceHistory.MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account";
             tempUserBalanceHistory.ChangedAmount = createAccountRequest.TotalBalance;
             tempUserBalanceHistory.ExchangedCoinName = "USDT";
-            tempBalance.CryptoCoin.CoinName = "USDT";
+
+            var usdt = await _cryptoCoinRepository.Where(p => p.CoinName == "USDT").SingleOrDefaultAsync();
+            tempBalance.CryptoCoin = usdt;
             tempBalance.Account = accountExist;
             tempBalance.TotalBalance = createAccountRequest.TotalBalance;
-            tempBalance.CryptoCoinId = 3;
-            
+            // tempBalance.CryptoCoinId = 3;
+
             await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             await _balanceRepository.AddAsync(tempBalance);
             await _UnitOfWork.CommitAsync();

@@ -19,24 +19,31 @@ namespace CurrencyExchange.Service.Services
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;
         private readonly IUnitOfWork _UnitOfWork;
+        private readonly ICryptoCoinRepository _cryptoCoinRepository;
 
-        public UserInformationService(IUserRepository userRepository, IAccountRepository accountRepository, IUserBalanceHistoryRepository userBalanceHistoryRepository, IBalanceRepository balanceRepository, IUnitOfWork unitOfWork)
+        public UserInformationService(IUserRepository userRepository, IAccountRepository accountRepository,
+            IUserBalanceHistoryRepository userBalanceHistoryRepository, IBalanceRepository balanceRepository, IUnitOfWork unitOfWork, ICryptoCoinRepository cryptoCoinRepository)
         {
             _userRepository = userRepository;
             _accountRepository = accountRepository;
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
             _balanceRepository = balanceRepository;
             _UnitOfWork = unitOfWork;
+            _cryptoCoinRepository = cryptoCoinRepository;
         }
 
-   
+
 
         public async Task<CustomResponseDto<UserInformationDto>> GetUserInformation(UserInformationRequest userInformationRequest)
         {
             var userExist = await _userRepository.Where(p => p.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
 
+            if (userExist == null)
+                return CustomResponseDto<UserInformationDto>.Fail(404, "User Not found");
 
             var accountExist = await _accountRepository.Where(p => p.UserId == userExist.Id).SingleOrDefaultAsync();
+            if (accountExist == null)
+                return CustomResponseDto<UserInformationDto>.Fail(404, "Account Not found");
 
             var balances = await _balanceRepository.Where(p => p.Account == accountExist).ToListAsync();
 
@@ -46,7 +53,9 @@ namespace CurrencyExchange.Service.Services
             {
                 BalanceDto userBalancesInfo = new BalanceDto();
                 userBalancesInfo.TotalAmount = item.TotalBalance;
-                userBalancesInfo.CryptoCoinName = item.CryptoCoin.CoinName;
+                var tempCoin = await _cryptoCoinRepository.Where(p => p.Id == item.CryptoCoinId).SingleOrDefaultAsync();
+
+                userBalancesInfo.CryptoCoinName = tempCoin.CoinName;
                 userBalancesInfos.Add(userBalancesInfo);
             }
             UserInformationDto userInformations = new UserInformationDto();
@@ -60,9 +69,15 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTranstactions(UserInformationRequest userInformationRequest)
         {
+
             var userExist = await _userRepository.Where(p => p.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
 
+            if (userExist == null)
+                return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail(404, "User Not found");
+
             var accountExist = await _accountRepository.Where(p => p.UserId == userExist.Id).SingleOrDefaultAsync();
+            if (accountExist == null)
+                return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail(404, "Account Not found");
 
             List<UserTransactionHistoryDto> userTransactionHistories = new List<UserTransactionHistoryDto>();
             var transactions = await _userBalanceHistoryRepository.Where(p => p.Account == accountExist).ToListAsync();
@@ -84,7 +99,13 @@ namespace CurrencyExchange.Service.Services
         {
             var userExist = await _userRepository.Where(p => p.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
 
+            if (userExist == null)
+                return CustomResponseDto<List<BalanceDto>>.Fail(404, "User Not found");
+
             var accountExist = await _accountRepository.Where(p => p.UserId == userExist.Id).SingleOrDefaultAsync();
+            if (accountExist == null)
+                return CustomResponseDto<List<BalanceDto>>.Fail(404, "Account Not found");
+
 
             var balances = await _balanceRepository.Where(p => p.Account == accountExist).ToListAsync();
 
@@ -94,7 +115,9 @@ namespace CurrencyExchange.Service.Services
             {
                 BalanceDto userBalancesInfo = new BalanceDto();
                 userBalancesInfo.TotalAmount = item.TotalBalance;
-                userBalancesInfo.CryptoCoinName = item.CryptoCoin.CoinName;
+                var tempCoin = await _cryptoCoinRepository.Where(p => p.Id == item.CryptoCoinId).SingleOrDefaultAsync();
+
+                userBalancesInfo.CryptoCoinName = tempCoin.CoinName;
                 userBalancesInfos.Add(userBalancesInfo);
 
             }

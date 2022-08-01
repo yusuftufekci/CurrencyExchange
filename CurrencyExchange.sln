@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.Repository
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.Service", "CurrencyExchange.Service\CurrencyExchange.Service.csproj", "{97953C65-C474-469F-9ADA-A511AF23BE32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.Cachgin", "CurrencyExchange.Cachgin\CurrencyExchange.Cachgin.csproj", "{F2F5936B-40D4-422C-A99E-1260036503C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.Caching", "CurrencyExchange.Cachgin\CurrencyExchange.Caching.csproj", "{F2F5936B-40D4-422C-A99E-1260036503C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyExchange.API", "CurrencyExchange.API\CurrencyExchange.API.csproj", "{D02F6C2B-A585-464C-AA2F-6C5ACB4A5B9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.API", "CurrencyExchange.API\CurrencyExchange.API.csproj", "{D02F6C2B-A585-464C-AA2F-6C5ACB4A5B9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
