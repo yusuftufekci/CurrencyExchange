@@ -18,7 +18,7 @@ namespace CurrencyExchange.API.Controllers.AuthenticationControllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> CreateUser(UserRegisterRequest userRegisterRequest)
+        public async Task<IActionResult> CreateUser([FromBody]UserRegisterRequest userRegisterRequest)
         { 
             userRegisterRequest.IpAdress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             return CreateActionResult(await _service.UserRegister(userRegisterRequest));

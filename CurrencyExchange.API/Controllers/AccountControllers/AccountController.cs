@@ -15,15 +15,15 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
             _service = service;
         }
         [HttpPost("CreateAccount")]
-        public async Task<IActionResult> CreateUser(CreateAccountRequest createAccountRequest)
+        public async Task<IActionResult> CreateUser(CreateAccountRequest createAccountRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.CreateAccount(createAccountRequest));
+            return CreateActionResult(await _service.CreateAccount(createAccountRequest, token));
         }
         [HttpPost("DepositFund")]
 
-        public async Task<IActionResult> DepositFund(DepositFundRequest depositFundRequest)
+        public async Task<IActionResult> DepositFund(DepositFundRequest depositFundRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.DepositFunds(depositFundRequest));
+            return CreateActionResult(await _service.DepositFunds(depositFundRequest, token));
         }
     }
 }

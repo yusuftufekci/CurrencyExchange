@@ -37,7 +37,7 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _cryptoCoinRepository = cryptoCoinRepository;
         }
-        public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest)
+        public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token)
         {
             var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
             if (userExist == null)
@@ -53,7 +53,7 @@ namespace CurrencyExchange.Service.Services
             return CustomResponseDto<NoContentDto>.Succes(201);
         }
 
-        public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest)
+        public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
         {
             Balance tempBalance = new Balance();
             UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();

@@ -16,20 +16,20 @@ namespace CurrencyExchange.API.Controllers.UserInformationControllers
         }
 
         [HttpPost("AllUserInformation")]
-        public async Task<IActionResult> GetAllUserInformation(UserInformationRequest userInformationRequest)
+        public async Task<IActionResult> GetAllUserInformation(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
             return CreateActionResult(await _service.GetUserInformation(userInformationRequest));
         }
 
         [HttpPost("AllTransactionsOfuser")]
-        public async Task<IActionResult> GetAllTranstactionsOfUser(UserInformationRequest userInformationRequest)
+        public async Task<IActionResult> GetAllTranstactionsOfUser(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
             return CreateActionResult(await _service.GetUserTranstactions(userInformationRequest));
         }
 
 
         [HttpPost("BalanceInformationOfUser")]
-        public async Task<IActionResult> GetAllBalancesOfUser(UserInformationRequest userInformationRequest)
+        public async Task<IActionResult> GetAllBalancesOfUser(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
             return CreateActionResult(await _service.GetUserBalanceInformation(userInformationRequest));
         }
