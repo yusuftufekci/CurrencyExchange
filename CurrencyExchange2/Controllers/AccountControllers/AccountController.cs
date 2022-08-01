@@ -1,9 +1,10 @@
-﻿using CurrencyExchange2.Model.Account;
+﻿using CurrencyExchange.Repository;
+using CurrencyExchange2.Model.Account;
 using CurrencyExchange2.Requests;
 using CurrencyExchange2.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Serilog;
 namespace CurrencyExchange2.Controllers.AccountControllers
 {
 
@@ -13,11 +14,11 @@ namespace CurrencyExchange2.Controllers.AccountControllers
     {
 
         public readonly ApplicationDbContext _context;
-
-        public AccountController(ApplicationDbContext context)
+        private readonly ILogger<AccountController> _logger;
+        public AccountController(ApplicationDbContext context, ILogger<AccountController> _logger)
         {
             _context = context;
-
+            this._logger = _logger;
         }
 
         [HttpPost]
@@ -32,12 +33,12 @@ namespace CurrencyExchange2.Controllers.AccountControllers
             if (userExists == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Invalid Mail Adress!" });
 
-            if ( await _context.Accounts.SingleOrDefaultAsync(p => p.UserId == userExists.UserId) == null){
+            if ( await _context.Accounts.SingleOrDefaultAsync(p => p.UserId == userExists.Id) == null){
                 Account tempAccount = new Account();
 
                 tempAccount.AccountName = account.AccountName;
-                tempAccount.UserId = userExists.UserId;
-                _context.Accounts.Add(tempAccount);
+                tempAccount.UserId = userExists.Id;
+                //_context.Accounts.Add(tempAccount);
 
                 await _context.SaveChangesAsync();
 
@@ -54,17 +55,18 @@ namespace CurrencyExchange2.Controllers.AccountControllers
         [Route("DepositFunds")]
         public async Task<ActionResult<List<Response>>> DepositFunds([FromBody] DepositFunds depositFund, [FromHeader] string token)
         {
+
             if (await _context.UserTokens.SingleOrDefaultAsync(p => p.Token == token) == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 401, Status = "Error", Message = "Invalid Token!" });
             }
 
             var userExists = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == depositFund.UserEmail);
-            var accountExist = await _context.Accounts.SingleOrDefaultAsync(p => p.UserId == userExists.UserId);
+            var accountExist = await _context.Accounts.SingleOrDefaultAsync(p => p.UserId == userExists.Id);
             if (userExists == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "Account doesnt exist" }); 
 
-            var balanceExist = await _context.Balances.SingleOrDefaultAsync(p => p.Account == accountExist && p.CoinName=="USDT");
+            var balanceExist = await _context.Balances.SingleOrDefaultAsync(p => p.Account == accountExist && p.CryptoCoin.CoinName=="USDT");
             if (balanceExist != null)
             {
                 balanceExist.TotalBalance += depositFund.TotalBalance;
@@ -75,18 +77,20 @@ namespace CurrencyExchange2.Controllers.AccountControllers
             }
             Balance tempBalance = new Balance();
             UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
-            tempUserBalanceHistory.Account = accountExist;
+            //tempUserBalanceHistory.Account = accountExist;
             tempUserBalanceHistory.MessageForChanging = depositFund.TotalBalance + " USDT deposit into the account";
             tempUserBalanceHistory.ChangedAmount = depositFund.TotalBalance;
             tempUserBalanceHistory.ExchangedCoinName = "USDT";
             tempBalance.CoinName = "USDT";
-            tempBalance.Account = accountExist;
+            //tempBalance.Account = accountExist;
             tempBalance.TotalBalance = depositFund.TotalBalance;
             tempBalance.CoinId = 3;
-            _context.Balances.Add(tempBalance);
-            _context.UserBalanceHistories.Add(tempUserBalanceHistory);
+           // _context.Balances.Add(tempBalance);
+            //_context.UserBalanceHistories.Add(tempUserBalanceHistory);
 
             await _context.SaveChangesAsync();
+            this._logger.LogInformation("|Log ||ASDASDSADSA");
+
             return Ok(new Response { StatusCode = 200, Status = "Success", Message = "Deposit Funded successfully!" });
 
         }

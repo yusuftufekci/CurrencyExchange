@@ -1,4 +1,5 @@
-﻿using CurrencyExchange2.Model.Account;
+﻿using CurrencyExchange.Repository;
+using CurrencyExchange2.Model.Account;
 using CurrencyExchange2.Requests;
 using CurrencyExchange2.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -24,21 +25,21 @@ namespace CurrencyExchange2.Controllers.UserController
             var userExist = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == userInfos.UserEmail);
             if (userExist == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "User doesnt exist" });
-            int userId = userExist.UserId;
+            int userId = userExist.Id;
             var userAccount = await _context.Accounts.SingleOrDefaultAsync(p => p.UserId == userId);
             if (userAccount == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "Account Doesnt Exist" });
             var balances = await _context.Balances.Where(p=> p.Account== userAccount).ToListAsync();
             string userEmailAddress = userExist.UserEmail;
             string userAccountName = userAccount.AccountName;
-            int accountId = userAccount.AccountId;
+            int accountId = userAccount.Id;
             List<UserBalances> userBalancesInfos = new List<UserBalances>();
 
             foreach (var item in balances)
             {
                 UserBalances userBalancesInfo = new UserBalances();
                 userBalancesInfo.TotalBalance = item.TotalBalance;
-                userBalancesInfo.CoinName = item.CoinName;
+                userBalancesInfo.CoinName = item.CryptoCoin.CoinName;
                 userBalancesInfos.Add(userBalancesInfo);
 
             }
@@ -58,12 +59,12 @@ namespace CurrencyExchange2.Controllers.UserController
             var userExist = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == userInfos.UserEmail);
             if (userExist == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "User doesnt exist" });
-            int userId = userExist.UserId;
+            int userId = userExist.Id;
             var userAccount = await _context.Accounts.SingleOrDefaultAsync(p => p.UserId == userId);
             if (userAccount == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 404, Status = "Error", Message = "Account Doesnt Exist" });
             string userAccountName = userAccount.AccountName;
-            int accountId = userAccount.AccountId;
+            int accountId = userAccount.Id;
             List<UserTransactionHistory> userTransactionHistories = new List<UserTransactionHistory>();
             var transactions = await _context.UserBalanceHistories.Where(p => p.Account == userAccount).ToListAsync();
             foreach (var item in transactions)

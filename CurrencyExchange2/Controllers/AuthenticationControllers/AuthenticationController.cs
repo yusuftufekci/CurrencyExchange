@@ -1,4 +1,5 @@
-﻿using CurrencyExchange2.Model.Authentication;
+﻿using CurrencyExchange.Repository;
+using CurrencyExchange2.Model.Authentication;
 using CurrencyExchange2.Requests;
 using CurrencyExchange2.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -35,113 +36,113 @@ namespace CurrencyExchange2.Controllers.AuthenticationControllers
 
         }
 
-        [HttpPost]
-        [Route("register")]
-        public async Task<ActionResult<List<Response>>> Register([FromBody] UserDto userDto)
-        {
-            if (await _context.Users.SingleOrDefaultAsync(mytable => mytable.UserEmail == userDto.Email) != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode= 409, Status = "Error", Message = "User already exists!" });
+        //[HttpPost]
+        //[Route("register")]
+        //public async Task<ActionResult<List<Response>>> Register([FromBody] UserDto userDto)
+        //{
+        //    if (await _context.Users.SingleOrDefaultAsync(mytable => mytable.UserEmail == userDto.Email) != null)
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode= 409, Status = "Error", Message = "User already exists!" });
            
-            CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-            if (remoteIpAddress != null)
-            {
-                user.UserEmail = userDto.Email;
-                user.IpAdress = remoteIpAddress;
-                userPassword.Password = passwordHash;
-                userPassword.PasswordSalt = passwordSalt;
-                userPassword.UserEmail = userDto.Email;
-                _context.Users.Add(user);
-                _context.PasswordInfos.Add(userPassword);
-                await _context.SaveChangesAsync();
-                return Ok(new Response { StatusCode = 201, Status = "Success", Message = "User created successfully!" });
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Can't get user IpAddress" });
+        //    CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+        //    var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+        //    if (remoteIpAddress != null)
+        //    {
+        //        user.UserEmail = userDto.Email;
+        //        user.IpAdress = remoteIpAddress;
+        //        userPassword.Password = passwordHash;
+        //        userPassword.PasswordSalt = passwordSalt;
+        //        userPassword.UserEmail = userDto.Email;
+        //        //_context.Users.Add(user);
+        //        //_context.PasswordInfos.Add(userPassword);
+        //        await _context.SaveChangesAsync();
+        //        return Ok(new Response { StatusCode = 201, Status = "Success", Message = "User created successfully!" });
+        //    }
+        //    else
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Can't get user IpAddress" });
 
-            }
-        }
+        //    }
+        //}
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("login")]
-        public async Task<ActionResult<List<LoginResponse>>> Login([FromBody] UserDto userDto)
-        {
-            var user_param = await _context.PasswordInfos.SingleOrDefaultAsync(p => p.UserEmail == userDto.Email);
-            if (user_param == null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Username or password is incorrect" });
-            if (VerifyPasswordHash(userDto.Password, user_param.Password, user_param.PasswordSalt))
-            {
-                var loginUser = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == userDto.Email);
-                string token = CreateToken(loginUser);
-                var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-
-
-                var controlToken = await _context.UserTokens.SingleOrDefaultAsync(p => p.UserId == loginUser.UserId);
-                loginUser.IpAdress = remoteIpAddress;
-                loginUser.ModifiedDate = DateTime.UtcNow;
-                if (controlToken == null)
-                {
-                    UserToken.Token = token;
-                    UserToken.UserId = loginUser.UserId;
-                    UserToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
-                    _context.UserTokens.Add(UserToken);
-                }
-                else
-                {
-                    controlToken.Token = token;
-                    controlToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
-                    controlToken.ModifiedDate = DateTime.UtcNow;
-                }
-                await _context.SaveChangesAsync();
-                return Ok(new LoginResponse {StatusCode=200, Status = "Success", Message = "Login Succesfull", Token = token });
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Username or password is incorrect" });
-            }
-        }
+        //[HttpPost]
+        //[AllowAnonymous]
+        //[Route("login")]
+        //public async Task<ActionResult<List<LoginResponse>>> Login([FromBody] UserDto userDto)
+        //{
+        //    var user_param = await _context.PasswordInfos.SingleOrDefaultAsync(p => p.UserEmail == userDto.Email);
+        //    if (user_param == null)
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Username or password is incorrect" });
+        //    if (VerifyPasswordHash(userDto.Password, user_param.Password, user_param.PasswordSalt))
+        //    {
+        //        var loginUser = await _context.Users.SingleOrDefaultAsync(p => p.UserEmail == userDto.Email);
+        //        string token = CreateToken(loginUser);
+        //        var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
 
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
+        //        var controlToken = await _context.UserTokens.SingleOrDefaultAsync(p => p.UserId == loginUser.UserId);
+        //        loginUser.IpAdress = remoteIpAddress;
+        //        loginUser.ModifiedDate = DateTime.UtcNow;
+        //        if (controlToken == null)
+        //        {
+        //            UserToken.Token = token;
+        //            UserToken.UserId = loginUser.UserId;
+        //            UserToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
+        //            _context.UserTokens.Add(UserToken);
+        //        }
+        //        else
+        //        {
+        //            controlToken.Token = token;
+        //            controlToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
+        //            controlToken.ModifiedDate = DateTime.UtcNow;
+        //        }
+        //        await _context.SaveChangesAsync();
+        //        return Ok(new LoginResponse {StatusCode=200, Status = "Success", Message = "Login Succesfull", Token = token });
+        //    }
+        //    else
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new Response { StatusCode = 400, Status = "Error", Message = "Username or password is incorrect" });
+        //    }
+        //}
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computeHash.SequenceEqual(passwordHash);
-            }
-        }
 
-        private string CreateToken(User user)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserEmail)
-            };
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
+        //private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        //{
+        //    using (var hmac = new HMACSHA512())
+        //    {
+        //        passwordSalt = hmac.Key;
+        //        passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        //    }
+        //}
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+        //private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        //{
+        //    using (var hmac = new HMACSHA512(passwordSalt))
+        //    {
+        //        var computeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        //        return computeHash.SequenceEqual(passwordHash);
+        //    }
+        //}
 
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddMonths(1),
-                signingCredentials: creds
-                );
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        //private string CreateToken(User user)
+        //{
+        //    List<Claim> claims = new List<Claim>
+        //    {
+        //        new Claim(ClaimTypes.Name, user.UserEmail)
+        //    };
+        //    var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+        //        _configuration.GetSection("AppSettings:Token").Value));
+
+        //    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+        //    var token = new JwtSecurityToken(
+        //        claims: claims,
+        //        expires: DateTime.Now.AddMonths(1),
+        //        signingCredentials: creds
+        //        );
+        //    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
            
-            return jwt;
-        }
+        //    return jwt;
+        //}
 
 
     }
