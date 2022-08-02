@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.API2", "CurrencyExchange2\CurrencyExchange.API2.csproj", "{625FF839-15F4-4485-B6E0-30AB0D9D7340}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.Core", "CurrencyExchange.Core\CurrencyExchange.Core.csproj", "{FEE128CF-9563-42F7-8EAF-A0BABBC9730D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.Repository", "CurrencyExchange.Repository\CurrencyExchange.Repository.csproj", "{C6212B1A-9CDB-49D6-B23D-C1180D52924B}"
@@ -21,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{625FF839-15F4-4485-B6E0-30AB0D9D7340}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{625FF839-15F4-4485-B6E0-30AB0D9D7340}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{625FF839-15F4-4485-B6E0-30AB0D9D7340}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{625FF839-15F4-4485-B6E0-30AB0D9D7340}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FEE128CF-9563-42F7-8EAF-A0BABBC9730D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FEE128CF-9563-42F7-8EAF-A0BABBC9730D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEE128CF-9563-42F7-8EAF-A0BABBC9730D}.Release|Any CPU.ActiveCfg = Release|Any CPU

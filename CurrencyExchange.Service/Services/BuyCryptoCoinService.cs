@@ -83,7 +83,9 @@ namespace CurrencyExchange.Service.Services
                 tempUserBalanceHistory.Account = accountExist;
                 tempUserBalanceHistory.MessageForChanging = buyCoinRequest.Amount + " " + buyCoinRequest.CoinToBuy + " deposit into the account";
                 tempUserBalanceHistory.ChangedAmount = buyCoinRequest.Amount;
-                tempUserBalanceHistory.ExchangedCoinName = buyCoinRequest.CoinToBuy;
+                tempUserBalanceHistory.BoughtCryptoCoin = buyCoinRequest.CoinToBuy;
+                tempUserBalanceHistory.SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin;
+
 
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _balanceRepository.AddAsync(tempBalance);
@@ -101,7 +103,9 @@ namespace CurrencyExchange.Service.Services
                 tempUserBalanceHistory.Account = accountExist;
                 tempUserBalanceHistory.MessageForChanging = buyCoinRequest.Amount + " " + buyCoinRequest.CoinToBuy + " deposit into the account";
                 tempUserBalanceHistory.ChangedAmount = buyCoinRequest.Amount;
-                tempUserBalanceHistory.ExchangedCoinName = buyCoinRequest.CoinToBuy;
+                tempUserBalanceHistory.BoughtCryptoCoin = buyCoinRequest.CoinToBuy;
+                tempUserBalanceHistory.SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin;
+
 
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _UnitOfWork.CommitAsync();
@@ -162,7 +166,8 @@ namespace CurrencyExchange.Service.Services
                 tempUserBalanceHistory.Account = accountExist;
                 tempUserBalanceHistory.MessageForChanging = totalAmount + " " + buyCoinRequest.CoinToBuy + " deposit into the account";
                 tempUserBalanceHistory.ChangedAmount = totalAmount;
-                tempUserBalanceHistory.ExchangedCoinName = buyCoinRequest.CoinToBuy;
+                tempUserBalanceHistory.BoughtCryptoCoin = buyCoinRequest.CoinToBuy;
+                tempUserBalanceHistory.SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin;
 
 
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
@@ -183,7 +188,9 @@ namespace CurrencyExchange.Service.Services
                 tempUserBalanceHistory.Account = accountExist;
                 tempUserBalanceHistory.MessageForChanging = totalAmount + " " + buyCoinRequest.CoinToBuy + " deposit into the account";
                 tempUserBalanceHistory.ChangedAmount = totalAmount;
-                tempUserBalanceHistory.ExchangedCoinName = buyCoinRequest.CoinToBuy;
+                tempUserBalanceHistory.BoughtCryptoCoin = buyCoinRequest.CoinToBuy;
+                tempUserBalanceHistory.SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin;
+
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _UnitOfWork.CommitAsync();
 

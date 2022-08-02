@@ -83,7 +83,8 @@ namespace CurrencyExchange.Service.Services
             tempUserBalanceHistory.Account = accountExist;
             tempUserBalanceHistory.MessageForChanging = sellCryptoCoinRequest.Amount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + totalAmount+" USDT";
             tempUserBalanceHistory.ChangedAmount = sellCryptoCoinRequest.Amount;
-            tempUserBalanceHistory.ExchangedCoinName = sellCryptoCoinRequest.CoinToSell;
+            tempUserBalanceHistory.BoughtCryptoCoin = "USDT";
+            tempUserBalanceHistory.SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell;
 
             await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             await _UnitOfWork.CommitAsync();
@@ -135,7 +136,8 @@ namespace CurrencyExchange.Service.Services
             tempUserBalanceHistory.Account = accountExist;
             tempUserBalanceHistory.MessageForChanging = totalAmount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + sellCryptoCoinRequest.Amount + " USDT";
             tempUserBalanceHistory.ChangedAmount = sellCryptoCoinRequest.Amount;
-            tempUserBalanceHistory.ExchangedCoinName = sellCryptoCoinRequest.CoinToSell;
+            tempUserBalanceHistory.BoughtCryptoCoin = "USDT";
+            tempUserBalanceHistory.SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell;
 
             await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             await _UnitOfWork.CommitAsync();

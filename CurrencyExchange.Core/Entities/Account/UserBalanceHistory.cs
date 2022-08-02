@@ -12,7 +12,10 @@ namespace CurrencyExchange.Core.Entities.Account
         public int AccountId { get; set; }
         public string MessageForChanging { get; set; }
 
-        public string ExchangedCoinName { get; set; }
+        public string BoughtCryptoCoin { get; set; }
+
+        public string SoldCryptoCoin { get; set; }
+
 
         public double ChangedAmount { get; set; }
     }

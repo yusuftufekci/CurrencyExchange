@@ -67,13 +67,14 @@ namespace CurrencyExchange.Service.Services
                 throw new NotFoundException($"Account not found");
             }
 
-            var balanceExist = await _balanceRepository.Where(p => p.Account == accountExist).SingleOrDefaultAsync();
+            var balanceExist = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoinId==3).SingleOrDefaultAsync();
             if (balanceExist == null)
             {
                 tempUserBalanceHistory.Account = accountExist;
                 tempUserBalanceHistory.MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account";
                 tempUserBalanceHistory.ChangedAmount = createAccountRequest.TotalBalance;
-                tempUserBalanceHistory.ExchangedCoinName = "USDT";
+                tempUserBalanceHistory.BoughtCryptoCoin = "USDT";
+                tempUserBalanceHistory.SoldCryptoCoin = "USDT";
 
                 var usdt = await _cryptoCoinRepository.Where(p => p.CoinName == "USDT").SingleOrDefaultAsync();
                 tempBalance.CryptoCoin = usdt;
@@ -91,7 +92,8 @@ namespace CurrencyExchange.Service.Services
                 tempUserBalanceHistory.Account = accountExist;
                 tempUserBalanceHistory.MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account";
                 tempUserBalanceHistory.ChangedAmount = createAccountRequest.TotalBalance;
-                tempUserBalanceHistory.ExchangedCoinName = "USDT";
+                tempUserBalanceHistory.BoughtCryptoCoin = "USDT";
+                tempUserBalanceHistory.SoldCryptoCoin = "USDT";
 
                 balanceExist.TotalBalance += createAccountRequest.TotalBalance;
                 // tempBalance.CryptoCoinId = 3;

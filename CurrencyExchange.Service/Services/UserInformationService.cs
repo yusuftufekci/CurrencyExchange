@@ -77,7 +77,8 @@ namespace CurrencyExchange.Service.Services
                 userTransactions.MessageForChanging = item.MessageForChanging;
                 userTransactions.AccountName = accountExist.AccountName;
                 userTransactions.ChangedAmount = item.ChangedAmount;
-                userTransactions.ExchangedCoinName = item.ExchangedCoinName;
+                userTransactions.BoughtCryptoCoin = item.BoughtCryptoCoin;
+                userTransactions.SoldCryptoCoin = item.SoldCryptoCoin;
 
                 userTransactionHistories.Add(userTransactions);
             }
