@@ -18,16 +18,16 @@ namespace CurrencyExchange.API.Controllers.AuthenticationControllers
         [HttpPost("Register")]
         public async Task<IActionResult> CreateUser([FromBody]UserRegisterRequest userRegisterRequest)
         { 
-            userRegisterRequest.IpAdress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-            return CreateActionResult(await _service.UserRegister(userRegisterRequest));
+            string IpAdress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            return CreateActionResult(await _service.UserRegister(userRegisterRequest, IpAdress));
         }
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginRequest userLoginRequest)
         {
 
-            userLoginRequest.IpAdress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-            return CreateActionResult(await _service.UserLogin(userLoginRequest));
+            string IpAdress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            return CreateActionResult(await _service.UserLogin(userLoginRequest, IpAdress));
         }
 
     }

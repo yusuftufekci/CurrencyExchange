@@ -11,8 +11,8 @@ namespace CurrencyExchange.Core.Services
     public interface IUserRegister<T> where T : class
 
     {
-        Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest);
-        Task<CustomResponseDto<TokenDto>> UserLogin(UserLoginRequest userLoginRequest);
+        Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest, string IpAdress);
+        Task<CustomResponseDto<TokenDto>> UserLogin(UserLoginRequest userLoginRequest, string IpAdress);
 
 
     }

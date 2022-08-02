@@ -15,25 +15,29 @@ namespace CurrencyExchange.API.Controllers.UserInformationControllers
         {
             _service = service;
         }
-        [ServiceFilter(typeof(NotFoundFilter<User>))]
 
+        [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
+        [ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("AllUserInformation")]
         public async Task<IActionResult> GetAllUserInformation(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.GetUserInformation(userInformationRequest, token));
+            return CreateActionResult(await _service.GetUserInformation(userInformationRequest));
         }
+
+        [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("AllTransactionsOfuser")]
         public async Task<IActionResult> GetAllTranstactionsOfUser(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.GetUserTranstactions(userInformationRequest, token));
+            return CreateActionResult(await _service.GetUserTranstactions(userInformationRequest));
         }
 
+        [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("BalanceInformationOfUser")]
         public async Task<IActionResult> GetAllBalancesOfUser(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.GetUserBalanceInformation(userInformationRequest, token));
+            return CreateActionResult(await _service.GetUserBalanceInformation(userInformationRequest));
         }
     }
 }

@@ -10,11 +10,11 @@ namespace CurrencyExchange.Core.Services
 {
     public interface IUserInformationService<T> where T : class
     {
-        Task<CustomResponseDto<UserInformationDto>> GetUserInformation(UserInformationRequest userInformationRequest, string token);
+        Task<CustomResponseDto<UserInformationDto>> GetUserInformation(UserInformationRequest userInformationRequest);
 
-        Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTranstactions(UserInformationRequest userInformationRequest, string token);
+        Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTranstactions(UserInformationRequest userInformationRequest);
 
-        Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation(UserInformationRequest userInformationRequest, string token);
+        Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation(UserInformationRequest userInformationRequest);
 
 
 

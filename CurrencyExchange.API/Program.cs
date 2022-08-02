@@ -35,8 +35,12 @@ builder.Services.AddScoped(typeof(ITokenRepository), typeof(TokenRepository));
 builder.Services.AddScoped(typeof(ICryptoCoinPriceRepository), typeof(CryptoCoinPriceRepository));
 builder.Services.AddScoped(typeof(IUserBalanceHistoryRepository), typeof(UserBalanceHistoryRepository));
 builder.Services.AddScoped(typeof(ICryptoCoinRepository), typeof(CryptoCoinRepository));
+builder.Services.AddScoped(typeof(ISellCryptoCoinService<>), typeof(SellCryptoCoinService<>));
 
+builder.Services.AddScoped(typeof(TokenControlFilter<>));
 builder.Services.AddScoped(typeof(NotFoundFilter<>));
+
+builder.Services.AddScoped(typeof(IBuyCryptoCoinService<>), typeof(BuyCryptoCoinService<>));
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IUserRegister<>), typeof(UserRegisterService<>));
 builder.Services.AddScoped(typeof(ICryptoCoinService), typeof(CryptoCoinService));

@@ -38,19 +38,26 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _cryptoCoinRepository = cryptoCoinRepository;
         }
-        public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token)
+        public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest)
         {
-            var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();         
+            var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
             Account tempAccount = new Account();
-
-            tempAccount.AccountName = createAccountRequest.AccountName;
-            tempAccount.UserId = userExist.Id;
-            await _accountRepository.AddAsync(tempAccount);
-            await _UnitOfWork.CommitAsync();
-            return CustomResponseDto<NoContentDto>.Succes(201);
+            var accountExist = await _accountRepository.Where(p => p.AccountName == createAccountRequest.AccountName).SingleOrDefaultAsync();
+            if (accountExist == null)
+            {
+                tempAccount.AccountName = createAccountRequest.AccountName;
+                tempAccount.UserId = userExist.Id;
+                await _accountRepository.AddAsync(tempAccount);
+                await _UnitOfWork.CommitAsync();
+                return CustomResponseDto<NoContentDto>.Succes(201);
+            }
+            else
+            {
+                return CustomResponseDto<NoContentDto>.Fail(401,"Account name already in use");
+            }
         }
 
-        public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
+    public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest)
         {
             Balance tempBalance = new Balance();
             UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
@@ -59,21 +66,40 @@ namespace CurrencyExchange.Service.Services
             {
                 throw new NotFoundException($"Account not found");
             }
-            tempUserBalanceHistory.Account = accountExist;
-            tempUserBalanceHistory.MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account";
-            tempUserBalanceHistory.ChangedAmount = createAccountRequest.TotalBalance;
-            tempUserBalanceHistory.ExchangedCoinName = "USDT";
 
-            var usdt = await _cryptoCoinRepository.Where(p => p.CoinName == "USDT").SingleOrDefaultAsync();
-            tempBalance.CryptoCoin = usdt;
-            tempBalance.Account = accountExist;
-            tempBalance.TotalBalance = createAccountRequest.TotalBalance;
-            // tempBalance.CryptoCoinId = 3;
+            var balanceExist = await _balanceRepository.Where(p => p.Account == accountExist).SingleOrDefaultAsync();
+            if (balanceExist == null)
+            {
+                tempUserBalanceHistory.Account = accountExist;
+                tempUserBalanceHistory.MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account";
+                tempUserBalanceHistory.ChangedAmount = createAccountRequest.TotalBalance;
+                tempUserBalanceHistory.ExchangedCoinName = "USDT";
 
-            await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
-            await _balanceRepository.AddAsync(tempBalance);
-            await _UnitOfWork.CommitAsync();
-            return CustomResponseDto<NoContentDto>.Succes(201);
+                var usdt = await _cryptoCoinRepository.Where(p => p.CoinName == "USDT").SingleOrDefaultAsync();
+                tempBalance.CryptoCoin = usdt;
+                tempBalance.Account = accountExist;
+                tempBalance.TotalBalance = createAccountRequest.TotalBalance;
+                // tempBalance.CryptoCoinId = 3;
+
+                await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
+                await _balanceRepository.AddAsync(tempBalance);
+                await _UnitOfWork.CommitAsync();
+                return CustomResponseDto<NoContentDto>.Succes(201);
+            }
+            else
+            {
+                tempUserBalanceHistory.Account = accountExist;
+                tempUserBalanceHistory.MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account";
+                tempUserBalanceHistory.ChangedAmount = createAccountRequest.TotalBalance;
+                tempUserBalanceHistory.ExchangedCoinName = "USDT";
+
+                balanceExist.TotalBalance += createAccountRequest.TotalBalance;
+                // tempBalance.CryptoCoinId = 3;
+
+                await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
+                await _UnitOfWork.CommitAsync();
+                return CustomResponseDto<NoContentDto>.Succes(201);
+            }
         }
     }
 }

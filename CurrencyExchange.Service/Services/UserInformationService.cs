@@ -35,7 +35,7 @@ namespace CurrencyExchange.Service.Services
 
 
 
-        public async Task<CustomResponseDto<UserInformationDto>> GetUserInformation(UserInformationRequest userInformationRequest, string token)
+        public async Task<CustomResponseDto<UserInformationDto>> GetUserInformation(UserInformationRequest userInformationRequest)
         {
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
@@ -63,7 +63,7 @@ namespace CurrencyExchange.Service.Services
 
         }
 
-        public async Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTranstactions(UserInformationRequest userInformationRequest, string token)
+        public async Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTranstactions(UserInformationRequest userInformationRequest)
         {
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
@@ -85,7 +85,7 @@ namespace CurrencyExchange.Service.Services
             return CustomResponseDto<List<UserTransactionHistoryDto>>.Succes(201, userTransactionHistories);
         }
 
-        public async Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation(UserInformationRequest userInformationRequest, string token)
+        public async Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation(UserInformationRequest userInformationRequest)
         {
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
