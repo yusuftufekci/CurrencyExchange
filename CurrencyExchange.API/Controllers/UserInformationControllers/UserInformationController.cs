@@ -1,12 +1,13 @@
-﻿using CurrencyExchange.Core.Requests;
+﻿using CurrencyExchange.API.Filters;
+using CurrencyExchange.Core.Entities.Account;
+using CurrencyExchange.Core.Entities.Authentication;
+using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers.UserInformationControllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class UserInformationController : CustomBaseController
     {
         private readonly IUserInformationService<UserInformationRequest> _service;
@@ -14,24 +15,25 @@ namespace CurrencyExchange.API.Controllers.UserInformationControllers
         {
             _service = service;
         }
+        [ServiceFilter(typeof(NotFoundFilter<User>))]
 
         [HttpPost("AllUserInformation")]
         public async Task<IActionResult> GetAllUserInformation(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.GetUserInformation(userInformationRequest));
+            return CreateActionResult(await _service.GetUserInformation(userInformationRequest, token));
         }
-
+        [ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("AllTransactionsOfuser")]
         public async Task<IActionResult> GetAllTranstactionsOfUser(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.GetUserTranstactions(userInformationRequest));
+            return CreateActionResult(await _service.GetUserTranstactions(userInformationRequest, token));
         }
 
-
+        [ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("BalanceInformationOfUser")]
         public async Task<IActionResult> GetAllBalancesOfUser(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.GetUserBalanceInformation(userInformationRequest));
+            return CreateActionResult(await _service.GetUserBalanceInformation(userInformationRequest, token));
         }
     }
 }

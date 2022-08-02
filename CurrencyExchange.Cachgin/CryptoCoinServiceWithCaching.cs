@@ -96,5 +96,35 @@ namespace CurrencyExchange.Cachgin
         {
             throw new NotImplementedException();
         }
+
+        public IQueryable<CryptoCoin> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        Task IGenericRepository<CryptoCoin>.AddAsync(CryptoCoin entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task IGenericRepository<CryptoCoin>.AddRangeAsync(IEnumerable<CryptoCoin> entities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update(CryptoCoin entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Remove(CryptoCoin entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveRange(IEnumerable<CryptoCoin> entities)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

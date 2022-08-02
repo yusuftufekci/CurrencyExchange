@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using CurrencyExchange.Core.HelperFunctions;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
+using CurrencyExchange.Service.Exceptions;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -33,7 +34,7 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<TokenDto>> UserLogin(UserLoginRequest userLoginRequest)
         {
-            var user = await _userRepository.Where(p=>p.UserEmail==userLoginRequest.Email).SingleOrDefaultAsync();
+            var user = await _userRepository.Where(p=>p.UserEmail==userLoginRequest.UserEmail).SingleOrDefaultAsync();
 
             var user_param = await _passwordRepository.Where(p => p.User == user).SingleOrDefaultAsync();
 
@@ -81,10 +82,17 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest)
         {
+
+            var userExist = await _userRepository.Where(p => p.UserEmail == userRegisterRequest.UserEmail).SingleOrDefaultAsync();
+            if (userExist == null)
+            {
+                throw new ClientSideException($"Email already used");
+                // return CustomResponseDto<NoContentDto>.Fail(404,"Email address not found");
+            }
             User user = new User();
             user.Name = userRegisterRequest.Name;
             user.Surname = userRegisterRequest.Surname;
-            user.UserEmail = userRegisterRequest.Email;
+            user.UserEmail = userRegisterRequest.UserEmail;
             user.IpAddress = userRegisterRequest.IpAdress;
 
             Password password = new Password();

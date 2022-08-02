@@ -1,4 +1,6 @@
-﻿using CurrencyExchange.Core.Requests;
+﻿using CurrencyExchange.API.Filters;
+using CurrencyExchange.Core.Entities.Authentication;
+using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +16,14 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
         {
             _service = service;
         }
+        [ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateUser(CreateAccountRequest createAccountRequest, [FromHeader] string token)
         {
             return CreateActionResult(await _service.CreateAccount(createAccountRequest, token));
         }
+        [ServiceFilter(typeof(NotFoundFilter<User>))]
+
         [HttpPost("DepositFund")]
 
         public async Task<IActionResult> DepositFund(DepositFundRequest depositFundRequest, [FromHeader] string token)

@@ -36,7 +36,7 @@ builder.Services.AddScoped(typeof(ICryptoCoinPriceRepository), typeof(CryptoCoin
 builder.Services.AddScoped(typeof(IUserBalanceHistoryRepository), typeof(UserBalanceHistoryRepository));
 builder.Services.AddScoped(typeof(ICryptoCoinRepository), typeof(CryptoCoinRepository));
 
-
+builder.Services.AddScoped(typeof(NotFoundFilter<>));
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IUserRegister<>), typeof(UserRegisterService<>));
 builder.Services.AddScoped(typeof(ICryptoCoinService), typeof(CryptoCoinService));
@@ -78,7 +78,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UserCustomException();
+app.UseCustomException();
 
 app.MapControllers();
 

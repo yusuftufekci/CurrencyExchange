@@ -1,12 +1,14 @@
 ﻿using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities;
+using CurrencyExchange.Core.Entities.Authentication;
 using CurrencyExchange.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Linq;
 
 namespace CurrencyExchange.API.Filters
 {
-    public class NotFoundFilter<T> : IAsyncActionFilter where T : BaseEntity
+    public class NotFoundFilter<T> : IAsyncActionFilter where T : User
     {
         private readonly IService<T> _service;
 
@@ -16,24 +18,26 @@ namespace CurrencyExchange.API.Filters
         }
 
 
-        public async Task OnActionExecutionAsync(ActionExecutingContext contex, ActionExecutionDelegate next)
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var idValue = contex.ActionArguments.Values.FirstOrDefault();
 
-            if (idValue==null)
+            string userEmail = context.HttpContext.Request.Query["UserEmail"];
+
+            if (userEmail == null)
             {
-                await next.Invoke();
+            context.Result = new NotFoundObjectResult(CustomResponseDto<NoContentDto>.Fail(401, $"Bad Parameter"));
+                return;
             }
+           
 
-            var id = (int)idValue;
-            var anyEntity = await _service.AnyAsync(x=>x.Id==id);
+            var anyEntity = await _service.AnyAsync(x=>x.UserEmail==userEmail);
 
             if (anyEntity)
             {
                 await next.Invoke();
             }
 
-            contex.Result = new NotFoundObjectResult(CustomResponseDto<NoContentDto>.Fail(404, $"{typeof(T).Name}({id}) not found"));
+            context.Result = new NotFoundObjectResult(CustomResponseDto<NoContentDto>.Fail(404, $"{typeof(T).Name}({userEmail}) not sssssfound"));
         }
 
     }

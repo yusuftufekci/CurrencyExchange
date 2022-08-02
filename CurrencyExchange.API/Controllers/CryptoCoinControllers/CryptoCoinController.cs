@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers.CryptoCoinControllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class CryptoCoinController : CustomBaseController
     {
         private readonly ICryptoCoinService _cryptoCoinService;

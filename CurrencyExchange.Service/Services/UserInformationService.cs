@@ -3,6 +3,7 @@ using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
+using CurrencyExchange.Service.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -36,14 +37,9 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<UserInformationDto>> GetUserInformation(UserInformationRequest userInformationRequest, string token)
         {
-            var userExist = await _userRepository.Where(p => p.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
-
-            if (userExist == null)
-                return CustomResponseDto<UserInformationDto>.Fail(404, "User Not found");
-
-            var accountExist = await _accountRepository.Where(p => p.UserId == userExist.Id).SingleOrDefaultAsync();
+            var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
-                return CustomResponseDto<UserInformationDto>.Fail(404, "Account Not found");
+                throw new NotFoundException($"Account not found");
 
             var balances = await _balanceRepository.Where(p => p.Account == accountExist).ToListAsync();
 
@@ -69,15 +65,9 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTranstactions(UserInformationRequest userInformationRequest, string token)
         {
-
-            var userExist = await _userRepository.Where(p => p.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
-
-            if (userExist == null)
-                return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail(404, "User Not found");
-
-            var accountExist = await _accountRepository.Where(p => p.UserId == userExist.Id).SingleOrDefaultAsync();
+            var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
-                return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail(404, "Account Not found");
+                throw new NotFoundException($"Account not found");
 
             List<UserTransactionHistoryDto> userTransactionHistories = new List<UserTransactionHistoryDto>();
             var transactions = await _userBalanceHistoryRepository.Where(p => p.Account == accountExist).ToListAsync();
@@ -97,15 +87,9 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation(UserInformationRequest userInformationRequest, string token)
         {
-            var userExist = await _userRepository.Where(p => p.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
-
-            if (userExist == null)
-                return CustomResponseDto<List<BalanceDto>>.Fail(404, "User Not found");
-
-            var accountExist = await _accountRepository.Where(p => p.UserId == userExist.Id).SingleOrDefaultAsync();
+            var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
-                return CustomResponseDto<List<BalanceDto>>.Fail(404, "Account Not found");
-
+                throw new NotFoundException($"Account not found");
 
             var balances = await _balanceRepository.Where(p => p.Account == accountExist).ToListAsync();
 

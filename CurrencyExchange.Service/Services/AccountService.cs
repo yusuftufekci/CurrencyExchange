@@ -5,6 +5,7 @@ using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
+using CurrencyExchange.Service.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -39,11 +40,7 @@ namespace CurrencyExchange.Service.Services
         }
         public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token)
         {
-            var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
-            if (userExist == null)
-            {
-                return CustomResponseDto<NoContentDto>.Fail(404,"Email address not found");
-            }
+            var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();         
             Account tempAccount = new Account();
 
             tempAccount.AccountName = createAccountRequest.AccountName;
@@ -57,15 +54,10 @@ namespace CurrencyExchange.Service.Services
         {
             Balance tempBalance = new Balance();
             UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
-            var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
-            if (userExist == null)
-            {
-                return CustomResponseDto<NoContentDto>.Fail(404, "Email address not found");
-            }
-            var accountExist = await _accountRepository.Where(p => p.UserId == userExist.Id).SingleOrDefaultAsync();
+            var accountExist = await _accountRepository.Where(p => p.User.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
             {
-                return CustomResponseDto<NoContentDto>.Fail(404, "Account Not found");
+                throw new NotFoundException($"Account not found");
             }
             tempUserBalanceHistory.Account = accountExist;
             tempUserBalanceHistory.MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account";

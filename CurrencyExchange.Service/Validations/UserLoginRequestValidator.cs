@@ -11,7 +11,7 @@ namespace CurrencyExchange.Service.Validations
     {
         public UserLoginRequestValidator()
         {
-            RuleFor(x => x.Email).EmailAddress().WithMessage("Must be email address").NotNull().WithMessage("{PropertyName} is required").NotEmpty().WithMessage("{PropertyName} cant be none!");
+            RuleFor(x => x.UserEmail).EmailAddress().WithMessage("Must be email address").NotNull().WithMessage("{PropertyName} is required").NotEmpty().WithMessage("{PropertyName} cant be none!");
             RuleFor(x => x.Password).NotEmpty().WithMessage("{PropertyName} can't be empty}").Length(9, 15).WithMessage("Password must be atleast 9 character").NotNull().WithMessage("{PropertyName} can't be null");
 
         }

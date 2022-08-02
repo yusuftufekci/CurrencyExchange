@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers.AuthenticationControllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class AuthenticationController : CustomBaseController
     {
         private readonly IUserRegister<UserRegisterRequest> _service;
