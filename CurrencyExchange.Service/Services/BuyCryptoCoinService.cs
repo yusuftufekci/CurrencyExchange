@@ -124,6 +124,7 @@ namespace CurrencyExchange.Service.Services
             var userExist = await _userRepository.Where(p => p.UserEmail == buyCoinRequest.UserEmail).SingleOrDefaultAsync();
             var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             string symbolOfCoins = buyCoinRequest.CoinToBuy + buyCoinRequest.BuyWİthThisCoin;
+
             if (accountExist == null)
                 throw new NotFoundException($"Account not found");
 
@@ -132,12 +133,13 @@ namespace CurrencyExchange.Service.Services
             {
                 throw new NotFoundException($"You dont have any" + buyCoinRequest.BuyWİthThisCoin);
             }
+
             var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
             if (coinTypeToBuy == null)
             {
                 throw new NotFoundException($"You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
-
             }
+
             double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
             double totalAmount = buyCoinRequest.Amount / coinPrice;
             totalAmount = Math.Round(totalAmount, 4);
@@ -149,6 +151,7 @@ namespace CurrencyExchange.Service.Services
             {
                 throw new ClientSideException("You dont have enough" + buyCoinRequest.BuyWİthThisCoin);
             }
+
             var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoin.CoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var coinToBuy = await _cryptoCoinRepository.Where(p => p.CoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyExchange.Core.Services
 {
-    public interface IUserRegister<T> where T : class
+    public interface IAuthenticationService<T> where T : class
 
     {
         Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest, string IpAdress);

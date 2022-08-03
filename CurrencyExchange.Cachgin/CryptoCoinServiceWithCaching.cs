@@ -13,7 +13,7 @@ namespace CurrencyExchange.Cachgin
 {
     public class CryptoCoinServiceWithCaching : ICryptoCoinRepository
     {
-        private const string CacheProductKey = "coinsKeys";
+        private const string CacheCryptoKey = "coinsCache";
         private readonly IMemoryCache  _memoryCache;
         private readonly ICryptoCoinRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
@@ -24,9 +24,9 @@ namespace CurrencyExchange.Cachgin
             _repository = repository;
             unitOfWork = _unitOfWork;
 
-            if(!_memoryCache.TryGetValue(CacheProductKey, out _))
+            if(!_memoryCache.TryGetValue(CacheCryptoKey, out _))
             {
-                _memoryCache.Set(CacheProductKey, _repository.GetAll().ToList());
+                _memoryCache.Set(CacheCryptoKey, _repository.GetAll().ToList());
             }
         }
 
@@ -54,12 +54,12 @@ namespace CurrencyExchange.Cachgin
 
         public Task<IEnumerable<CryptoCoin>> GetAllAsync()
         {
-            return Task.FromResult(_memoryCache.Get<IEnumerable<CryptoCoin>>(CacheProductKey));
+            return Task.FromResult(_memoryCache.Get<IEnumerable<CryptoCoin>>(CacheCryptoKey));
         }
 
         public Task<CryptoCoin> GetByIdAsync(int id)
         {
-            return Task.FromResult(_memoryCache.Get<List<CryptoCoin>>(CacheProductKey).FirstOrDefault(x => x.Id == id));
+            return Task.FromResult(_memoryCache.Get<List<CryptoCoin>>(CacheCryptoKey).FirstOrDefault(x => x.Id == id));
         }
 
         public async Task RemoveAsync(CryptoCoin entity)
@@ -83,13 +83,20 @@ namespace CurrencyExchange.Cachgin
             await CacheAllProductsAsync();
         }
 
+        public Task<CustomResponseDto<List<CryptoCoin>>> GetCryptoCoin()
+        {
+            var cryptoCoin = _memoryCache.Get<List<CryptoCoin>>(CacheCryptoKey);
+           
+            return Task.FromResult(CustomResponseDto<List<CryptoCoin>>.Succes(200, cryptoCoin));
+        }
+
         public IQueryable<CryptoCoin> Where(Expression<Func<CryptoCoin, bool>> expression)
         {
-            return _memoryCache.Get<List<CryptoCoin>>(CacheProductKey).Where(expression.Compile()).AsQueryable();
+            return _memoryCache.Get<List<CryptoCoin>>(CacheCryptoKey).Where(expression.Compile()).AsQueryable();
         }
         public async Task CacheAllProductsAsync()
         {
-            _memoryCache.Set(CacheProductKey, await _repository.GetAll().ToListAsync());
+            _memoryCache.Set(CacheCryptoKey, await _repository.GetAll().ToListAsync());
         }
 
         public Task<CustomResponseDto<NoContentDto>> CryptoCoin()

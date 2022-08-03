@@ -42,12 +42,15 @@ builder.Services.AddScoped(typeof(NotFoundFilter<>));
 
 builder.Services.AddScoped(typeof(IBuyCryptoCoinService<>), typeof(BuyCryptoCoinService<>));
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
-builder.Services.AddScoped(typeof(IUserRegister<>), typeof(UserRegisterService<>));
+builder.Services.AddScoped(typeof(IAuthenticationService<>), typeof(AuthenticationService<>));
 builder.Services.AddScoped(typeof(ICryptoCoinService), typeof(CryptoCoinService));
 builder.Services.AddScoped(typeof(ICryptoCoinPriceService), typeof(CryptoCoinPriceService));
 builder.Services.AddScoped(typeof(ICryptoCoinPriceService), typeof(CryptoCoinPriceService));
 builder.Services.AddScoped(typeof(IUserInformationService<>), typeof(UserInformationService<>));
 builder.Services.AddScoped(typeof(IAccount<>), typeof(AccountService<>));
+
+
+
 
 builder.Services.AddScoped(typeof(NotFoundFilter<>));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

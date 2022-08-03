@@ -13,5 +13,6 @@ namespace CurrencyExchange.Core.Entities.Authentication
         public string Name { get; set; }
         public string Surname { get; set; }
         public string IpAddress { get; set; }
+
     }
 }
