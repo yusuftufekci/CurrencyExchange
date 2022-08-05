@@ -14,6 +14,7 @@ using CurrencyExchange.Core.HelperFunctions;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using CurrencyExchange.Service.Exceptions;
+using CurrencyExchange.Core.RabbitMqLogger;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -23,12 +24,16 @@ namespace CurrencyExchange.Service.Services
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _UnitOfWork;
         private readonly IPasswordRepository _passwordRepository;
-        public AuthenticationService(IUserRepository repository, IUnitOfWork unitOfWork, IPasswordRepository passwordRepository, ITokenRepository tokenRepository)
+        private readonly ISenderLogger _sender;
+
+        public AuthenticationService(IUserRepository repository, IUnitOfWork unitOfWork,
+            IPasswordRepository passwordRepository, ITokenRepository tokenRepository, ISenderLogger senderLogger)
         {
             _userRepository = repository;
             _UnitOfWork = unitOfWork;
             _passwordRepository = passwordRepository;
             _tokenRepository = tokenRepository;
+            _sender = senderLogger;
         }
 
 
@@ -40,12 +45,16 @@ namespace CurrencyExchange.Service.Services
 
             if (user_param == null)
             {
+                _sender.SenderFunction("Log", "UserLogin request failed. Username or Password is wrong!");
+
                 return CustomResponseDto<TokenDto>.Fail(404, new List<string> { "Username or Password is wrong!" });
             }
 
 
             if (!PasswordHash.VerifyPasswordHash(userLoginRequest.Password, user_param.PasswordHash, user_param.PasswordSalt))
             {
+                _sender.SenderFunction("Log", "UserLogin request failed. Username or Password is wrong!");
+
                 return CustomResponseDto<TokenDto>.Fail(404, new List<string> { "Username or Password is wrong!" });
             }
 
@@ -72,7 +81,7 @@ namespace CurrencyExchange.Service.Services
                 controlToken.ModifiedDate = DateTime.UtcNow;
                 await _UnitOfWork.CommitAsync();
             }
-
+            _sender.SenderFunction("Log", "UserLogin request succesfully completed.");
             return CustomResponseDto<TokenDto>.Succes(201, new TokenDto { Token = token });
         }
 
@@ -82,8 +91,9 @@ namespace CurrencyExchange.Service.Services
             var userExist = await _userRepository.Where(p => p.UserEmail == userRegisterRequest.UserEmail).SingleOrDefaultAsync();
             if (userExist != null)
             {
-                throw new ClientSideException($"Email already used");
-                // return CustomResponseDto<NoContentDto>.Fail(404,"Email address not found");
+                _sender.SenderFunction("Log", "UserRegister request failed. Email already in used");
+                // throw new ClientSideException($"Email already used");
+                return CustomResponseDto<NoContentDto>.Fail(404,"Email address not found");
             }
 
             User user = new User();
@@ -101,6 +111,7 @@ namespace CurrencyExchange.Service.Services
             await _userRepository.AddAsync(user);
             await _passwordRepository.AddAsync(password);
             await _UnitOfWork.CommitAsync();
+            _sender.SenderFunction("Log", "UserRegister request succesfully completed.");
             return CustomResponseDto<NoContentDto>.Succes(201);
         }
     }

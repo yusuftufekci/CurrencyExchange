@@ -1,6 +1,7 @@
 ﻿using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.CryptoCoins;
+using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
@@ -24,11 +25,13 @@ namespace CurrencyExchange.Service.Services
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;
         private readonly ICryptoCoinRepository _cryptoCoinRepository;
+        private readonly ISenderLogger _sender;
 
 
         public AccountService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             ITokenRepository tokenRepository, IUserBalanceHistoryRepository userBalanceHistoryRepository,
-            IBalanceRepository balanceRepository, ICryptoCoinRepository cryptoCoinRepository)
+            IBalanceRepository balanceRepository,
+            ICryptoCoinRepository cryptoCoinRepository,ISenderLogger senderLogger)
         {
             _userRepository = repository;
             _UnitOfWork = unitOfWork;
@@ -37,24 +40,26 @@ namespace CurrencyExchange.Service.Services
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
             _balanceRepository = balanceRepository;
             _cryptoCoinRepository = cryptoCoinRepository;
+            _sender = senderLogger;
         }
         public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest)
         {
             var userExist = await _userRepository.Where(p => p.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
             Account tempAccount = new Account();
             var accountExist = await _accountRepository.Where(p => p.AccountName == createAccountRequest.AccountName).SingleOrDefaultAsync();
-            if (accountExist == null)
+            if (accountExist != null)
             {
-                tempAccount.AccountName = createAccountRequest.AccountName;
-                tempAccount.UserId = userExist.Id;
-                await _accountRepository.AddAsync(tempAccount);
-                await _UnitOfWork.CommitAsync();
-                return CustomResponseDto<NoContentDto>.Succes(201);
+                _sender.SenderFunction("Log", "CreateAccount request failed. Account name already exist");
+                return CustomResponseDto<NoContentDto>.Fail(401, "Account name already in use");
             }
-            else
-            {
-                return CustomResponseDto<NoContentDto>.Fail(401,"Account name already in use");
-            }
+          
+            tempAccount.AccountName = createAccountRequest.AccountName;
+            tempAccount.UserId = userExist.Id;
+            await _accountRepository.AddAsync(tempAccount);
+            await _UnitOfWork.CommitAsync();
+            _sender.SenderFunction("Log", "DepositFunds request succesfully completed");
+            return CustomResponseDto<NoContentDto>.Succes(201);
+            
         }
 
     public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest)
@@ -64,7 +69,8 @@ namespace CurrencyExchange.Service.Services
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == createAccountRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
             {
-                throw new NotFoundException($"Account not found");
+                _sender.SenderFunction("Log", "DepositFunds request failed. Account not found");
+                return CustomResponseDto<NoContentDto>.Fail(404,"Account not found");
             }
 
             var balanceExist = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoinId==3).SingleOrDefaultAsync();
@@ -85,6 +91,8 @@ namespace CurrencyExchange.Service.Services
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _balanceRepository.AddAsync(tempBalance);
                 await _UnitOfWork.CommitAsync();
+                _sender.SenderFunction("Log", "DepositFunds request succesfully completed");
+
                 return CustomResponseDto<NoContentDto>.Succes(201);
             }
             else
@@ -100,6 +108,7 @@ namespace CurrencyExchange.Service.Services
 
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _UnitOfWork.CommitAsync();
+                _sender.SenderFunction("Log", "DepositFunds request succesfully completed");
                 return CustomResponseDto<NoContentDto>.Succes(201);
             }
         }

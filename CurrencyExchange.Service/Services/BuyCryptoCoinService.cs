@@ -1,5 +1,6 @@
 ﻿using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
+using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
@@ -23,11 +24,12 @@ namespace CurrencyExchange.Service.Services
         private readonly IBalanceRepository _balanceRepository;
         private readonly ICryptoCoinPriceRepository _cryptoCoinPriceRepository;
         private readonly ICryptoCoinRepository _cryptoCoinRepository;
+        private readonly ISenderLogger _sender;
 
         public BuyCryptoCoinService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
            IBalanceRepository balanceRepository,
-           ICryptoCoinPriceRepository cryptoCoinPriceRepository, ICryptoCoinRepository cryptoCoinRepository)
+           ICryptoCoinPriceRepository cryptoCoinPriceRepository, ICryptoCoinRepository cryptoCoinRepository, ISenderLogger sender)
         {
             _userRepository = repository;
             _UnitOfWork = unitOfWork;
@@ -36,7 +38,7 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _cryptoCoinPriceRepository = cryptoCoinPriceRepository;
             _cryptoCoinRepository = cryptoCoinRepository;
-
+            _sender = sender;
         }
 
         public async Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount(BuyCoinRequest buyCoinRequest)
@@ -45,27 +47,35 @@ namespace CurrencyExchange.Service.Services
             var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             string symbolOfCoins = buyCoinRequest.CoinToBuy + buyCoinRequest.BuyWİthThisCoin;
             if (accountExist == null)
-                throw new NotFoundException($"Account not found");
+            {
+                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. Account not found");
+                return CustomResponseDto<NoContentDto>.Fail(404,"Account not found");
+            }
 
             var balanceExist = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == buyCoinRequest.BuyWİthThisCoin && p.Account == accountExist).SingleOrDefaultAsync();
             if (balanceExist == null)
             {
-                throw new NotFoundException($"You dont have any" + buyCoinRequest.BuyWİthThisCoin);
+                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User dont have any" + buyCoinRequest.BuyWİthThisCoin);
+                return CustomResponseDto<NoContentDto>.Fail(404, $"You dont have any" + buyCoinRequest.BuyWİthThisCoin);
             }
             var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
             if (coinTypeToBuy == null)
             {
-                throw new NotFoundException($"You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
-
+                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
             }
             double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
             double totalAmount = coinPrice * buyCoinRequest.Amount;
             totalAmount = Math.Round(totalAmount, 4);
             if (totalAmount <= 0.001)
-                throw new ClientSideException("You can't buy this amount of coin");
+            {
+                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User can't buy this amount of coin");
+                return CustomResponseDto<NoContentDto>.Fail(404, "You can't buy this amount of coin");
+            }
             if (totalAmount > balanceExist.TotalBalance)
             {
-                throw new ClientSideException("You dont have enough" + buyCoinRequest.BuyWİthThisCoin);
+                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User dont have enough" + buyCoinRequest.BuyWİthThisCoin);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You dont have enough" + buyCoinRequest.BuyWİthThisCoin);
             }
             var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoin.CoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var coinToBuy = await _cryptoCoinRepository.Where(p => p.CoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
@@ -112,7 +122,7 @@ namespace CurrencyExchange.Service.Services
 
 
             }
-
+            _sender.SenderFunction("Log", "BuyCoinWithAmount request succesfully completed.");
             return CustomResponseDto<NoContentDto>.Succes(201);
 
         }
@@ -126,18 +136,23 @@ namespace CurrencyExchange.Service.Services
             string symbolOfCoins = buyCoinRequest.CoinToBuy + buyCoinRequest.BuyWİthThisCoin;
 
             if (accountExist == null)
-                throw new NotFoundException($"Account not found");
+            {
+                _sender.SenderFunction("Log", "BuyCoinWithAmount2 request failed. Account not found");
+                return CustomResponseDto<NoContentDto>.Fail(404, "Account not found");
+            }
 
             var balanceExist = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == buyCoinRequest.BuyWİthThisCoin && p.Account == accountExist).SingleOrDefaultAsync();
             if (balanceExist == null)
             {
-                throw new NotFoundException($"You dont have any" + buyCoinRequest.BuyWİthThisCoin);
+                _sender.SenderFunction("Log", "BuyCoinWithAmount2 request failed. User dont have any" + buyCoinRequest.BuyWİthThisCoin);
+                return CustomResponseDto<NoContentDto>.Fail(404, $"You dont have any" + buyCoinRequest.BuyWİthThisCoin);
             }
 
             var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
             if (coinTypeToBuy == null)
             {
-                throw new NotFoundException($"You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
+                _sender.SenderFunction("Log", "BuyCoinWithAmount2 request failed. User can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
             }
 
             double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
@@ -145,11 +160,15 @@ namespace CurrencyExchange.Service.Services
             totalAmount = Math.Round(totalAmount, 4);
 
             if (totalAmount <= 0.001)
-                throw new ClientSideException("You can't buy this amount of coin");
+            {
+                _sender.SenderFunction("Log", "BuyCoinWithAmount2 request failed. User can't buy this amount of coin");
+                return CustomResponseDto<NoContentDto>.Fail(404, "You can't buy this amount of coin");
+            }
 
             if (totalAmount > balanceExist.TotalBalance)
             {
-                throw new ClientSideException("You dont have enough" + buyCoinRequest.BuyWİthThisCoin);
+                _sender.SenderFunction("Log", "BuyCoinWithAmount2 request failed. User dont have enough" + buyCoinRequest.BuyWİthThisCoin);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You dont have enough" + buyCoinRequest.BuyWİthThisCoin);
             }
 
             var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoin.CoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
@@ -198,6 +217,7 @@ namespace CurrencyExchange.Service.Services
                 await _UnitOfWork.CommitAsync();
 
             }
+            _sender.SenderFunction("Log", "BuyCoinWithAmount2 request succesfully completed.");
             return CustomResponseDto<NoContentDto>.Succes(201);
 
         }

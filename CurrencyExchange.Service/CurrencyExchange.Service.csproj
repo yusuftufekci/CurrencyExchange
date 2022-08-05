@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Nlog.RabbitMQ.Target" Version="2.7.7" />
   </ItemGroup>
 
   <ItemGroup>

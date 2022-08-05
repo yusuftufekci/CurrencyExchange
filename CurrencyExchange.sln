@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.Caching", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.API", "CurrencyExchange.API\CurrencyExchange.API.csproj", "{D02F6C2B-A585-464C-AA2F-6C5ACB4A5B9C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyExchange.Log", "CurrencyExchange.Log2\CurrencyExchange.Log.csproj", "{20083D21-EA75-4AD7-90DC-6511D25443D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{D02F6C2B-A585-464C-AA2F-6C5ACB4A5B9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D02F6C2B-A585-464C-AA2F-6C5ACB4A5B9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D02F6C2B-A585-464C-AA2F-6C5ACB4A5B9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20083D21-EA75-4AD7-90DC-6511D25443D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20083D21-EA75-4AD7-90DC-6511D25443D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20083D21-EA75-4AD7-90DC-6511D25443D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20083D21-EA75-4AD7-90DC-6511D25443D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

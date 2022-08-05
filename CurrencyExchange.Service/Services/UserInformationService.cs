@@ -1,4 +1,5 @@
 ﻿using CurrencyExchange.Core.DTOs;
+using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
@@ -21,9 +22,11 @@ namespace CurrencyExchange.Service.Services
         private readonly IBalanceRepository _balanceRepository;
         private readonly IUnitOfWork _UnitOfWork;
         private readonly ICryptoCoinRepository _cryptoCoinRepository;
+        private readonly ISenderLogger _sender;
 
         public UserInformationService(IUserRepository userRepository, IAccountRepository accountRepository,
-            IUserBalanceHistoryRepository userBalanceHistoryRepository, IBalanceRepository balanceRepository, IUnitOfWork unitOfWork, ICryptoCoinRepository cryptoCoinRepository)
+            IUserBalanceHistoryRepository userBalanceHistoryRepository,
+            IBalanceRepository balanceRepository, IUnitOfWork unitOfWork, ICryptoCoinRepository cryptoCoinRepository, ISenderLogger sender)
         {
             _userRepository = userRepository;
             _accountRepository = accountRepository;
@@ -31,6 +34,7 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _UnitOfWork = unitOfWork;
             _cryptoCoinRepository = cryptoCoinRepository;
+            _sender = sender;
         }
 
 
@@ -39,7 +43,10 @@ namespace CurrencyExchange.Service.Services
         {
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
-                throw new NotFoundException($"Account not found");
+            {
+                _sender.SenderFunction("Log", "CreateAccount request failed. Account not found");
+                return CustomResponseDto<UserInformationDto>.Fail(404, "Account not found");
+            }
 
             var balances = await _balanceRepository.Where(p => p.Account == accountExist).ToListAsync();
 
@@ -58,6 +65,7 @@ namespace CurrencyExchange.Service.Services
             userInformations.UserBalances = userBalancesInfos;
             userInformations.UserAccountName = accountExist.AccountName;
             userInformations.UserEmail = userInformationRequest.UserEmail;
+            _sender.SenderFunction("Log", "GetUserInformation request succesfully completed");
 
             return CustomResponseDto<UserInformationDto>.Succes(201, userInformations);
 
@@ -67,7 +75,11 @@ namespace CurrencyExchange.Service.Services
         {
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
-                throw new NotFoundException($"Account not found");
+            {
+                _sender.SenderFunction("Log", "GetUserTranstactions request failed. Account not found");
+                return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail(404, "Account not found");
+
+            }
 
             List<UserTransactionHistoryDto> userTransactionHistories = new List<UserTransactionHistoryDto>();
             var transactions = await _userBalanceHistoryRepository.Where(p => p.Account == accountExist).ToListAsync();
@@ -82,6 +94,7 @@ namespace CurrencyExchange.Service.Services
 
                 userTransactionHistories.Add(userTransactions);
             }
+            _sender.SenderFunction("Log", "GetUserTranstactions request succesfully completed");
 
             return CustomResponseDto<List<UserTransactionHistoryDto>>.Succes(201, userTransactionHistories);
         }
@@ -90,7 +103,11 @@ namespace CurrencyExchange.Service.Services
         {
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userInformationRequest.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
-                throw new NotFoundException($"Account not found");
+            {
+                _sender.SenderFunction("Log", "GetUserBalanceInformation request failed. Account not found");
+                return CustomResponseDto<List<BalanceDto>>.Fail(404, "Account not found");
+
+            }
 
             var balances = await _balanceRepository.Where(p => p.Account == accountExist).ToListAsync();
 
@@ -101,11 +118,12 @@ namespace CurrencyExchange.Service.Services
                 BalanceDto userBalancesInfo = new BalanceDto();
                 userBalancesInfo.TotalAmount = item.TotalBalance;
                 var tempCoin = await _cryptoCoinRepository.Where(p => p.Id == item.CryptoCoinId).SingleOrDefaultAsync();
-
                 userBalancesInfo.CryptoCoinName = tempCoin.CoinName;
                 userBalancesInfos.Add(userBalancesInfo);
 
             }
+            _sender.SenderFunction("Log", "GetUserBalanceInformation request succesfully completed");
+
             return CustomResponseDto<List<BalanceDto>>.Succes(201, userBalancesInfos);
         }
     }

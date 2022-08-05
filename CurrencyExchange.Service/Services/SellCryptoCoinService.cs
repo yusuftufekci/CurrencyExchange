@@ -1,5 +1,6 @@
 ﻿using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
+using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
@@ -23,11 +24,12 @@ namespace CurrencyExchange.Service.Services
         private readonly IBalanceRepository _balanceRepository;
         private readonly ICryptoCoinPriceRepository _cryptoCoinPriceRepository;
         private readonly ICryptoCoinRepository _cryptoCoinRepository;
+        private readonly ISenderLogger _sender;
 
         public SellCryptoCoinService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
            IBalanceRepository balanceRepository,
-           ICryptoCoinPriceRepository cryptoCoinPriceRepository, ICryptoCoinRepository cryptoCoinRepository)
+           ICryptoCoinPriceRepository cryptoCoinPriceRepository, ICryptoCoinRepository cryptoCoinRepository, ISenderLogger sender)
         {
             _userRepository = repository;
             _UnitOfWork = unitOfWork;
@@ -36,7 +38,7 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _cryptoCoinPriceRepository = cryptoCoinPriceRepository;
             _cryptoCoinRepository = cryptoCoinRepository;
-
+            _sender = sender;
         }
 
         public async Task<CustomResponseDto<NoContentDto>> SellCryptoCoin(SellCryptoCoinRequest sellCryptoCoinRequest)
@@ -49,28 +51,39 @@ namespace CurrencyExchange.Service.Services
             var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             string symbolOfCoins = sellCryptoCoinRequest.CoinToSell + "USDT";
             if (accountExist == null)
-                throw new NotFoundException($"Account not found");
+            {
+                _sender.SenderFunction("Log", "SellCryptoCoin request failed. Account not found");
+                return CustomResponseDto<NoContentDto>.Fail(404, "Account not found");
+            }
 
             var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
             if (coinTypeToBuy == null)
             {
-                throw new NotFoundException($"There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
+                _sender.SenderFunction("Log", "SellCryptoCoin request failed. There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
+                return CustomResponseDto<NoContentDto>.Fail(404, "There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
             }
             var balanceExist = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == sellCryptoCoinRequest.CoinToSell && p.Account == accountExist).SingleOrDefaultAsync();
             if (balanceExist == null)
             {
-                throw new NotFoundException($"You dont have any" + sellCryptoCoinRequest.CoinToSell);
+                _sender.SenderFunction("Log", "SellCryptoCoin request failed. You dont have any" + sellCryptoCoinRequest.CoinToSell);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You dont have any" + sellCryptoCoinRequest.CoinToSell);
             }
 
-           
+
             double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
             double totalAmount = coinPrice * sellCryptoCoinRequest.Amount; // Dolara ekleyeceğim miktar
             totalAmount = Math.Round(totalAmount, 4);
             if (totalAmount <= 0.001)
-                throw new ClientSideException("You can't sell this amount of coin. Too low");
+            {
+                _sender.SenderFunction("Log", "SellCryptoCoin request failed. User can't sell this amount of coin. Too low");
+                return CustomResponseDto<NoContentDto>.Fail(404, "You can't sell this amount of coin. Too low");
+
+
+            }
             if (sellCryptoCoinRequest.Amount > balanceExist.TotalBalance)
             {
-                throw new ClientSideException("You dont have enough " + sellCryptoCoinRequest.CoinToSell);
+                _sender.SenderFunction("Log", "SellCryptoCoin request failed. User dont have enough " + sellCryptoCoinRequest.CoinToSell);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You dont have enough " + sellCryptoCoinRequest.CoinToSell);
             }
 
             UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
@@ -88,6 +101,8 @@ namespace CurrencyExchange.Service.Services
 
             await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             await _UnitOfWork.CommitAsync();
+            _sender.SenderFunction("Log", "SellCryptoCoin request succesfully completed");
+
             return CustomResponseDto<NoContentDto>.Succes(201);
 
         }
@@ -103,27 +118,38 @@ namespace CurrencyExchange.Service.Services
             var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             string symbolOfCoins = sellCryptoCoinRequest.CoinToSell + "USDT";
             if (accountExist == null)
-                throw new NotFoundException($"Account not found");
+            {
+                _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. Account not found");
+                return CustomResponseDto<NoContentDto>.Fail(404, "Account not found");
+
+            }
 
             var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
             if (coinTypeToBuy == null)
             {
-                throw new NotFoundException($"There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
+                _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
+                return CustomResponseDto<NoContentDto>.Fail(404, "There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
             }
             var balanceExist = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == sellCryptoCoinRequest.CoinToSell && p.Account == accountExist).SingleOrDefaultAsync();
             if (balanceExist == null)
             {
-                throw new NotFoundException($"You dont have any" + sellCryptoCoinRequest.CoinToSell);
+                _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. You dont have any" + sellCryptoCoinRequest.CoinToSell);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You dont have any" + sellCryptoCoinRequest.CoinToSell);
             }
 
             double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
             double totalAmount = sellCryptoCoinRequest.Amount /coinPrice ; //Coinden  çıkaracağım miktar
             totalAmount = Math.Round(totalAmount, 4);
             if (totalAmount <= 0.001)
-                throw new ClientSideException("You can't sell this amount of coin. Too low");
+            {
+                _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. User can't sell this amount of coin. Too low");
+                return CustomResponseDto<NoContentDto>.Fail(404, "You can't sell this amount of coin. Too low");
+
+            }
             if (totalAmount > balanceExist.TotalBalance)
             {
-                throw new ClientSideException("You dont have enough " + sellCryptoCoinRequest.CoinToSell);
+                _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. User dont have enough " + sellCryptoCoinRequest.CoinToSell);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You dont have enough " + sellCryptoCoinRequest.CoinToSell);
             }
 
             UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
@@ -141,12 +167,11 @@ namespace CurrencyExchange.Service.Services
 
             await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             await _UnitOfWork.CommitAsync();
+            _sender.SenderFunction("Log", "SellCryptoCoin2 request succesfully completed");
+
             return CustomResponseDto<NoContentDto>.Succes(201);
 
 
-
-
-            throw new NotImplementedException();
         }
     }
 }

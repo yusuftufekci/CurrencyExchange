@@ -1,21 +1,23 @@
+﻿using CurrencyExchange.API;
 using CurrencyExchange.API.Filters;
 using CurrencyExchange.API.Middlewares;
+using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
 using CurrencyExchange.Repository;
 using CurrencyExchange.Repository.Repositories;
 using CurrencyExchange.Repository.UnitOfWorks;
+using CurrencyExchange.Service.RabbitMqLogger;
 using CurrencyExchange.Service.Services;
 using CurrencyExchange.Service.Validations;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NLog;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 
 builder.Services.AddControllers(options => { options.Filters.Add(new ValidateFilterAttribute()); })
@@ -48,6 +50,7 @@ builder.Services.AddScoped(typeof(ICryptoCoinPriceService), typeof(CryptoCoinPri
 builder.Services.AddScoped(typeof(ICryptoCoinPriceService), typeof(CryptoCoinPriceService));
 builder.Services.AddScoped(typeof(IUserInformationService<>), typeof(UserInformationService<>));
 builder.Services.AddScoped(typeof(IAccount<>), typeof(AccountService<>));
+builder.Services.AddScoped(typeof(ISenderLogger), typeof(SenderLogger));
 
 
 

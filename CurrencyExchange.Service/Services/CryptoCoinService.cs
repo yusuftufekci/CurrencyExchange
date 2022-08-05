@@ -1,5 +1,6 @@
 ﻿using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.CryptoCoins;
+using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
@@ -16,13 +17,14 @@ namespace CurrencyExchange.Service.Services
     {
         private readonly ICryptoCoinRepository _cryptoCoinRepository;
         private readonly IUnitOfWork _UnitOfWork;
+        private readonly ISenderLogger _sender;
 
         public CryptoCoinService(IUnitOfWork unitOfWork,
-          ICryptoCoinRepository cryptoCoinRepository, IUnitOfWork unitOfWork1)
+          ICryptoCoinRepository cryptoCoinRepository, IUnitOfWork unitOfWork1, ISenderLogger sender)
         {
             _UnitOfWork = unitOfWork1;
             _cryptoCoinRepository = cryptoCoinRepository;
-
+            _sender = sender;
         }
         public async Task<CustomResponseDto<NoContentDto>> CryptoCoin()
         {
@@ -66,12 +68,16 @@ namespace CurrencyExchange.Service.Services
                 }
                 else
                 {
+                    _sender.SenderFunction("Log", "CryptoCoinPrice request failed. Connection Problem.");
+
                     return CustomResponseDto<NoContentDto>.Fail(404,"Problem");
 
                 }
 
             }
             await _UnitOfWork.CommitAsync();
+            _sender.SenderFunction("Log", "CryptoCoin request succesfully completed.");
+
             return CustomResponseDto<NoContentDto>.Succes(201);
         }
     }
