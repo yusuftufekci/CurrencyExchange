@@ -11,14 +11,12 @@ namespace CurrencyExchange.API.Filters
 {
     public class TokenControlFilter<T> : IAsyncActionFilter where T : UserToken
     {
-        private readonly IService<T> _service;
         private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _UnitOfWork;
 
-        public TokenControlFilter(IService<T> service, ITokenRepository tokenRepository, IUserRepository userRepository, IUnitOfWork unitOfWork)
+        public TokenControlFilter(ITokenRepository tokenRepository, IUserRepository userRepository, IUnitOfWork unitOfWork)
         {
-            _service = service;
             _tokenRepository = tokenRepository;
             _userRepository = userRepository;
             _UnitOfWork = unitOfWork;
