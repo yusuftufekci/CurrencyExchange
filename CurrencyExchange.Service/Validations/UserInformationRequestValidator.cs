@@ -12,7 +12,6 @@ namespace CurrencyExchange.Service.Validations
     {
         public UserInformationRequestValidator()
         {
-            RuleFor(x => x.UserEmail).EmailAddress().WithMessage("Must be email address").NotNull().WithMessage("{PropertyName} is required").NotEmpty().WithMessage("{PropertyName} cant be none!");
 
         }
     }

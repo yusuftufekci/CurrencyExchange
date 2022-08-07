@@ -20,15 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CurrencyExchange.Cachgin\CurrencyExchange.Caching.csproj" />
     <ProjectReference Include="..\CurrencyExchange.Service\CurrencyExchange.Service.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="LOG\log2\" />
   </ItemGroup>
 
 </Project>

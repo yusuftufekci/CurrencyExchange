@@ -9,7 +9,6 @@ namespace CurrencyExchange.Core.Requests
 {
     public class DepositFundRequest
     {
-        public string? UserEmail { get; set; }
 
         public double TotalBalance { get; set; } = 0;
     }

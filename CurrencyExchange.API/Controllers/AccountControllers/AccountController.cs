@@ -16,41 +16,22 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
         public AccountController(IAccount<CreateAccountRequest> service)
         {
             _service = service;
-           
-
         }
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        [ServiceFilter(typeof(NotFoundFilter<User>))]
+        //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateUser(CreateAccountRequest createAccountRequest, [FromHeader] string token)
         {
-
-            return CreateActionResult(await _service.CreateAccount(createAccountRequest));
+            return CreateActionResult(await _service.CreateAccount(createAccountRequest,token));
         }
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        [ServiceFilter(typeof(NotFoundFilter<User>))]
+        //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("DepositFund")]
         public async Task<IActionResult> DepositFund(DepositFundRequest depositFundRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.DepositFunds(depositFundRequest));
+            return CreateActionResult(await _service.DepositFunds(depositFundRequest, token));
         }
-
-        //[HttpPost("RabbitMqDeneme")]
-        //public async Task<IActionResult> Rabbit(DepositFundRequest depositFundRequest)
-        //{
-        //    _sender.SenderFUnction();
-
-        //    string response =_recieveLogger.RecieveFunction();
-
-        //    _logger.LogInfo("Here is info message from the controller.");
-        //    _logger.LogDebug("Here is debug message from the controller.");
-        //    _logger.LogWarn("Here is warn message from the controller.");
-        //    _logger.LogError("Here is error message from the controller.");
-
-        //    return CreateActionResult(CustomResponseDto<string>.Succes(201,response));
-
-        //}
     }
 }

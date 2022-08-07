@@ -35,7 +35,6 @@ namespace CurrencyExchange.Service.Services
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var cryptoCoins = _cryptoCoinRepository.GetAll().ToList();
-
                     var ResponceString = await response.Content.ReadAsStringAsync();
                     var root = (JContainer)JToken.Parse(ResponceString);
                     var list = root.DescendantsAndSelf().OfType<JProperty>().Where(p => p.Name == "id").Select(p => p.Value.Value<string>());
@@ -43,9 +42,10 @@ namespace CurrencyExchange.Service.Services
                     {
                         foreach (var item in list)
                         {
-                            var tempCoinType = new CryptoCoin();
-
-                            tempCoinType.CoinName = item;
+                            var tempCoinType = new CryptoCoin
+                            {
+                                CoinName = item
+                            };
                             await _cryptoCoinRepository.AddAsync(tempCoinType);
                         }
                     }
@@ -57,27 +57,23 @@ namespace CurrencyExchange.Service.Services
                             var coinExist =  _cryptoCoinRepository.Where(p => p.CoinName == item).SingleOrDefault();
                             if (coinExist == null)
                             {
-                                var tempCoinType = new CryptoCoin();
-
-                                tempCoinType.CoinName = item;
+                                var tempCoinType = new CryptoCoin
+                                {
+                                    CoinName = item
+                                };
                                 await _cryptoCoinRepository.AddAsync(tempCoinType);
                             }
                         }
                     }
-
                 }
                 else
                 {
                     _sender.SenderFunction("Log", "CryptoCoinPrice request failed. Connection Problem.");
-
                     return CustomResponseDto<NoContentDto>.Fail(404,"Problem");
-
                 }
-
             }
             await _UnitOfWork.CommitAsync();
             _sender.SenderFunction("Log", "CryptoCoin request succesfully completed.");
-
             return CustomResponseDto<NoContentDto>.Succes(201);
         }
     }

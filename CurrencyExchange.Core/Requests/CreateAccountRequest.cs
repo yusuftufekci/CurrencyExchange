@@ -10,7 +10,5 @@ namespace CurrencyExchange.Core.Requests
     public class CreateAccountRequest
     {
         public string AccountName { get; set; }
-
-        public string? UserEmail { get; set; }
     }
 }

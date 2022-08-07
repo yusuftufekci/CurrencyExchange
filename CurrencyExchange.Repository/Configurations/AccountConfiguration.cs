@@ -17,6 +17,7 @@ namespace CurrencyExchange.Repository.Configurations
             builder.Property(x => x.UserId).IsRequired();
             builder.Property(x => x.CreatedDate).IsRequired();
             builder.Property(x => x.ModifiedDate).IsRequired();
+
         }
     }
 }

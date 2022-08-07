@@ -17,6 +17,7 @@ namespace CurrencyExchange.Service.Services
 {
     public class BuyCryptoCoinService<T> : IBuyCryptoCoinService<T> where T : class
     {
+        private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _UnitOfWork;
         private readonly IAccountRepository _accountRepository;
@@ -29,7 +30,7 @@ namespace CurrencyExchange.Service.Services
         public BuyCryptoCoinService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
            IBalanceRepository balanceRepository,
-           ICryptoCoinPriceRepository cryptoCoinPriceRepository, ICryptoCoinRepository cryptoCoinRepository, ISenderLogger sender)
+           ICryptoCoinPriceRepository cryptoCoinPriceRepository, ICryptoCoinRepository cryptoCoinRepository, ISenderLogger sender, ITokenRepository tokenRepository)
         {
             _userRepository = repository;
             _UnitOfWork = unitOfWork;
@@ -39,11 +40,14 @@ namespace CurrencyExchange.Service.Services
             _cryptoCoinPriceRepository = cryptoCoinPriceRepository;
             _cryptoCoinRepository = cryptoCoinRepository;
             _sender = sender;
+            _tokenRepository = tokenRepository;
         }
 
-        public async Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount(BuyCoinRequest buyCoinRequest)
+        public async Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount(BuyCoinRequest buyCoinRequest, string token)
         {
-            var userExist = await _userRepository.Where(p => p.UserEmail == buyCoinRequest.UserEmail).SingleOrDefaultAsync();
+            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
+
+            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync();
             var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             string symbolOfCoins = buyCoinRequest.CoinToBuy + buyCoinRequest.BuyWİthThisCoin;
             if (accountExist == null)
@@ -81,47 +85,45 @@ namespace CurrencyExchange.Service.Services
             var coinToBuy = await _cryptoCoinRepository.Where(p => p.CoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             if (balanceExistForBuyCoin == null)
             {
-                Balance tempBalance = new Balance();
-                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
+                Balance tempBalance = new Balance
+                {
+                    CryptoCoin = coinToBuy,
+                    Account = accountExist,
+                    TotalBalance = buyCoinRequest.Amount
+                 };
 
 
                 balanceExist.TotalBalance -= totalAmount;
-                tempBalance.CryptoCoin = coinToBuy;
-                tempBalance.Account = accountExist;
-                tempBalance.TotalBalance = buyCoinRequest.Amount;
 
-                tempUserBalanceHistory.Account = accountExist;
-                tempUserBalanceHistory.MessageForChanging = buyCoinRequest.Amount + " " + buyCoinRequest.CoinToBuy + " deposit into the account";
-                tempUserBalanceHistory.ChangedAmount = buyCoinRequest.Amount;
-                tempUserBalanceHistory.BoughtCryptoCoin = buyCoinRequest.CoinToBuy;
-                tempUserBalanceHistory.SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin;
-
-
+                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory
+                {
+                    Account = accountExist,
+                    MessageForChanging = buyCoinRequest.Amount + " " + buyCoinRequest.CoinToBuy + " deposit into the account",
+                    ChangedAmount = buyCoinRequest.Amount,
+                    BoughtCryptoCoin = buyCoinRequest.CoinToBuy,
+                    SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin,
+                    ChangedAmountSoldCryptoCoin = totalAmount
+                 };
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _balanceRepository.AddAsync(tempBalance);
-                await _UnitOfWork.CommitAsync();
-                
             }
             else
             {
-                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
-
+                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory
+                {
+                    Account = accountExist,
+                    MessageForChanging = buyCoinRequest.Amount + " " + buyCoinRequest.CoinToBuy + " deposit into the account",
+                    ChangedAmount = buyCoinRequest.Amount,
+                    BoughtCryptoCoin = buyCoinRequest.CoinToBuy,
+                    SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin,
+                    ChangedAmountSoldCryptoCoin = totalAmount
+                };
                 balanceExistForBuyCoin.TotalBalance += buyCoinRequest.Amount;
                 balanceExist.TotalBalance -= totalAmount;
                 balanceExist.ModifiedDate = DateTime.UtcNow;
-
-                tempUserBalanceHistory.Account = accountExist;
-                tempUserBalanceHistory.MessageForChanging = buyCoinRequest.Amount + " " + buyCoinRequest.CoinToBuy + " deposit into the account";
-                tempUserBalanceHistory.ChangedAmount = buyCoinRequest.Amount;
-                tempUserBalanceHistory.BoughtCryptoCoin = buyCoinRequest.CoinToBuy;
-                tempUserBalanceHistory.SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin;
-
-
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
-                await _UnitOfWork.CommitAsync();
-
-
             }
+            await _UnitOfWork.CommitAsync();
             _sender.SenderFunction("Log", "BuyCoinWithAmount request succesfully completed.");
             return CustomResponseDto<NoContentDto>.Succes(201);
 
@@ -129,10 +131,11 @@ namespace CurrencyExchange.Service.Services
 
         
 
-        public async Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount2(BuyCoinRequest buyCoinRequest)
+        public async Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount2(BuyCoinRequest buyCoinRequest, string token)
         {
-            var userExist = await _userRepository.Where(p => p.UserEmail == buyCoinRequest.UserEmail).SingleOrDefaultAsync();
-            var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
+            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
+
+            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync(); var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             string symbolOfCoins = buyCoinRequest.CoinToBuy + buyCoinRequest.BuyWİthThisCoin;
 
             if (accountExist == null)
@@ -176,47 +179,50 @@ namespace CurrencyExchange.Service.Services
 
             if (balanceExistForBuyCoin == null)
             {
-                Balance tempBalance = new Balance();
-                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
+                Balance tempBalance = new Balance
+                {
+                    CryptoCoin = coinToBuy,
+                    Account = accountExist,
+                    TotalBalance = totalAmount
+                 };
 
 
                 balanceExist.TotalBalance -= buyCoinRequest.Amount;
-                tempBalance.CryptoCoin = coinToBuy;
-                tempBalance.Account = accountExist;
-                tempBalance.TotalBalance = totalAmount;
 
-                tempUserBalanceHistory.Account = accountExist;
-                tempUserBalanceHistory.MessageForChanging = totalAmount + " " + buyCoinRequest.CoinToBuy + " deposit into the account";
-                tempUserBalanceHistory.ChangedAmount = totalAmount;
-                tempUserBalanceHistory.BoughtCryptoCoin = buyCoinRequest.CoinToBuy;
-                tempUserBalanceHistory.SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin;
-
+                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory
+                {
+                    Account = accountExist,
+                    MessageForChanging = totalAmount + " " + buyCoinRequest.CoinToBuy + " deposit into the account",
+                    ChangedAmount = totalAmount,
+                    BoughtCryptoCoin = buyCoinRequest.CoinToBuy,
+                    SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin,
+                    ChangedAmountSoldCryptoCoin = buyCoinRequest.Amount
+                };
 
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _balanceRepository.AddAsync(tempBalance);
-                await _UnitOfWork.CommitAsync();
 
 
             }
             else
             {
-                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory();
 
                 balanceExistForBuyCoin.TotalBalance += totalAmount;
                 balanceExist.TotalBalance -= buyCoinRequest.Amount;
                 balanceExist.ModifiedDate = DateTime.UtcNow;
 
-
-                tempUserBalanceHistory.Account = accountExist;
-                tempUserBalanceHistory.MessageForChanging = totalAmount + " " + buyCoinRequest.CoinToBuy + " deposit into the account";
-                tempUserBalanceHistory.ChangedAmount = totalAmount;
-                tempUserBalanceHistory.BoughtCryptoCoin = buyCoinRequest.CoinToBuy;
-                tempUserBalanceHistory.SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin;
-
+                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory
+                {
+                    Account = accountExist,
+                    MessageForChanging = totalAmount + " " + buyCoinRequest.CoinToBuy + " deposit into the account",
+                    ChangedAmount = totalAmount,
+                    BoughtCryptoCoin = buyCoinRequest.CoinToBuy,
+                    SoldCryptoCoin = buyCoinRequest.BuyWİthThisCoin,
+                    ChangedAmountSoldCryptoCoin = buyCoinRequest.Amount
+                 };
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
-                await _UnitOfWork.CommitAsync();
-
             }
+            await _UnitOfWork.CommitAsync();
             _sender.SenderFunction("Log", "BuyCoinWithAmount2 request succesfully completed.");
             return CustomResponseDto<NoContentDto>.Succes(201);
 

@@ -8,7 +8,6 @@ namespace CurrencyExchange.Core.Requests
 {
     public class BuyCoinRequest
     {
-        public string UserEmail { get; set; }
         public string CoinToBuy { get; set; }
         public string BuyWİthThisCoin { get; set; }
         public double Amount { get; set; }

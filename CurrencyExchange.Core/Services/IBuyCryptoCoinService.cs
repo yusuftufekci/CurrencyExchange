@@ -10,9 +10,9 @@ namespace CurrencyExchange.Core.Services
 {
     public interface IBuyCryptoCoinService<T> where T : class
     {
-        Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount(BuyCoinRequest buyCoinRequest);
+        Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount(BuyCoinRequest buyCoinRequest, string token);
 
-        Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount2(BuyCoinRequest buyCoinRequest);
+        Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount2(BuyCoinRequest buyCoinRequest, string token);
 
     }
 }

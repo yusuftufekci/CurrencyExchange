@@ -5,6 +5,7 @@ using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -17,16 +18,25 @@ namespace CurrencyExchange.Cachgin
         private readonly IMemoryCache  _memoryCache;
         private readonly ICryptoCoinRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICryptoCoinPriceService _cryptoCoinPriceService;
 
-        public CryptoCoinServiceWithCaching(IMemoryCache memoryCache, ICryptoCoinRepository repository, IUnitOfWork unitOfWork)
+
+        public CryptoCoinServiceWithCaching(IMemoryCache memoryCache, ICryptoCoinRepository repository, IUnitOfWork unitOfWork, ICryptoCoinPriceService cryptoCoinPriceService)
         {
+            _cryptoCoinPriceService = cryptoCoinPriceService;
+            _cryptoCoinPriceService.CryptoCoinPrice();
             _memoryCache = memoryCache;
             _repository = repository;
             unitOfWork = _unitOfWork;
 
-            if(!_memoryCache.TryGetValue(CacheCryptoKey, out _))
+            if (!_memoryCache.TryGetValue(CacheCryptoKey, out _))
             {
-                _memoryCache.Set(CacheCryptoKey, _repository.GetAll().ToList());
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromSeconds(30))
+                    .SetAbsoluteExpiration(TimeSpan.FromSeconds(300))
+                    .SetPriority(CacheItemPriority.Normal)
+                    .SetSize(1024);
+                _memoryCache.Set(CacheCryptoKey, _repository.GetAll().ToList(), cacheEntryOptions);
             }
         }
 

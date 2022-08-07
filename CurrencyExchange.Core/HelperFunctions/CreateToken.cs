@@ -46,7 +46,7 @@ namespace CurrencyExchange.Core.HelperFunctions
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-            new Claim(ClaimTypes.Name, user.UserEmail),
+            new Claim(ClaimTypes.Name, user.UserEmail, ClaimTypes.Expiration),
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Issuer = myIssuer,
@@ -55,7 +55,35 @@ namespace CurrencyExchange.Core.HelperFunctions
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
+            var token2 = tokenHandler.WriteToken(token);
+            var jwtToken = new JwtSecurityToken(token2);
+            var a =jwtToken.Claims;
             return tokenHandler.WriteToken(token);
+        }
+        public static string ParseToken(string token)
+        {
+            try
+            {
+                var jwtToken = new JwtSecurityToken(token);
+                var expDate = jwtToken.Claims.ToList()[2].Value;
+                if (expDate == null)
+                    return null;
+                var dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(Int64.Parse(expDate));
+                if (DateTime.Now > dateTimeOffset)
+                {
+                    return "Token expired";
+                }
+                var userEmail = jwtToken.Claims.ToList()[0].Value;
+                if (userEmail != null)
+                    return userEmail;
+                return null;
+
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+           
         }
     }
 }

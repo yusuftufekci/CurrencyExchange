@@ -12,7 +12,6 @@ namespace CurrencyExchange.Service.Validations
     {
         public DepositFundRequestValidator()
         {
-            RuleFor(x => x.UserEmail).EmailAddress().WithMessage("Must be email address").NotNull().WithMessage("{PropertyName} is required").NotEmpty().WithMessage("{PropertyName} cant be none!");
             RuleFor(x => x.TotalBalance).NotNull().WithMessage("{PropertyName} is required").NotEmpty().WithMessage("{PropertyName} cant be none!").InclusiveBetween(1,double.MaxValue).WithMessage("{PropertyName} must be greater than 0");
 
         }

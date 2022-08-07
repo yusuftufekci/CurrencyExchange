@@ -4,6 +4,7 @@ using CurrencyExchange.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurrencyExchange.Repository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220805103934_isActiveColumnAddedToAllTables")]
+    partial class isActiveColumnAddedToAllTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,10 +108,6 @@ namespace CurrencyExchange.Repository.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<decimal>("ChangedAmount")
-                        .HasColumnType("decimal(15,4)")
-                        .HasColumnName("ChangedAmountBoughtCryptoCoin");
-
-                    b.Property<decimal>("ChangedAmountSoldCryptoCoin")
                         .HasColumnType("decimal(15,4)");
 
                     b.Property<DateTime>("CreatedDate")
@@ -121,8 +119,7 @@ namespace CurrencyExchange.Repository.Migrations
                     b.Property<string>("MessageForChanging")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("Description");
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
@@ -136,7 +133,7 @@ namespace CurrencyExchange.Repository.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.ToTable("TransactionHistory");
+                    b.ToTable("UserBalanceHistories");
                 });
 
             modelBuilder.Entity("CurrencyExchange.Core.Entities.Authentication.Password", b =>

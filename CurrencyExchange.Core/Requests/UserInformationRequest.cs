@@ -9,6 +9,5 @@ namespace CurrencyExchange.Core.Requests
 {
     public class UserInformationRequest
     {
-        public string UserEmail { get; set; }
     }
 }

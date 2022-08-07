@@ -1,6 +1,7 @@
 ﻿using CurrencyExchange.API;
 using CurrencyExchange.API.Filters;
 using CurrencyExchange.API.Middlewares;
+using CurrencyExchange.Cachgin;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Services;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using System.Reflection;
+using CryptoCoinServiceWithCaching = CurrencyExchange.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,15 +49,11 @@ builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IAuthenticationService<>), typeof(AuthenticationService<>));
 builder.Services.AddScoped(typeof(ICryptoCoinService), typeof(CryptoCoinService));
 builder.Services.AddScoped(typeof(ICryptoCoinPriceService), typeof(CryptoCoinPriceService));
-builder.Services.AddScoped(typeof(ICryptoCoinPriceService), typeof(CryptoCoinPriceService));
 builder.Services.AddScoped(typeof(IUserInformationService<>), typeof(UserInformationService<>));
 builder.Services.AddScoped(typeof(IAccount<>), typeof(AccountService<>));
 builder.Services.AddScoped(typeof(ISenderLogger), typeof(SenderLogger));
 
 
-
-
-builder.Services.AddScoped(typeof(NotFoundFilter<>));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), options =>

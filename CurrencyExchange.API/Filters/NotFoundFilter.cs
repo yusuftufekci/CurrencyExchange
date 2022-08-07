@@ -25,7 +25,7 @@ namespace CurrencyExchange.API.Filters
 
             if (userEmail == null)
             {
-            context.Result = new NotFoundObjectResult(CustomResponseDto<NoContentDto>.Fail(401, $"Bad Parameter"));
+                context.Result = new NotFoundObjectResult(CustomResponseDto<NoContentDto>.Fail(401, $"Bad Parameter"));
                 return;
             }
            
@@ -35,6 +35,7 @@ namespace CurrencyExchange.API.Filters
             if (anyEntity)
             {
                 await next.Invoke();
+
             }
 
             context.Result = new NotFoundObjectResult(CustomResponseDto<NoContentDto>.Fail(404, $"{typeof(T).Name}({userEmail}) not sssssfound"));

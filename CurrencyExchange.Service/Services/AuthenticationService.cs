@@ -39,6 +39,11 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<TokenDto>> UserLogin(UserLoginRequest userLoginRequest, string IpAdress)
         {
+            if (IpAdress is null)
+            {
+                _sender.SenderFunction("Log", "Can't get IpAdress from user");
+                return CustomResponseDto<TokenDto>.Fail(404, "Can't get IpAdress from user");
+            }
             var user = await _userRepository.Where(p => p.UserEmail == userLoginRequest.UserEmail).SingleOrDefaultAsync();
 
             var user_param = await _passwordRepository.Where(p => p.User == user).SingleOrDefaultAsync();
@@ -67,18 +72,25 @@ namespace CurrencyExchange.Service.Services
 
             if (controlToken == null)
             {
-                UserToken userToken = new UserToken();
-                userToken.Token = token;
-                userToken.UserId = user.Id;
-                userToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
+                UserToken userToken = new UserToken
+                {
+                    Token = token,
+                    UserId = user.Id,
+                    ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo
+                };
+               
                 await _tokenRepository.AddAsync(userToken);
                 await _UnitOfWork.CommitAsync();
             }
             else
             {
-                controlToken.Token = token;
-                controlToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
-                controlToken.ModifiedDate = DateTime.UtcNow;
+                UserToken userToken = new UserToken
+                {
+                    Token = token,
+                    ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo,
+                    ModifiedDate = DateTime.UtcNow
+                };
+              
                 await _UnitOfWork.CommitAsync();
             }
             _sender.SenderFunction("Log", "UserLogin request succesfully completed.");
@@ -87,27 +99,38 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest, string IpAdress)
         {
+            if (IpAdress is null)
+            {
+                _sender.SenderFunction("Log", "Can't get IpAdress from user");
+                return CustomResponseDto<NoContentDto>.Fail(404, "Can't get IpAdress from user");
+            }
+
 
             var userExist = await _userRepository.Where(p => p.UserEmail == userRegisterRequest.UserEmail).SingleOrDefaultAsync();
             if (userExist != null)
             {
                 _sender.SenderFunction("Log", "UserRegister request failed. Email already in used");
                 // throw new ClientSideException($"Email already used");
-                return CustomResponseDto<NoContentDto>.Fail(404,"Email address not found");
+                return CustomResponseDto<NoContentDto>.Fail(404, "Email already in used");
             }
 
-            User user = new User();
-            user.Name = userRegisterRequest.Name;
-            user.Surname = userRegisterRequest.Surname;
-            user.UserEmail = userRegisterRequest.UserEmail;
-            user.IpAddress = IpAdress;
-
-            Password password = new Password();
+            User user = new User
+            {
+                Name = userRegisterRequest.Name,
+                Surname = userRegisterRequest.Surname,
+                UserEmail = userRegisterRequest.UserEmail,
+                IpAddress = IpAdress
+             };
 
             PasswordHash.CreatePasswordHash(userRegisterRequest.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            password.User = user;
-            password.PasswordHash = passwordHash;
-            password.PasswordSalt = passwordSalt;
+
+            Password password = new Password
+            {
+                User = user,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
+            };
+
             await _userRepository.AddAsync(user);
             await _passwordRepository.AddAsync(password);
             await _UnitOfWork.CommitAsync();

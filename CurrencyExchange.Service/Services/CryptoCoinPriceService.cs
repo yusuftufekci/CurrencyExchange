@@ -20,12 +20,12 @@ namespace CurrencyExchange.Service.Services
         private readonly ISenderLogger _sender;
 
         public CryptoCoinPriceService(IUnitOfWork unitOfWork,
-          ICryptoCoinPriceRepository cryptoCoinPriceRepository , IUnitOfWork unitOfWork1, ISenderLogger senderLogger  ) 
+          ICryptoCoinPriceRepository cryptoCoinPriceRepository, IUnitOfWork unitOfWork1, ISenderLogger senderLogger)
         {
             _UnitOfWork = unitOfWork1;
             _cryptoCoinPriceRepository = cryptoCoinPriceRepository;
             _sender = senderLogger;
-            
+
         }
 
         public async Task<CustomResponseDto<NoContentDto>> CryptoCoinPrice()
@@ -39,7 +39,7 @@ namespace CurrencyExchange.Service.Services
                 {
                     var ResponceString = await response.Content.ReadAsStringAsync();
 
-                    var cryptoCoinPrices =  _cryptoCoinPriceRepository.GetAll().ToList();
+                    var cryptoCoinPrices = _cryptoCoinPriceRepository.GetAll().ToList();
 
                     var ResponceObject = JsonConvert.DeserializeObject<List<CryptoCoinPriceDto>>(ResponceString);
                     if (cryptoCoinPrices.Count == 0)
@@ -61,7 +61,7 @@ namespace CurrencyExchange.Service.Services
                     {
                         foreach (var item in ResponceObject)
                         {
-                           var coinPrice2 =  _cryptoCoinPriceRepository.GetAll().ToList();
+                            var coinPrice2 = _cryptoCoinPriceRepository.GetAll().ToList();
                             if (coinPrice2 == null)
                             {
                                 var coinPrice = new CryptoCoinPrice();
@@ -80,14 +80,14 @@ namespace CurrencyExchange.Service.Services
                 else
                 {
                     _sender.SenderFunction("Log", "CryptoCoinPrice request failed. Connection Problem.");
-                    return CustomResponseDto<NoContentDto>.Fail(404,"Problem");
+                    return CustomResponseDto<NoContentDto>.Fail(404, "Problem");
 
                 }
             }
 
 
         }
-    
+
 
     }
 }
