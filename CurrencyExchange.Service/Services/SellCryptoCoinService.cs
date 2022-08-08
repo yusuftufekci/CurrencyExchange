@@ -1,5 +1,6 @@
 ﻿using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
+using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
@@ -57,8 +58,10 @@ namespace CurrencyExchange.Service.Services
                 return CustomResponseDto<NoContentDto>.Fail(404, "Account not found");
             }
 
-            var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
-            if (coinTypeToBuy == null)
+
+            var cryptoCoinPrices = await GetCryptoCoinPrices.AsyncGetCryptoCoinPrices();
+
+            var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.symbol == symbolOfCoins); if (coinTypeToBuy == null)
             {
                 _sender.SenderFunction("Log", "SellCryptoCoin request failed. There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
@@ -69,7 +72,7 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "SellCryptoCoin request failed. You dont have any" + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You dont have any" + sellCryptoCoinRequest.CoinToSell);
             }
-            double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
+            double coinPrice = Convert.ToDouble(coinTypeToBuy.price);
             double totalAmount = coinPrice * sellCryptoCoinRequest.Amount; // Dolara ekleyeceğim miktar
             totalAmount = Math.Round(totalAmount, 4);
             if (totalAmount <= 0.001)
@@ -120,8 +123,10 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. Account not found");
                 return CustomResponseDto<NoContentDto>.Fail(404, "Account not found");
             }
-            var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
-            if (coinTypeToBuy == null)
+
+            var cryptoCoinPrices = await GetCryptoCoinPrices.AsyncGetCryptoCoinPrices();
+
+            var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.symbol == symbolOfCoins); if (coinTypeToBuy == null)
             {
                 _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
@@ -132,7 +137,7 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. You dont have any" + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You dont have any" + sellCryptoCoinRequest.CoinToSell);
             }
-            double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
+            double coinPrice = Convert.ToDouble(coinTypeToBuy.price);
             double totalAmount = sellCryptoCoinRequest.Amount /coinPrice ; //Coinden  çıkaracağım miktar
             totalAmount = Math.Round(totalAmount, 4);
             if (totalAmount <= 0.001)
