@@ -16,13 +16,9 @@ namespace CurrencyExchange.API.Filters
         {
             _service = service;
         }
-
-
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-
             string userEmail = context.HttpContext.Request.Query["UserEmail"];
-
             if (userEmail == null)
             {
                 context.Result = new NotFoundObjectResult(CustomResponseDto<NoContentDto>.Fail(401, $"Bad Parameter"));
@@ -31,7 +27,6 @@ namespace CurrencyExchange.API.Filters
            
 
             var anyEntity = await _service.AnyAsync(x=>x.UserEmail==userEmail);
-
             if (anyEntity)
             {
                 await next.Invoke();

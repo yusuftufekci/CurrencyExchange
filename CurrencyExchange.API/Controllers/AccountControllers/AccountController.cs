@@ -19,7 +19,6 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
         }
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateUser(CreateAccountRequest createAccountRequest, [FromHeader] string token)
         {
@@ -27,7 +26,6 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
         }
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("DepositFund")]
         public async Task<IActionResult> DepositFund(DepositFundRequest depositFundRequest, [FromHeader] string token)
         {

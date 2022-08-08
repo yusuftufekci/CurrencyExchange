@@ -17,13 +17,11 @@ namespace CurrencyExchange.API.Controllers.UserInformationControllers
         }
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        // [ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("AllUserInformation")]
         public async Task<IActionResult> GetAllUserInformation(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {
             return CreateActionResult(await _service.GetUserInformation(userInformationRequest, token));
         }
-
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("AllTransactionsOfuser")]
@@ -31,9 +29,7 @@ namespace CurrencyExchange.API.Controllers.UserInformationControllers
         {
             return CreateActionResult(await _service.GetUserTranstactions(userInformationRequest, token));
         }
-
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("BalanceInformationOfUser")]
         public async Task<IActionResult> GetAllBalancesOfUser(UserInformationRequest userInformationRequest, [FromHeader] string token)
         {

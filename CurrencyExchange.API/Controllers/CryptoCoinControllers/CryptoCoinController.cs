@@ -18,12 +18,10 @@ namespace CurrencyExchange.API.Controllers.CryptoCoinControllers
         }
         [HttpPost("GetCryptoCoinList")]
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-
         public async Task<IActionResult> GetCryptoCoinList()
         {
             return CreateActionResult(await _cryptoCoinService.CryptoCoin());
         }
-
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("GetCryptoCoinPriceList")]
         public async Task<IActionResult> GetCryptoCoinPriceList()

@@ -16,17 +16,13 @@ namespace CurrencyExchange.API.Controllers.TransactionControllers
             _service = service;
         }
 
-
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("SellCryptoCoin")]
         public async Task<IActionResult> SellCryptoCoin(SellCryptoCoinRequest sellCryptoCoinRequest, [FromHeader] string token)
         {
             return CreateActionResult(await _service.SellCryptoCoin(sellCryptoCoinRequest, token));
         }
-
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("SellCryptoCoinV2")]
         public async Task<IActionResult> SellCryptoCoinV2(SellCryptoCoinRequest sellCryptoCoinRequest, [FromHeader] string token)
         {

@@ -54,7 +54,6 @@ namespace CurrencyExchange.API.Filters
             
             if (userToken != null)
             {
-                //var anyEntity = await _service.AnyAsync(x => x.Token == token);
                 var userExist = _userRepository.Where(x => x.Id == userToken.UserId).SingleOrDefault();
 
                 if (userExist != null)

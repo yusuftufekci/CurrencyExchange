@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
+// Şu an da kullanılmıyor
+
 namespace CurrencyExchange.Cachgin
 {
     public class CryptoCoinServiceWithCaching : ICryptoCoinRepository
