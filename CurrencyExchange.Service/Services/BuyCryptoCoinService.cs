@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CurrencyExchange.Core.HelperFunctions;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -59,16 +60,19 @@ namespace CurrencyExchange.Service.Services
             var balanceExist = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == buyCoinRequest.BuyWİthThisCoin && p.Account == accountExist).SingleOrDefaultAsync();
             if (balanceExist == null)
             {
-                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User dont have any" + buyCoinRequest.BuyWİthThisCoin);
-                return CustomResponseDto<NoContentDto>.Fail(404, $"You dont have any" + buyCoinRequest.BuyWİthThisCoin);
+                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User don't have any" + buyCoinRequest.BuyWİthThisCoin);
+                return CustomResponseDto<NoContentDto>.Fail(404, $"You don't have any" + buyCoinRequest.BuyWİthThisCoin);
             }
-            var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
+            
+            var cryptoCoinPrices = await GetCryptoCoinPrices.AsyncGetCryptoCoinPrices();
+            
+            var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.symbol == symbolOfCoins);
             if (coinTypeToBuy == null)
             {
                 _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
             }
-            double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
+            double coinPrice = Convert.ToDouble(coinTypeToBuy.price);
             double totalAmount = coinPrice * buyCoinRequest.Amount;
             totalAmount = Math.Round(totalAmount, 4);
             if (totalAmount <= 0.001)
@@ -78,8 +82,8 @@ namespace CurrencyExchange.Service.Services
             }
             if (totalAmount > balanceExist.TotalBalance)
             {
-                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User dont have enough" + buyCoinRequest.BuyWİthThisCoin);
-                return CustomResponseDto<NoContentDto>.Fail(404, "You dont have enough" + buyCoinRequest.BuyWİthThisCoin);
+                _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User don't have enough" + buyCoinRequest.BuyWİthThisCoin);
+                return CustomResponseDto<NoContentDto>.Fail(404, "You don't have enough" + buyCoinRequest.BuyWİthThisCoin);
             }
             var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoin.CoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var coinToBuy = await _cryptoCoinRepository.Where(p => p.CoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
@@ -151,14 +155,15 @@ namespace CurrencyExchange.Service.Services
                 return CustomResponseDto<NoContentDto>.Fail(404, $"You dont have any" + buyCoinRequest.BuyWİthThisCoin);
             }
 
-            var coinTypeToBuy = await _cryptoCoinPriceRepository.Where(p => p.Symbol == symbolOfCoins).SingleOrDefaultAsync();
-            if (coinTypeToBuy == null)
+            var cryptoCoinPrices = await GetCryptoCoinPrices.AsyncGetCryptoCoinPrices();
+
+            var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.symbol == symbolOfCoins); if (coinTypeToBuy == null)
             {
                 _sender.SenderFunction("Log", "BuyCoinWithAmount2 request failed. User can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWİthThisCoin);
             }
 
-            double coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
+            double coinPrice = Convert.ToDouble(coinTypeToBuy.price);
             double totalAmount = buyCoinRequest.Amount / coinPrice;
             totalAmount = Math.Round(totalAmount, 4);
 
