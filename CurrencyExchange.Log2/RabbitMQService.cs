@@ -9,7 +9,7 @@ namespace CurrencyExchange.Log2
 {
     public class RabbitMQService
     {
-        private readonly string _hostName = "localhost";
+        private readonly string _hostName = "host.docker.internal";
 
         public IConnection GetRabbitMQConnection()
         {

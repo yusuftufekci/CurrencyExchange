@@ -44,7 +44,8 @@ namespace CurrencyExchange.Repository
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=CryptoCurrency;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+            optionsBuilder.UseSqlServer("Server =172.17.0.3, 1433; Database=CryptoCurrency; Trusted_Connection=False; User Id=sa; Password=Karadeniz61; MultipleActiveResultSets=True");
         }
     }
 }
+
