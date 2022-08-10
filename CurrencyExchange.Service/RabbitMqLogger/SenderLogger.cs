@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using CurrencyExchange.Core.RabbitMqLogger;
 using RabbitMQ.Client;
 
@@ -22,7 +18,7 @@ namespace CurrencyExchange.Service.RabbitMqLogger
                                      autoDelete: false,
                                      arguments: null);
 
-                string message = logMessage;
+                var message = logMessage;
                 var body = Encoding.UTF8.GetBytes(message);
 
                 channel.BasicPublish(exchange: "",

@@ -1,10 +1,4 @@
 ﻿using CurrencyExchange.Core.DTOs;
-using CurrencyExchange.Core.Requests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CurrencyExchange.Core.Services
 {
@@ -12,7 +6,7 @@ namespace CurrencyExchange.Core.Services
     {
         Task<CustomResponseDto<UserInformationDto>> GetUserInformation( string token);
 
-        Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTranstactions(string token);
+        Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTransactions(string token);
 
         Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation( string token);
 

@@ -2,7 +2,6 @@
 using CurrencyExchange.Core.Entities.Authentication;
 using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.Repositories;
-using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -13,13 +12,13 @@ namespace CurrencyExchange.API.Filters
     {
         private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IUnitOfWork _UnitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         public TokenControlFilter(ITokenRepository tokenRepository, IUserRepository userRepository, IUnitOfWork unitOfWork)
         {
             _tokenRepository = tokenRepository;
             _userRepository = userRepository;
-            _UnitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -43,7 +42,7 @@ namespace CurrencyExchange.API.Filters
             {
                 var updateToken = _tokenRepository.Where(x => x.Token == token).SingleOrDefault();
                 updateToken.IsActive = false;
-                await _UnitOfWork.CommitAsync();
+                await _unitOfWork.CommitAsync();
                 context.Result = new NotFoundObjectResult(CustomResponseDto<NoContentDto>.Fail(404, $"{typeof(T).Name}({token}) token expired"));
                 return;
 

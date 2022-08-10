@@ -12,14 +12,14 @@ namespace CurrencyExchange.Log2
 {
     public class Consumer
     {
-        private readonly RabbitMQService _rabbitMQService;
+        private readonly RabbitMqService _rabbitMqService;
 
         public Consumer(string queueName)
         {
-            LoggerManager _logger = new LoggerManager();
-            _rabbitMQService = new RabbitMQService();
+            LoggerManager logger = new LoggerManager();
+            _rabbitMqService = new RabbitMqService();
 
-            using (var connection = _rabbitMQService.GetRabbitMQConnection())
+            using (var connection = _rabbitMqService.GetRabbitMqConnection())
             {
                 using (var channel = connection.CreateModel())
                 {
@@ -30,7 +30,7 @@ namespace CurrencyExchange.Log2
                         var body = ea.Body.ToArray();
 
                         var message = Encoding.UTF8.GetString(body);
-                        _logger.LogInfo(message);
+                        logger.LogInfo(message);
 
                         Console.WriteLine("{0} isimli queue üzerinden gelen mesaj: \"{1}\"", queueName, message);
                     };

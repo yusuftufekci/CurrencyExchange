@@ -1,10 +1,8 @@
 ﻿using CurrencyExchange.Core.DTOs;
-using CurrencyExchange.Core.Entities;
 using CurrencyExchange.Core.Entities.Authentication;
 using CurrencyExchange.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Linq;
 
 namespace CurrencyExchange.API.Filters
 {

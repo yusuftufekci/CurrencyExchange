@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CurrencyExchange.Service.Exceptions
+﻿namespace CurrencyExchange.Service.Exceptions
 {
     public class ClientSideException : Exception
     {

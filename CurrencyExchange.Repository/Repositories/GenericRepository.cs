@@ -1,24 +1,19 @@
 ﻿using CurrencyExchange.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CurrencyExchange.Repository.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
 
-        protected readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext Context;
         private readonly DbSet<T> _dbSet;
 
         public GenericRepository(ApplicationDbContext context)
         {
-            _context = context;
-            _dbSet = _context.Set<T>();
+            Context = context;
+            _dbSet = Context.Set<T>();
         }
 
         public async Task AddAsync(T entity)

@@ -34,15 +34,13 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _cryptoCoinRepository = cryptoCoinRepository;
             _sender = sender;
-            _tokenRepository = tokenRepository;            _userRepository = userRepository;
+            _tokenRepository = tokenRepository;
+            _userRepository = userRepository;
 
         }
-
-
         public async Task<CustomResponseDto<UserInformationDto>> GetUserInformation( string token)
         {
             var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
-
             var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync();
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userExist.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
@@ -51,12 +49,12 @@ namespace CurrencyExchange.Service.Services
                 return CustomResponseDto<UserInformationDto>.Fail(404, "Account not found");
             }
             var balances = await _balanceRepository.Where(p => p.Account == accountExist).ToListAsync();
-            List<BalanceDto> userBalancesInfos = new List<BalanceDto>();
+            var userBalancesInfos = new List<BalanceDto>();
             foreach (var item in balances)
             {
                 var tempCoin = await _cryptoCoinRepository.Where(p => p.Id == item.CryptoCoinId).SingleOrDefaultAsync();
 
-                BalanceDto userBalancesInfo = new BalanceDto
+                var userBalancesInfo = new BalanceDto
                 {
                     TotalAmount = item.TotalBalance,
                     CryptoCoinName = tempCoin.CoinName
@@ -64,33 +62,32 @@ namespace CurrencyExchange.Service.Services
                  };
                 userBalancesInfos.Add(userBalancesInfo);
             }
-            UserInformationDto userInformations = new UserInformationDto
+            var userInformations = new UserInformationDto
             {
                 UserBalances = userBalancesInfos,
                 UserAccountName = accountExist.AccountName,
                 UserEmail = userExist.UserEmail
              };
-            _sender.SenderFunction("Log", "GetUserInformation request succesfully completed");
+            _sender.SenderFunction("Log", "GetUserInformation request successfully completed");
             return CustomResponseDto<UserInformationDto>.Succes(201, userInformations);
 
         }
 
-        public async Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTranstactions( string token)
+        public async Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTransactions( string token)
         {
             var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
-
             var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync();
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userExist.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
             {
-                _sender.SenderFunction("Log", "GetUserTranstactions request failed. Account not found");
+                _sender.SenderFunction("Log", "GetUserTransactions request failed. Account not found");
                 return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail(404, "Account not found");
             }
-            List<UserTransactionHistoryDto> userTransactionHistories = new List<UserTransactionHistoryDto>();
+            var userTransactionHistories = new List<UserTransactionHistoryDto>();
             var transactions = await _userBalanceHistoryRepository.Where(p => p.Account == accountExist).ToListAsync();
             foreach (var item in transactions)
             {
-                UserTransactionHistoryDto userTransactions = new UserTransactionHistoryDto
+                var userTransactions = new UserTransactionHistoryDto
                 {
                     MessageForChanging = item.MessageForChanging,
                     AccountName = accountExist.AccountName,
@@ -100,35 +97,33 @@ namespace CurrencyExchange.Service.Services
                 };
                 userTransactionHistories.Add(userTransactions);
             }
-            _sender.SenderFunction("Log", "GetUserTranstactions request succesfully completed");
+            _sender.SenderFunction("Log", "GetUserTransactions request succesfully completed");
             return CustomResponseDto<List<UserTransactionHistoryDto>>.Succes(201, userTransactionHistories);
         }
 
         public async Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation( string token)
         {
             var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
-
             var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync();
             var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userExist.UserEmail).SingleOrDefaultAsync();
             if (accountExist == null)
             {
                 _sender.SenderFunction("Log", "GetUserBalanceInformation request failed. Account not found");
                 return CustomResponseDto<List<BalanceDto>>.Fail(404, "Account not found");
-
             }
             var balances = await _balanceRepository.Where(p => p.Account == accountExist).ToListAsync();
-            List<BalanceDto> userBalancesInfos = new List<BalanceDto>();
+            var userBalancesInfos = new List<BalanceDto>();
             foreach (var item in balances)
             {
                 var tempCoin = await _cryptoCoinRepository.Where(p => p.Id == item.CryptoCoinId).SingleOrDefaultAsync();
-                BalanceDto userBalancesInfo = new BalanceDto
+                var userBalancesInfo = new BalanceDto
                 {
                     TotalAmount = item.TotalBalance,
                     CryptoCoinName = tempCoin.CoinName
                 };
                 userBalancesInfos.Add(userBalancesInfo);
             }
-            _sender.SenderFunction("Log", "GetUserBalanceInformation request succesfully completed");
+            _sender.SenderFunction("Log", "GetUserBalanceInformation request successfully completed");
             return CustomResponseDto<List<BalanceDto>>.Succes(201, userBalancesInfos);
         }
     }

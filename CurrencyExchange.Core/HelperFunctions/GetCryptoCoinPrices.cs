@@ -1,11 +1,5 @@
 ﻿using CurrencyExchange.Core.DTOs;
-using CurrencyExchange.Core.Services;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CurrencyExchange.Core.HelperFunctions
 {
@@ -23,17 +17,17 @@ namespace CurrencyExchange.Core.HelperFunctions
                 HttpResponseMessage response = await client.GetAsync("https://api.binance.com/api/v3/ticker/price");
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    var ResponceString = await response.Content.ReadAsStringAsync();
+                    var responceString = await response.Content.ReadAsStringAsync();
 
 
-                    var ResponceObject = JsonConvert.DeserializeObject<List<CryptoCoinPriceDto>>(ResponceString);
+                    var responceObject = JsonConvert.DeserializeObject<List<CryptoCoinPriceDto>>(responceString);
 
-                    foreach (var item in ResponceObject)
+                    foreach (var item in responceObject)
                     {
                         var coinPrice = new CryptoCoinPriceDto
                         {
-                            price = item.price,
-                            symbol = item.symbol
+                            Price = item.Price,
+                            Symbol = item.Symbol
                          };
                        
                         cryptoCoinPrices.Add(coinPrice);

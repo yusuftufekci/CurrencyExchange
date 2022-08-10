@@ -1,8 +1,5 @@
-﻿using CurrencyExchange.Core.DTOs;
-using CurrencyExchange.Core.Entities.Authentication;
-using CurrencyExchange.Core.Requests;
+﻿using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers.AuthenticationControllers

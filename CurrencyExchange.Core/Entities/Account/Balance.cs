@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CurrencyExchange.Core.Entities.CryptoCoins;
+﻿using CurrencyExchange.Core.Entities.CryptoCoins;
 
 namespace CurrencyExchange.Core.Entities.Account
 {

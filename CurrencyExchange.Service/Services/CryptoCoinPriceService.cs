@@ -16,13 +16,13 @@ namespace CurrencyExchange.Service.Services
     public class CryptoCoinPriceService : ICryptoCoinPriceService
     {
         private readonly ICryptoCoinPriceRepository _cryptoCoinPriceRepository;
-        private readonly IUnitOfWork _UnitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ISenderLogger _sender;
 
         public CryptoCoinPriceService(IUnitOfWork unitOfWork,
           ICryptoCoinPriceRepository cryptoCoinPriceRepository, IUnitOfWork unitOfWork1, ISenderLogger senderLogger)
         {
-            _UnitOfWork = unitOfWork1;
+            _unitOfWork = unitOfWork1;
             _cryptoCoinPriceRepository = cryptoCoinPriceRepository;
             _sender = senderLogger;
 
@@ -37,41 +37,41 @@ namespace CurrencyExchange.Service.Services
                 HttpResponseMessage response = await client.GetAsync("https://api.binance.com/api/v3/ticker/price");
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    var ResponceString = await response.Content.ReadAsStringAsync();
+                    var responceString = await response.Content.ReadAsStringAsync();
 
                     var cryptoCoinPrices = _cryptoCoinPriceRepository.GetAll().ToList();
 
-                    var ResponceObject = JsonConvert.DeserializeObject<List<CryptoCoinPriceDto>>(ResponceString);
+                    var responceObject = JsonConvert.DeserializeObject<List<CryptoCoinPriceDto>>(responceString);
                     if (cryptoCoinPrices.Count == 0)
                     {
-                        foreach (var item in ResponceObject)
+                        foreach (var item in responceObject)
                         {
                             var coinPrice = new CryptoCoinPrice();
 
-                            coinPrice.Price = item.price;
-                            coinPrice.Symbol = item.symbol;
+                            coinPrice.Price = item.Price;
+                            coinPrice.Symbol = item.Symbol;
                             _cryptoCoinPriceRepository.AddAsync(coinPrice);
                         }
-                        await _UnitOfWork.CommitAsync();
+                        await _unitOfWork.CommitAsync();
                         _sender.SenderFunction("Log", "CryptoCoinPrice request succesfully completed.");
 
                         return CustomResponseDto<NoContentDto>.Succes(201);
                     }
                     else
                     {
-                        foreach (var item in ResponceObject)
+                        foreach (var item in responceObject)
                         {
                             var coinPrice2 = _cryptoCoinPriceRepository.GetAll().ToList();
                             if (coinPrice2 == null)
                             {
                                 var coinPrice = new CryptoCoinPrice();
 
-                                coinPrice.Price = item.price;
+                                coinPrice.Price = item.Price;
                                 coinPrice.ModifiedDate = DateTime.UtcNow;
                             }
 
                         }
-                        await _UnitOfWork.CommitAsync();
+                        await _unitOfWork.CommitAsync();
                         _sender.SenderFunction("Log", "CryptoCoinPrice request succesfully completed.");
                         return CustomResponseDto<NoContentDto>.Succes(201);
 

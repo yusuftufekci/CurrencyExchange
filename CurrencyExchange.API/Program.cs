@@ -1,7 +1,5 @@
-﻿using CurrencyExchange.API;
-using CurrencyExchange.API.Filters;
+﻿using CurrencyExchange.API.Filters;
 using CurrencyExchange.API.Middlewares;
-using CurrencyExchange.Cachgin;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Services;
@@ -11,11 +9,9 @@ using CurrencyExchange.Repository.Repositories;
 using CurrencyExchange.Repository.UnitOfWorks;
 using CurrencyExchange.Service.RabbitMqLogger;
 using CurrencyExchange.Service.Services;
-using CurrencyExchange.Service.Validations;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NLog;
 using System.Reflection;
 using CryptoCoinServiceWithCaching = CurrencyExchange.Service.Services;
 

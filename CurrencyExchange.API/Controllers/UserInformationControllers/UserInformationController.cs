@@ -1,9 +1,7 @@
 ﻿using CurrencyExchange.API.Filters;
-using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Authentication;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers.UserInformationControllers
@@ -27,7 +25,7 @@ namespace CurrencyExchange.API.Controllers.UserInformationControllers
         [HttpPost("AllTransactionsOfuser")]
         public async Task<IActionResult> GetAllTransactionsOfUser( [FromHeader] string token)
         {
-            return CreateActionResult(await _service.GetUserTranstactions( token));
+            return CreateActionResult(await _service.GetUserTransactions( token));
         }
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("BalanceInformationOfUser")]

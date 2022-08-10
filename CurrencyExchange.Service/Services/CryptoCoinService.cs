@@ -16,13 +16,13 @@ namespace CurrencyExchange.Service.Services
     public class CryptoCoinService : ICryptoCoinService
     {
         private readonly ICryptoCoinRepository _cryptoCoinRepository;
-        private readonly IUnitOfWork _UnitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ISenderLogger _sender;
 
         public CryptoCoinService(IUnitOfWork unitOfWork,
           ICryptoCoinRepository cryptoCoinRepository, IUnitOfWork unitOfWork1, ISenderLogger sender)
         {
-            _UnitOfWork = unitOfWork1;
+            _unitOfWork = unitOfWork1;
             _cryptoCoinRepository = cryptoCoinRepository;
             _sender = sender;
         }
@@ -35,8 +35,8 @@ namespace CurrencyExchange.Service.Services
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var cryptoCoins = _cryptoCoinRepository.GetAll().ToList();
-                    var ResponceString = await response.Content.ReadAsStringAsync();
-                    var root = (JContainer)JToken.Parse(ResponceString);
+                    var responceString = await response.Content.ReadAsStringAsync();
+                    var root = (JContainer)JToken.Parse(responceString);
                     var list = root.DescendantsAndSelf().OfType<JProperty>().Where(p => p.Name == "id").Select(p => p.Value.Value<string>());
                     if (cryptoCoins == null)
                     {
@@ -72,7 +72,7 @@ namespace CurrencyExchange.Service.Services
                     return CustomResponseDto<NoContentDto>.Fail(404,"Problem");
                 }
             }
-            await _UnitOfWork.CommitAsync();
+            await _unitOfWork.CommitAsync();
             _sender.SenderFunction("Log", "CryptoCoin request succesfully completed.");
             return CustomResponseDto<NoContentDto>.Succes(201);
         }

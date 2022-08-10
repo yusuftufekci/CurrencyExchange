@@ -1,5 +1,4 @@
 ﻿using CurrencyExchange.Core.DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers

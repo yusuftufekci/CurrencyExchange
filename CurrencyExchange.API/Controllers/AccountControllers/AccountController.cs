@@ -1,10 +1,7 @@
 ﻿using CurrencyExchange.API.Filters;
-using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Authentication;
-using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers.AccountControllers
@@ -24,7 +21,6 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
         {
             return CreateActionResult(await _service.CreateAccount(createAccountRequest,token));
         }
-
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("DepositFund")]
         public async Task<IActionResult> DepositFund(DepositFundRequest depositFundRequest, [FromHeader] string token)
