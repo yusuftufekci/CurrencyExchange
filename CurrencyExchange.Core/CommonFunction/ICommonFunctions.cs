@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Authentication;
+using CurrencyExchange.Core.Entities.Log;
+using CurrencyExchange.Core.Entities.LogMessages;
 
 namespace CurrencyExchange.Core.CommonFunction
 {
@@ -12,6 +14,10 @@ namespace CurrencyExchange.Core.CommonFunction
     {
         Task<Account> GetAccount(string token);
         Task<User> GetUser(string token);
+
+        Task<ResponseMessages> GetApiResponseMessage(string key, string language);
+
+        Task<LogMessages> GetLogResponseMessage(string key, string language);
 
 
 

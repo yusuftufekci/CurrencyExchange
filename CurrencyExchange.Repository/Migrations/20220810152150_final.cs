@@ -9,23 +9,7 @@ namespace CurrencyExchange.Repository.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Balances_CryptoCoins_CryptoCoinId",
-                table: "Balances");
-
-            migrationBuilder.DropTable(
-                name: "CryptoCoinPrices");
-
-            migrationBuilder.DropTable(
-                name: "CryptoCoins");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Balances_CryptoCoinId",
-                table: "Balances");
-
-            migrationBuilder.DropColumn(
-                name: "CryptoCoinId",
-                table: "Balances");
+            
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

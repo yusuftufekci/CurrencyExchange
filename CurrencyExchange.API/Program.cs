@@ -34,6 +34,9 @@ builder.Services.AddScoped(typeof(IAccountRepository), typeof(AccountRepository)
 builder.Services.AddScoped(typeof(IBalanceRepository), typeof(BalanceRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(ITokenRepository), typeof(TokenRepository));
+builder.Services.AddScoped(typeof(IResponseMessageRepository), typeof(ResponseMessageRepository));
+builder.Services.AddScoped(typeof(ILogMessagesRepository), typeof(LogMessagesRepository));
+
 builder.Services.AddScoped(typeof(IUserBalanceHistoryRepository), typeof(UserBalanceHistoryRepository));
 builder.Services.AddScoped(typeof(ISellCryptoCoinService<>), typeof(SellCryptoCoinService<>));
 

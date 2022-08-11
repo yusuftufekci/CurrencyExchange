@@ -2,6 +2,8 @@
 using CurrencyExchange.Core.Entities.Authentication;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using CurrencyExchange.Core.Entities.Log;
+using CurrencyExchange.Core.Entities.LogMessages;
 
 namespace CurrencyExchange.Repository
 {
@@ -23,6 +25,8 @@ namespace CurrencyExchange.Repository
 
 
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<ResponseMessages> ResponseMessages { get; set; }
+        public DbSet<LogMessages> LogMessages { get; set; }
 
         public DbSet<Balance> Balances { get; set; }
         public DbSet<UserBalanceHistory> UserBalanceHistories { get; set; }
