@@ -12,7 +12,7 @@ namespace CurrencyExchange.Service.Services
 {
     public class AccountService<T> : IAccount<T> where T : class
     {
-        private  readonly ITokenRepository _tokenRepository;
+        private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountRepository _accountRepository;
@@ -55,7 +55,7 @@ namespace CurrencyExchange.Service.Services
             return CustomResponseDto<NoContentDto>.Succes(201);
         }
 
-    public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
+        public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
         {
             var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
             var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
@@ -63,9 +63,9 @@ namespace CurrencyExchange.Service.Services
             if (accountExist == null)
             {
                 _sender.SenderFunction("Log", "DepositFunds request failed. Account not found");
-                return CustomResponseDto<NoContentDto>.Fail(404,"Account not found");
+                return CustomResponseDto<NoContentDto>.Fail(404, "Account not found");
             }
-            var balanceExist = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoinName=="USDT").SingleOrDefaultAsync();
+            var balanceExist = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoinName == "USDT").SingleOrDefaultAsync();
             if (balanceExist == null)
             {
                 UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory

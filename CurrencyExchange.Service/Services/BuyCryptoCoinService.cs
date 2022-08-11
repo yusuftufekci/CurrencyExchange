@@ -73,7 +73,7 @@ namespace CurrencyExchange.Service.Services
             var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var cryptoCoins = await GetCryptoCoins.AsyncGetCryptoCoins();
 
-            var coinToBuy =  cryptoCoins.SingleOrDefault(p => p.CoinName == buyCoinRequest.CoinToBuy);
+            var coinToBuy = cryptoCoins.SingleOrDefault(p => p.CoinName == buyCoinRequest.CoinToBuy);
             if (balanceExistForBuyCoin == null)
             {
                 var tempBalance = new Balance
