@@ -36,6 +36,23 @@ namespace CurrencyExchange.Service.Services
             _commonFunctions = commonFunctions;
         }
 
+        public double CalculateTotalAmountByUsdt(string price, double amount)
+        {
+            var coinPrice = Convert.ToDouble(price);
+            var totalAmount = coinPrice * amount;
+            totalAmount = Math.Round(totalAmount, 4);
+            return totalAmount;
+        }
+
+        public double CalculateTotalAmountByCoin(string price, double amount)
+        {
+            var coinPrice = Convert.ToDouble(price);
+            var totalAmount = amount / coinPrice;
+            totalAmount = Math.Round(totalAmount, 4);
+            return totalAmount;
+        }
+
+
         public async Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount(BuyCoinRequest buyCoinRequest, string token)
         {
             var accountExist = await _commonFunctions.GetAccount(token);
@@ -58,9 +75,7 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWIthThisCoin);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWIthThisCoin);
             }
-            var coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
-            var totalAmount = coinPrice * buyCoinRequest.Amount;
-            totalAmount = Math.Round(totalAmount, 4);
+            var totalAmount = CalculateTotalAmountByUsdt(coinTypeToBuy.Price, buyCoinRequest.Amount);
             if (totalAmount <= 0.001)
             {
                 _sender.SenderFunction("Log", "BuyCoinWithAmount request failed. User can't buy this amount of coin");
@@ -73,7 +88,12 @@ namespace CurrencyExchange.Service.Services
             }
             var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var cryptoCoins = await GetCryptoCoins.AsyncGetCryptoCoins();
+            if (cryptoCoins == null)
+            {
+                _sender.SenderFunction("Log", "Can't reach binance api.");
+                return CustomResponseDto<NoContentDto>.Fail(404, "Can't reach binance api.");
 
+            }
             var coinToBuy = cryptoCoins.SingleOrDefault(p => p.CoinName == buyCoinRequest.CoinToBuy);
             if (balanceExistForBuyCoin == null)
             {
@@ -139,9 +159,8 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "BuyCoinWithAmount2 request failed. User can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWIthThisCoin);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You can't buy " + buyCoinRequest.CoinToBuy + " with " + buyCoinRequest.BuyWIthThisCoin);
             }
-            var coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
-            var totalAmount = buyCoinRequest.Amount / coinPrice;
-            totalAmount = Math.Round(totalAmount, 4);
+
+            var totalAmount = CalculateTotalAmountByCoin(coinTypeToBuy.Price, buyCoinRequest.Amount);
             if (totalAmount <= 0.001)
             {
                 _sender.SenderFunction("Log", "BuyCoinWithAmount2 request failed. User can't buy this amount of coin");
