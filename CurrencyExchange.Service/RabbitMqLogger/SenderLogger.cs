@@ -8,7 +8,7 @@ namespace CurrencyExchange.Service.RabbitMqLogger
     {
         public  void SenderFunction(string queName, string logMessage)
         {
-            var factory = new ConnectionFactory() { HostName = "host.docker.internal" };
+            var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {

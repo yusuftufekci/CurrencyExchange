@@ -1,6 +1,5 @@
 ﻿using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Authentication;
-using CurrencyExchange.Core.Entities.CryptoCoins;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -22,12 +21,10 @@ namespace CurrencyExchange.Repository
 
         public DbSet<Password> PasswordInfos { get; set; }
 
-        public DbSet<CryptoCoinPrice> CryptoCoinPrices { get; set; }
 
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<Balance> Balances { get; set; }
-        public DbSet<CryptoCoin> CryptoCoins { get; set; }
         public DbSet<UserBalanceHistory> UserBalanceHistories { get; set; }
 
 
@@ -39,7 +36,7 @@ namespace CurrencyExchange.Repository
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server =172.17.0.3, 1433; Database=CryptoCurrency; Trusted_Connection=False; User Id=sa; Password=Karadeniz61; MultipleActiveResultSets=True");
+            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=CryptoCurrency;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
         }
     }
 }

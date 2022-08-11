@@ -12,7 +12,7 @@ namespace CurrencyExchange.Service.Services
 {
     public class SellCryptoCoinService<T> : ISellCryptoCoinService<T> where T : class
     {
-        private  readonly ITokenRepository _tokenRepository;
+        private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountRepository _accountRepository;
@@ -22,7 +22,7 @@ namespace CurrencyExchange.Service.Services
 
         public SellCryptoCoinService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
-           IBalanceRepository balanceRepository, 
+           IBalanceRepository balanceRepository,
             ISenderLogger sender, ITokenRepository tokenRepository)
         {
             _userRepository = repository;
@@ -39,8 +39,9 @@ namespace CurrencyExchange.Service.Services
             /*
              Bu fonksiyon kullanıcı eğer belli bir miktar  Coinlik satış yapmak isterse kullanılacak.
             */
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync(); var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
+            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
+            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
+            var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             var symbolOfCoins = sellCryptoCoinRequest.CoinToSell + "USDT";
             if (accountExist == null)
             {
@@ -53,7 +54,7 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "SellCryptoCoin request failed. There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
             }
-            var balanceExist = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == sellCryptoCoinRequest.CoinToSell && p.Account == accountExist).SingleOrDefaultAsync();
+            var balanceExist = await _balanceRepository.Where(p => p.CryptoCoinName == sellCryptoCoinRequest.CoinToSell && p.Account == accountExist).SingleOrDefaultAsync();
             if (balanceExist == null)
             {
                 _sender.SenderFunction("Log", "SellCryptoCoin request failed. You dont have any" + sellCryptoCoinRequest.CoinToSell);
@@ -72,7 +73,7 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "SellCryptoCoin request failed. User dont have enough " + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You dont have enough " + sellCryptoCoinRequest.CoinToSell);
             }
-            var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == "USDT" && p.Account == accountExist).SingleOrDefaultAsync();
+            var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoinName == "USDT" && p.Account == accountExist).SingleOrDefaultAsync();
             balanceExistForBuyCoin.TotalBalance += totalAmount;
             balanceExist.TotalBalance -= sellCryptoCoinRequest.Amount;
             balanceExist.ModifiedDate = DateTime.UtcNow;
@@ -97,8 +98,8 @@ namespace CurrencyExchange.Service.Services
              Bu fonksiyon kullanıcı eğer belli bir miktar dolarlık satış yapmak isterse kullanılacak.
             */
 
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync();
+            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
+            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
             var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             var symbolOfCoins = sellCryptoCoinRequest.CoinToSell + "USDT";
             if (accountExist == null)
@@ -112,14 +113,14 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "There is no Crypto Coin name  " + sellCryptoCoinRequest.CoinToSell);
             }
-            var balanceExist = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == sellCryptoCoinRequest.CoinToSell && p.Account == accountExist).SingleOrDefaultAsync();
+            var balanceExist = await _balanceRepository.Where(p => p.CryptoCoinName == sellCryptoCoinRequest.CoinToSell && p.Account == accountExist).SingleOrDefaultAsync();
             if (balanceExist == null)
             {
                 _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. You dont have any" + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You dont have any" + sellCryptoCoinRequest.CoinToSell);
             }
             var coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
-            var totalAmount = sellCryptoCoinRequest.Amount /coinPrice ; //Coinden  çıkaracağım miktar
+            var totalAmount = sellCryptoCoinRequest.Amount / coinPrice; //Coinden  çıkaracağım miktar
             totalAmount = Math.Round(totalAmount, 4);
             if (totalAmount <= 0.001)
             {
@@ -131,11 +132,10 @@ namespace CurrencyExchange.Service.Services
                 _sender.SenderFunction("Log", "SellCryptoCoin2 request failed. User dont have enough " + sellCryptoCoinRequest.CoinToSell);
                 return CustomResponseDto<NoContentDto>.Fail(404, "You dont have enough " + sellCryptoCoinRequest.CoinToSell);
             }
-            var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoin.CoinName == "USDT" && p.Account == accountExist).SingleOrDefaultAsync();
+            var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoinName == "USDT" && p.Account == accountExist).SingleOrDefaultAsync();
             balanceExistForBuyCoin.TotalBalance += sellCryptoCoinRequest.Amount;
             balanceExist.TotalBalance -= totalAmount;
-            balanceExist.ModifiedDate = DateTime.UtcNow;
-            var tempUserBalanceHistory = new UserBalanceHistory
+            balanceExist.ModifiedDate = DateTime.UtcNow;eHistory
             {
                 Account = accountExist,
                 MessageForChanging = totalAmount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + sellCryptoCoinRequest.Amount + " USDT",

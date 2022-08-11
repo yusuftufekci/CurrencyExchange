@@ -68,8 +68,9 @@ namespace CurrencyExchange.Repository.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CryptoCoinId")
-                        .HasColumnType("int");
+                    b.Property<string>("CryptoCoinName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -83,8 +84,6 @@ namespace CurrencyExchange.Repository.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
-
-                    b.HasIndex("CryptoCoinId");
 
                     b.ToTable("Balances");
                 });
@@ -245,64 +244,6 @@ namespace CurrencyExchange.Repository.Migrations
                     b.ToTable("UserTokens");
                 });
 
-            modelBuilder.Entity("CurrencyExchange.Core.Entities.CryptoCoins.CryptoCoin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("CoinName")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CryptoCoins");
-                });
-
-            modelBuilder.Entity("CurrencyExchange.Core.Entities.CryptoCoins.CryptoCoinPrice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Price")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CryptoCoinPrices");
-                });
-
             modelBuilder.Entity("CurrencyExchange.Core.Entities.Account.Account", b =>
                 {
                     b.HasOne("CurrencyExchange.Core.Entities.Authentication.User", "User")
@@ -322,15 +263,7 @@ namespace CurrencyExchange.Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CurrencyExchange.Core.Entities.CryptoCoins.CryptoCoin", "CryptoCoin")
-                        .WithMany("Balances")
-                        .HasForeignKey("CryptoCoinId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Account");
-
-                    b.Navigation("CryptoCoin");
                 });
 
             modelBuilder.Entity("CurrencyExchange.Core.Entities.Account.UserBalanceHistory", b =>
@@ -367,11 +300,6 @@ namespace CurrencyExchange.Repository.Migrations
                 });
 
             modelBuilder.Entity("CurrencyExchange.Core.Entities.Account.Account", b =>
-                {
-                    b.Navigation("Balances");
-                });
-
-            modelBuilder.Entity("CurrencyExchange.Core.Entities.CryptoCoins.CryptoCoin", b =>
                 {
                     b.Navigation("Balances");
                 });

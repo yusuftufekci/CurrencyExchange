@@ -1,5 +1,6 @@
 ﻿using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
+using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
@@ -17,28 +18,26 @@ namespace CurrencyExchange.Service.Services
         private readonly IAccountRepository _accountRepository;
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;
-        private readonly ICryptoCoinRepository _cryptoCoinRepository;
         private readonly ISenderLogger _sender;
 
 
         public AccountService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
             IBalanceRepository balanceRepository,
-            ICryptoCoinRepository cryptoCoinRepository,ISenderLogger senderLogger, ITokenRepository tokenRepository)
+            ISenderLogger senderLogger, ITokenRepository tokenRepository)
         {
             _userRepository = repository;
             _unitOfWork = unitOfWork;
             _accountRepository = accountRepository;
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
             _balanceRepository = balanceRepository;
-            _cryptoCoinRepository = cryptoCoinRepository;
             _sender = senderLogger;
             _tokenRepository = tokenRepository;
         }
         public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync();
+            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
+            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
             var accountExist = await _accountRepository.Where(p => p.User == userExist).FirstOrDefaultAsync();
             if (accountExist != null)
             {
@@ -58,15 +57,15 @@ namespace CurrencyExchange.Service.Services
 
     public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleOrDefaultAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleOrDefaultAsync();
+            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
+            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
             var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
             if (accountExist == null)
             {
                 _sender.SenderFunction("Log", "DepositFunds request failed. Account not found");
                 return CustomResponseDto<NoContentDto>.Fail(404,"Account not found");
             }
-            var balanceExist = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoinId==3).SingleOrDefaultAsync();
+            var balanceExist = await _balanceRepository.Where(p => p.Account == accountExist && p.CryptoCoinName=="USDT").SingleOrDefaultAsync();
             if (balanceExist == null)
             {
                 UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory
@@ -79,10 +78,12 @@ namespace CurrencyExchange.Service.Services
                     ChangedAmountSoldCryptoCoin = createAccountRequest.TotalBalance
                 };
 
-                var usdt = await _cryptoCoinRepository.Where(p => p.CoinName == "USDT").SingleOrDefaultAsync();
+                var cryptoCoins = await GetCryptoCoins.AsyncGetCryptoCoins();
+
+                var usdt = cryptoCoins.SingleOrDefault(p => p.CoinName == "USDT");
                 var tempBalance = new Balance
                 {
-                    CryptoCoin = usdt,
+                    CryptoCoinName = usdt.CoinName,
                     Account = accountExist,
                     TotalBalance = createAccountRequest.TotalBalance
                 };
