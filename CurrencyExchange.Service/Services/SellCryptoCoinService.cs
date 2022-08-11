@@ -1,4 +1,5 @@
-﻿using CurrencyExchange.Core.DTOs;
+﻿using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
@@ -19,11 +20,12 @@ namespace CurrencyExchange.Service.Services
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;
         private readonly ISenderLogger _sender;
+        private readonly ICommonFunctions _commonFunctions;
 
         public SellCryptoCoinService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
            IBalanceRepository balanceRepository,
-            ISenderLogger sender, ITokenRepository tokenRepository)
+            ISenderLogger sender, ITokenRepository tokenRepository, ICommonFunctions commonFunctions)
         {
             _userRepository = repository;
             _unitOfWork = unitOfWork;
@@ -32,6 +34,7 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _sender = sender;
             _tokenRepository = tokenRepository;
+            _commonFunctions = commonFunctions;
         }
 
         public async Task<CustomResponseDto<NoContentDto>> SellCryptoCoin(SellCryptoCoinRequest sellCryptoCoinRequest, string token)
@@ -39,9 +42,8 @@ namespace CurrencyExchange.Service.Services
             /*
              Bu fonksiyon kullanıcı eğer belli bir miktar  Coinlik satış yapmak isterse kullanılacak.
             */
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
+            var accountExist = await _commonFunctions.GetAccount(token);
+
             var symbolOfCoins = sellCryptoCoinRequest.CoinToSell + "USDT";
             if (accountExist == null)
             {
@@ -98,9 +100,7 @@ namespace CurrencyExchange.Service.Services
              Bu fonksiyon kullanıcı eğer belli bir miktar dolarlık satış yapmak isterse kullanılacak.
             */
 
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
+            var accountExist = await _commonFunctions.GetAccount(token);
             var symbolOfCoins = sellCryptoCoinRequest.CoinToSell + "USDT";
             if (accountExist == null)
             {

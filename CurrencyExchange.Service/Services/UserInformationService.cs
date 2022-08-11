@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.HelperFunctions;
 
 namespace CurrencyExchange.Service.Services
@@ -23,11 +24,12 @@ namespace CurrencyExchange.Service.Services
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;
         private readonly ISenderLogger _sender;
+        private readonly ICommonFunctions _commonFunctions;
 
         public UserInformationService(IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
             IBalanceRepository balanceRepository,
-            ISenderLogger sender, ITokenRepository tokenRepository, IUserRepository userRepository)
+            ISenderLogger sender, ITokenRepository tokenRepository, IUserRepository userRepository, ICommonFunctions commonFunctions)
         {
             _accountRepository = accountRepository;
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
@@ -35,13 +37,14 @@ namespace CurrencyExchange.Service.Services
             _sender = sender;
             _tokenRepository = tokenRepository;
             _userRepository = userRepository;
-
+            _commonFunctions = commonFunctions;
         }
         public async Task<CustomResponseDto<UserInformationDto>> GetUserInformation(string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userExist.UserEmail).SingleOrDefaultAsync();
+            var userExist = await _commonFunctions.GetUser(token);
+
+            var accountExist = await _commonFunctions.GetAccount(token);
+
             if (accountExist == null)
             {
                 _sender.SenderFunction("Log", "CreateAccount request failed. Account not found");
@@ -77,9 +80,7 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTransactions(string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userExist.UserEmail).SingleOrDefaultAsync();
+            var accountExist = await _commonFunctions.GetAccount(token);
             if (accountExist == null)
             {
                 _sender.SenderFunction("Log", "GetUserTransactions request failed. Account not found");
@@ -105,9 +106,7 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation(string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            var accountExist = await _accountRepository.Where(p => p.User.UserEmail == userExist.UserEmail).SingleOrDefaultAsync();
+            var accountExist = await _commonFunctions.GetAccount(token);
             if (accountExist == null)
             {
                 _sender.SenderFunction("Log", "GetUserBalanceInformation request failed. Account not found");

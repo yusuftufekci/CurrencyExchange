@@ -1,4 +1,5 @@
-﻿using CurrencyExchange.Core.DTOs;
+﻿using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
@@ -19,12 +20,13 @@ namespace CurrencyExchange.Service.Services
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;
         private readonly ISenderLogger _sender;
+        private readonly ICommonFunctions _commonFunctions;
 
 
         public AccountService(IUserRepository repository, IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
             IBalanceRepository balanceRepository,
-            ISenderLogger senderLogger, ITokenRepository tokenRepository)
+            ISenderLogger senderLogger, ITokenRepository tokenRepository, ICommonFunctions commonFunctions)
         {
             _userRepository = repository;
             _unitOfWork = unitOfWork;
@@ -33,12 +35,13 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _sender = senderLogger;
             _tokenRepository = tokenRepository;
+            _commonFunctions = commonFunctions;
         }
         public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            var accountExist = await _accountRepository.Where(p => p.User == userExist).FirstOrDefaultAsync();
+            var userExist = await _commonFunctions.GetUser(token);
+            var accountExist = await _commonFunctions.GetAccount(token);
+
             if (accountExist != null)
             {
                 _sender.SenderFunction("Log", "CreateAccount request failed. Account already exist");
@@ -57,9 +60,7 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
+            var accountExist = await _commonFunctions.GetAccount(token);
             if (accountExist == null)
             {
                 _sender.SenderFunction("Log", "DepositFunds request failed. Account not found");

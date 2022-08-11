@@ -13,6 +13,8 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Service.CommonFunction;
 using CryptoCoinServiceWithCaching = CurrencyExchange.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +45,8 @@ builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IAuthenticationService<>), typeof(AuthenticationService<>));
 builder.Services.AddScoped(typeof(IUserInformationService<>), typeof(UserInformationService<>));
 builder.Services.AddScoped(typeof(IAccount<>), typeof(AccountService<>));
+builder.Services.AddScoped(typeof(ICommonFunctions), typeof(CommonFunctions));
+
 builder.Services.AddScoped(typeof(ISenderLogger), typeof(SenderLogger));
 
 
