@@ -135,7 +135,8 @@ namespace CurrencyExchange.Service.Services
             var balanceExistForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoinName == "USDT" && p.Account == accountExist).SingleOrDefaultAsync();
             balanceExistForBuyCoin.TotalBalance += sellCryptoCoinRequest.Amount;
             balanceExist.TotalBalance -= totalAmount;
-            balanceExist.ModifiedDate = DateTime.UtcNow;eHistory
+            balanceExist.ModifiedDate = DateTime.UtcNow;
+            var tempUserBalanceHistory = new UserBalanceHistory
             {
                 Account = accountExist,
                 MessageForChanging = totalAmount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + sellCryptoCoinRequest.Amount + " USDT",

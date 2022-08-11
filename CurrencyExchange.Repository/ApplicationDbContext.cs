@@ -40,4 +40,3 @@ namespace CurrencyExchange.Repository
         }
     }
 }
-
