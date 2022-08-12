@@ -69,7 +69,5 @@ namespace CurrencyExchange.Service.Services
         {
             return _repository.Where(expression);
         }
-
-       
     }
 }

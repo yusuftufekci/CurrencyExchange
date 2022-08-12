@@ -19,7 +19,7 @@ namespace CurrencyExchange.API.Controllers.TransactionControllers
         [HttpPost("BuyCryptoCoin")]
         public async Task<IActionResult> BuyCryptoCoin(BuyCoinRequest buyCoinRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.BuyCoinWithAmount(buyCoinRequest, token));
+            return CreateActionResult(await _service.BuyCryptoCoinByUsdt(buyCoinRequest, token));
         }
 
 
@@ -27,7 +27,7 @@ namespace CurrencyExchange.API.Controllers.TransactionControllers
         [HttpPost("BuyCryptoCoinV2")]
         public async Task<IActionResult> BuyCryptoCoinV2(BuyCoinRequest buyCoinRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.BuyCoinWithAmount2(buyCoinRequest, token));
+            return CreateActionResult(await _service.BuyCryptoCoinByCoin(buyCoinRequest, token));
         }
 
 

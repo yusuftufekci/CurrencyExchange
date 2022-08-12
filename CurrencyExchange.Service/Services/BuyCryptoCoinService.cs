@@ -50,7 +50,7 @@ namespace CurrencyExchange.Service.Services
         }
 
 
-        public async Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount(BuyCoinRequest buyCoinRequest, string token)
+        public async Task<CustomResponseDto<NoContentDto>> BuyCryptoCoinByUsdt(BuyCoinRequest buyCoinRequest, string token)
         {
             ResponseMessages responseMessage;
             LogMessages logMessages;
@@ -146,12 +146,12 @@ namespace CurrencyExchange.Service.Services
             await _unitOfWork.CommitAsync();
             logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountSuccess", language: "en");
 
-            _logSender.SenderFunction("Log", "BuyCoinWithAmount request successfully completed.");
+            _logSender.SenderFunction("Log", "BuyCryptoCoinByUsdt request successfully completed.");
             return CustomResponseDto<NoContentDto>.Succes(201);
 
         }
 
-        public async Task<CustomResponseDto<NoContentDto>> BuyCoinWithAmount2(BuyCoinRequest buyCoinRequest, string token)
+        public async Task<CustomResponseDto<NoContentDto>> BuyCryptoCoinByCoin(BuyCoinRequest buyCoinRequest, string token)
         {
             ResponseMessages responseMessage;
             LogMessages logMessages;
@@ -245,7 +245,7 @@ namespace CurrencyExchange.Service.Services
             }
             await _unitOfWork.CommitAsync();
             logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmount2Success", language: "en");
-            _logSender.SenderFunction("Log", "BuyCoinWithAmount2 request successfully completed.");
+            _logSender.SenderFunction("Log", "BuyCryptoCoinByCoin request successfully completed.");
             return CustomResponseDto<NoContentDto>.Succes(201);
 
         }
