@@ -1,4 +1,5 @@
 ﻿using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.ConfigModels;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Log;
@@ -10,6 +11,7 @@ using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -20,17 +22,20 @@ namespace CurrencyExchange.Service.Services
         private readonly IBalanceRepository _balanceRepository;
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
+        private readonly ControlCryptoCoinAmountSettings _controlCryptoCoinAmountSettings;
 
         public SellCryptoCoinService( IUnitOfWork unitOfWork, 
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
            IBalanceRepository balanceRepository,
-            ISenderLogger logSender, ICommonFunctions commonFunctions)
+            ISenderLogger logSender, ICommonFunctions commonFunctions, IOptions<ControlCryptoCoinAmountSettings> controlCryptoCoinAmountSettings)
         {
             _unitOfWork = unitOfWork;
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
             _balanceRepository = balanceRepository;
             _logSender = logSender;
             _commonFunctions = commonFunctions;
+            _controlCryptoCoinAmountSettings = controlCryptoCoinAmountSettings.Value;
+
         }
 
         public async Task<CustomResponseDto<NoContentDto>> SellCryptoCoin(SellCryptoCoinRequest sellCryptoCoinRequest, string token)
@@ -68,8 +73,8 @@ namespace CurrencyExchange.Service.Services
             }
             var coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
             var totalAmount = coinPrice * sellCryptoCoinRequest.Amount;
-            totalAmount = Math.Round(totalAmount, 4);
-            if (totalAmount <= 0.001)
+            totalAmount = Math.Round(totalAmount, _controlCryptoCoinAmountSettings.NumberOfRound);
+            if (totalAmount <=_controlCryptoCoinAmountSettings.TotalAmount)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinLowPrice", language: "en");
                 responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmount", language: "en");
@@ -138,8 +143,8 @@ namespace CurrencyExchange.Service.Services
             }
             var coinPrice = Convert.ToDouble(coinTypeToBuy.Price);
             var totalAmount = sellCryptoCoinRequest.Amount / coinPrice; //Coinden  çıkaracağım miktar
-            totalAmount = Math.Round(totalAmount, 4);
-            if (totalAmount <= 0.001)
+            totalAmount = Math.Round(totalAmount, _controlCryptoCoinAmountSettings.NumberOfRound);
+            if (totalAmount <= _controlCryptoCoinAmountSettings.TotalAmount)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinLowPrice", language: "en");
                 responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmount", language: "en");

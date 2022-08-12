@@ -30,6 +30,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
+builder.Services.Configure<ControlCryptoCoinAmountSettings>(builder.Configuration.GetSection("ControlCryptoCoinAmountSettings"));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -48,6 +49,8 @@ builder.Services.AddScoped(typeof(TokenControlFilter<>));
 builder.Services.AddScoped(typeof(NotFoundFilter<>));
 builder.Services.AddScoped(typeof(AppSettings));
 builder.Services.AddScoped(typeof(RabbitMqSettings));
+builder.Services.AddScoped(typeof(ControlCryptoCoinAmountSettings));
+
 
 
 builder.Services.AddScoped(typeof(IBuyCryptoCoinService<>), typeof(BuyCryptoCoinService<>));

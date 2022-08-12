@@ -1,4 +1,5 @@
 ﻿using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.ConfigModels;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Log;
@@ -10,6 +11,7 @@ using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
 using CurrencyExchange.Core.HelperFunctions;
+using Microsoft.Extensions.Options;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -20,24 +22,27 @@ namespace CurrencyExchange.Service.Services
         private readonly IBalanceRepository _balanceRepository;
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
+        private readonly ControlCryptoCoinAmountSettings _controlCryptoCoinAmountSettings;
 
 
         public BuyCryptoCoinService( IUnitOfWork unitOfWork,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
-           IBalanceRepository balanceRepository, ISenderLogger logSender , ICommonFunctions commonFunctions)
+           IBalanceRepository balanceRepository, ISenderLogger logSender ,
+            ICommonFunctions commonFunctions, IOptions<ControlCryptoCoinAmountSettings> controlCryptoCoinAmountSettings)
         {
             _unitOfWork = unitOfWork;
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
             _balanceRepository = balanceRepository;
             _logSender = logSender;
             _commonFunctions = commonFunctions;
+            _controlCryptoCoinAmountSettings = controlCryptoCoinAmountSettings.Value;
         }
 
         public double CalculateTotalAmountByUsdt(string price, double amount)
         {
             var coinPrice = Convert.ToDouble(price);
             var totalAmount = coinPrice * amount;
-            totalAmount = Math.Round(totalAmount, 4);
+            totalAmount = Math.Round(totalAmount, _controlCryptoCoinAmountSettings.NumberOfRound);
             return totalAmount;
         }
 
@@ -45,7 +50,7 @@ namespace CurrencyExchange.Service.Services
         {
             var coinPrice = Convert.ToDouble(price);
             var totalAmount = amount / coinPrice;
-            totalAmount = Math.Round(totalAmount, 4);
+            totalAmount = Math.Round(totalAmount, _controlCryptoCoinAmountSettings.NumberOfRound);
             return totalAmount;
         }
 
@@ -81,7 +86,7 @@ namespace CurrencyExchange.Service.Services
                 return CustomResponseDto<NoContentDto>.Fail(404, responseMessage.Value);
             }
             var totalAmount = CalculateTotalAmountByUsdt(coinTypeToBuy.Price, buyCoinRequest.Amount);
-            if (totalAmount <= 0.001)
+            if (totalAmount <= _controlCryptoCoinAmountSettings.TotalAmount)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountLowPrice", language: "en");
                 responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmount", language: "en");
@@ -182,7 +187,7 @@ namespace CurrencyExchange.Service.Services
             }
 
             var totalAmount = CalculateTotalAmountByCoin(coinTypeToBuy.Price, buyCoinRequest.Amount);
-            if (totalAmount <= 0.001)
+            if (totalAmount <= _controlCryptoCoinAmountSettings.TotalAmount)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountLowPrice", language: "en");
                 responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmount", language: "en");
