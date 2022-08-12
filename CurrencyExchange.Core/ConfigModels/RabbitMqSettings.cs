@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CurrencyExchange.Core.HelperFunctions
+namespace CurrencyExchange.Core.ConfigModels
 {
-    public class AppSettings
-    { 
-        public string Secret { get; set; }
+    public class RabbitMqSettings
+    {
+        public string Host { get; set; }
     }
 }

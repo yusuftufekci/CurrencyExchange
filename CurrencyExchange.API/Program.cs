@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Service.CommonFunction;
-using CurrencyExchange.Core.HelperFunctions;
+using CurrencyExchange.Core.ConfigModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +29,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -46,6 +47,7 @@ builder.Services.AddScoped(typeof(ISellCryptoCoinService<>), typeof(SellCryptoCo
 builder.Services.AddScoped(typeof(TokenControlFilter<>));
 builder.Services.AddScoped(typeof(NotFoundFilter<>));
 builder.Services.AddScoped(typeof(AppSettings));
+builder.Services.AddScoped(typeof(RabbitMqSettings));
 
 
 builder.Services.AddScoped(typeof(IBuyCryptoCoinService<>), typeof(BuyCryptoCoinService<>));

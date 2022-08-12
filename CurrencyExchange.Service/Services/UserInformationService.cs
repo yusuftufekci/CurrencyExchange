@@ -1,16 +1,8 @@
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
-using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
-using CurrencyExchange.Core.UnitOfWorks;
-using CurrencyExchange.Service.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;

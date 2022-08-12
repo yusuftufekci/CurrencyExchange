@@ -15,6 +15,7 @@ using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using CurrencyExchange.Core.ConfigModels;
 
 namespace CurrencyExchange.Service.Services
 {

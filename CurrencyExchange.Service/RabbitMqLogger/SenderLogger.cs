@@ -1,14 +1,23 @@
 ﻿using System.Text;
+using CurrencyExchange.Core.ConfigModels;
 using CurrencyExchange.Core.RabbitMqLogger;
+using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
 namespace CurrencyExchange.Service.RabbitMqLogger
 {
     public class SenderLogger : ISenderLogger
     {
-        public  void SenderFunction(string queName, string logMessage)
+        private readonly RabbitMqSettings _rabbitMqSettings;
+
+        public SenderLogger(IOptions<RabbitMqSettings> rabbitMqSettings)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            _rabbitMqSettings = rabbitMqSettings.Value;
+        }
+
+        public void SenderFunction(string queName, string logMessage)
+        {
+            var factory = new ConnectionFactory() { HostName = _rabbitMqSettings.Host };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
