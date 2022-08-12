@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Service.CommonFunction;
-using CryptoCoinServiceWithCaching = CurrencyExchange.Service.Services;
+using CurrencyExchange.Core.HelperFunctions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +27,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
+
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped(typeof(IPasswordRepository), typeof(PasswordRepository));
@@ -42,6 +45,8 @@ builder.Services.AddScoped(typeof(ISellCryptoCoinService<>), typeof(SellCryptoCo
 
 builder.Services.AddScoped(typeof(TokenControlFilter<>));
 builder.Services.AddScoped(typeof(NotFoundFilter<>));
+builder.Services.AddScoped(typeof(AppSettings));
+
 
 builder.Services.AddScoped(typeof(IBuyCryptoCoinService<>), typeof(BuyCryptoCoinService<>));
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
@@ -51,6 +56,7 @@ builder.Services.AddScoped(typeof(IAccount<>), typeof(AccountService<>));
 builder.Services.AddScoped(typeof(ICommonFunctions), typeof(CommonFunctions));
 
 builder.Services.AddScoped(typeof(ISenderLogger), typeof(SenderLogger));
+
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -66,7 +72,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+
 builder.Services.AddSwaggerGen();
+
+
+
 
 builder.Services.AddMemoryCache();
 

@@ -5,8 +5,6 @@ namespace CurrencyExchange.Core.HelperFunctions
 {
     public class GetCryptoCoinPrices
     {
-
-
         public static async Task<List<CryptoCoinPriceDto>?> AsyncGetCryptoCoinPrices()
         {
             var cryptoCoinPrices = new List<CryptoCoinPriceDto>();

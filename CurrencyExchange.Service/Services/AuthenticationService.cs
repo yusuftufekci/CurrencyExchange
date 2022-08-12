@@ -7,10 +7,14 @@ using CurrencyExchange.Core.UnitOfWorks;
 using CurrencyExchange.Core.HelperFunctions;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -22,9 +26,11 @@ namespace CurrencyExchange.Service.Services
         private readonly IPasswordRepository _passwordRepository;
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
+        private readonly AppSettings _appSettings;
 
         public AuthenticationService(IUserRepository repository, IUnitOfWork unitOfWork,
-            IPasswordRepository passwordRepository, ITokenRepository tokenRepository, ISenderLogger logSenderLogger, ICommonFunctions commonFunctions)
+            IPasswordRepository passwordRepository, ITokenRepository tokenRepository, ISenderLogger logSenderLogger,
+            ICommonFunctions commonFunctions, IOptions<AppSettings> appSettings)
         {
             _userRepository = repository;
             _unitOfWork = unitOfWork;
@@ -32,6 +38,7 @@ namespace CurrencyExchange.Service.Services
             _tokenRepository = tokenRepository;
             _logSender = logSenderLogger;
             _commonFunctions = commonFunctions;
+            _appSettings = appSettings.Value;
         }
 
 
@@ -62,7 +69,7 @@ namespace CurrencyExchange.Service.Services
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<TokenDto>.Fail(404, new List<string> { responseMessage.Value });
             }
-            var token = CreateToken.GenerateToken(user);
+            var token = GenerateToken(user);
 
             var controlToken = await _tokenRepository.Where(p => p.UserId == user.Id).SingleOrDefaultAsync();
             user.IpAddress = ipAdress;
@@ -81,12 +88,10 @@ namespace CurrencyExchange.Service.Services
             }
             else
             {
-                var userToken = new UserToken
-                {
-                    Token = token,
-                    ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo,
-                    ModifiedDate = DateTime.UtcNow
-                };
+                controlToken.ExpDate = new JwtSecurityTokenHandler().ReadToken(token).ValidTo;
+                controlToken.Token = token;
+                controlToken.ModifiedDate = DateTime.UtcNow;
+               
                 await _unitOfWork.CommitAsync();
             }
             logMessages = await _commonFunctions.GetLogResponseMessage("LoginSuccess", language: "en");
@@ -136,6 +141,30 @@ namespace CurrencyExchange.Service.Services
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Succes(201);
         }
+
+        public string GenerateToken(User user)
+        {
+
+            var mySecret = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+            var mySecurityKey = new SymmetricSecurityKey((mySecret));
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.UserEmail, ClaimTypes.Expiration),
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+
     }
 
 }
