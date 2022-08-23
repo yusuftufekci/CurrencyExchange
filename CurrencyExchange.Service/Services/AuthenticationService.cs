@@ -155,7 +155,7 @@ namespace CurrencyExchange.Service.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserEmail, ClaimTypes.Expiration),
+                    new Claim(ClaimTypes.Name, user.UserEmail),
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256Signature)

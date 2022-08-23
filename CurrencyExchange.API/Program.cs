@@ -47,10 +47,9 @@ builder.Services.AddScoped(typeof(ISellCryptoCoinService<>), typeof(SellCryptoCo
 
 builder.Services.AddScoped(typeof(TokenControlFilter<>));
 builder.Services.AddScoped(typeof(NotFoundFilter<>));
-builder.Services.AddScoped(typeof(AppSettings));
-builder.Services.AddScoped(typeof(RabbitMqSettings));
-builder.Services.AddScoped(typeof(ControlCryptoCoinAmountSettings));
-
+builder.Services.AddSingleton(typeof(AppSettings));
+builder.Services.AddSingleton(typeof(RabbitMqSettings));
+builder.Services.AddSingleton(typeof(ControlCryptoCoinAmountSettings));
 
 
 builder.Services.AddScoped(typeof(IBuyCryptoCoinService<>), typeof(BuyCryptoCoinService<>));
@@ -59,9 +58,7 @@ builder.Services.AddScoped(typeof(IAuthenticationService<>), typeof(Authenticati
 builder.Services.AddScoped(typeof(IUserInformationService<>), typeof(UserInformationService<>));
 builder.Services.AddScoped(typeof(IAccount<>), typeof(AccountService<>));
 builder.Services.AddScoped(typeof(ICommonFunctions), typeof(CommonFunctions));
-
-builder.Services.AddScoped(typeof(ISenderLogger), typeof(SenderLogger));
-
+builder.Services.AddSingleton(typeof(ISenderLogger), typeof(SenderLogger));
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -73,16 +70,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-
 builder.Services.AddSwaggerGen();
-
-
-
 
 builder.Services.AddMemoryCache();
 
@@ -96,8 +88,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-
 
 app.UseAuthorization();
 
