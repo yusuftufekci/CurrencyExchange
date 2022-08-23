@@ -58,7 +58,7 @@ namespace CurrencyExchange.Service.Services
             await _unitOfWork.CommitAsync();
             logMessages = await _commonFunctions.GetLogResponseMessage("CreateAccountSuccess", language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
-            return CustomResponseDto<NoContentDto>.Succes(201);
+            return CustomResponseDto<NoContentDto>.Success(201);
         }
 
         public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
@@ -101,7 +101,7 @@ namespace CurrencyExchange.Service.Services
                 await _unitOfWork.CommitAsync();
                 logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsSuccess", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
-                return CustomResponseDto<NoContentDto>.Succes(201);
+                return CustomResponseDto<NoContentDto>.Success(201);
             }
             else
             {
@@ -120,7 +120,7 @@ namespace CurrencyExchange.Service.Services
                 await _unitOfWork.CommitAsync();
                 logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsSuccess", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
-                return CustomResponseDto<NoContentDto>.Succes(201);
+                return CustomResponseDto<NoContentDto>.Success(201);
             }
         }
     }

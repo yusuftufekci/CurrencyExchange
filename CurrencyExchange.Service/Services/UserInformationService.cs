@@ -67,7 +67,7 @@ namespace CurrencyExchange.Service.Services
             logMessages = await _commonFunctions.GetLogResponseMessage("GetUserInformationSuccess", language: "en");
 
             _logSender.SenderFunction("Log", "GetUserInformation request successfully completed");
-            return CustomResponseDto<UserInformationDto>.Succes(201, userInformations);
+            return CustomResponseDto<UserInformationDto>.Success(201, userInformations);
 
         }
 
@@ -100,7 +100,7 @@ namespace CurrencyExchange.Service.Services
             logMessages = await _commonFunctions.GetLogResponseMessage("GetUserTransactionsSuccess", language: "en");
 
             _logSender.SenderFunction("Log", "GetUserTransactions request succesfully completed");
-            return CustomResponseDto<List<UserTransactionHistoryDto>>.Succes(201, userTransactionHistories);
+            return CustomResponseDto<List<UserTransactionHistoryDto>>.Success(201, userTransactionHistories);
         }
 
         public async Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation(string token)
@@ -132,7 +132,7 @@ namespace CurrencyExchange.Service.Services
             logMessages = await _commonFunctions.GetLogResponseMessage("GetUserBalanceInformationSuccess", language: "en");
 
             _logSender.SenderFunction("Log", logMessages.Value);
-            return CustomResponseDto<List<BalanceDto>>.Succes(201, userBalancesInfos);
+            return CustomResponseDto<List<BalanceDto>>.Success(201, userBalancesInfos);
         }
     }
 }

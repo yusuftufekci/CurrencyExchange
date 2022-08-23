@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CurrencyExchange.Core.Entities.Log
+﻿namespace CurrencyExchange.Core.Entities.Log
 {
     public class ResponseMessages : BaseEntity
     {

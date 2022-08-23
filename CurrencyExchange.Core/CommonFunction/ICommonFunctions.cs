@@ -13,8 +13,5 @@ namespace CurrencyExchange.Core.CommonFunction
         Task<ResponseMessages> GetApiResponseMessage(string key, string language);
 
         Task<LogMessages> GetLogResponseMessage(string key, string language);
-
-
-
     }
 }

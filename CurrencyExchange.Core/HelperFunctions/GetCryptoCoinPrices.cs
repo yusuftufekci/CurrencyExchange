@@ -1,4 +1,4 @@
-﻿using CurrencyExchange.Core.DTOs;
+﻿using CurrencyExchange.Core.DTOs.CryptoCoins;
 using Newtonsoft.Json;
 
 namespace CurrencyExchange.Core.HelperFunctions
@@ -14,7 +14,8 @@ namespace CurrencyExchange.Core.HelperFunctions
             if (response.StatusCode != System.Net.HttpStatusCode.OK) return null;
             var responceString = await response.Content.ReadAsStringAsync();
             var responceObject = JsonConvert.DeserializeObject<List<CryptoCoinPriceDto>>(responceString);
-            cryptoCoinPrices.AddRange(responceObject.Select(item => new CryptoCoinPriceDto { Price = item.Price, Symbol = item.Symbol }));
+            cryptoCoinPrices.AddRange(responceObject.Select(item =>
+                new CryptoCoinPriceDto { Price = item.Price, Symbol = item.Symbol }));
             return cryptoCoinPrices;
         }
     }

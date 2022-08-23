@@ -8,7 +8,7 @@ using CurrencyExchange.Core.Entities.CryptoCoins;
 using CurrencyExchange.Core.HelperFunctions;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace CurrencyExchange.Caching
+namespace CurrencyExchange.Caching.CryptoCoins
 {
     public class CryptoCoinServiceWithCaching
     {

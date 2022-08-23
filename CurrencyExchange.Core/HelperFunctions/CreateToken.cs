@@ -1,8 +1,4 @@
-﻿using CurrencyExchange.Core.Entities.Authentication;
-using System.Security.Claims;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
+﻿using System.IdentityModel.Tokens.Jwt;
 
 namespace CurrencyExchange.Core.HelperFunctions
 {
@@ -14,24 +10,21 @@ namespace CurrencyExchange.Core.HelperFunctions
             {
                 var jwtToken = new JwtSecurityToken(token);
                 var expDate = jwtToken.Claims.ToList()[2].Value;
-                if (expDate == null)
-                    return null;
+                if (expDate == null) return null;
                 var dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(Int32.Parse(expDate));
                 if (DateTime.Now > dateTimeOffset)
                 {
                     return "Token expired";
                 }
-                var userEmail = jwtToken.Claims.ToList()[0].Value;
-                if (userEmail != null)
-                    return userEmail;
-                return null;
 
+                var userEmail = jwtToken.Claims.ToList()[0].Value;
+                if (userEmail != null) return userEmail;
+                return null;
             }
             catch (Exception e)
             {
                 return null;
             }
-           
         }
     }
 }

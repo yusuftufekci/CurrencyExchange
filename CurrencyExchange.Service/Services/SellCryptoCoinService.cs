@@ -1,12 +1,10 @@
-﻿using CurrencyExchange.Cachgin;
-using CurrencyExchange.Caching;
+﻿using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.ConfigModels;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
-using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
@@ -109,7 +107,7 @@ namespace CurrencyExchange.Service.Services
             logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinSuccess", language: "en");
 
             _logSender.SenderFunction("Log", logMessages.Value);
-            return CustomResponseDto<NoContentDto>.Succes(201);
+            return CustomResponseDto<NoContentDto>.Success(201);
 
         }
 
@@ -179,7 +177,7 @@ namespace CurrencyExchange.Service.Services
             logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinSuccess", language: "en");
 
             _logSender.SenderFunction("Log", logMessages.Value);
-            return CustomResponseDto<NoContentDto>.Succes(201);
+            return CustomResponseDto<NoContentDto>.Success(201);
         }
     }
 }

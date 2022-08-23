@@ -16,8 +16,7 @@ using System.Reflection;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Service.CommonFunction;
 using CurrencyExchange.Core.ConfigModels;
-using CurrencyExchange.Cachgin;
-using CurrencyExchange.Caching;
+using CurrencyExchange.Caching.CryptoCoins;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +53,7 @@ builder.Services.AddScoped(typeof(IUserBalanceHistoryRepository), typeof(UserBal
 builder.Services.AddScoped(typeof(ISellCryptoCoinService<>), typeof(SellCryptoCoinService<>));
 
 builder.Services.AddScoped(typeof(TokenControlFilter<>));
-builder.Services.AddScoped(typeof(NotFoundFilter<>));
+//builder.Services.AddScoped(typeof(NotFoundFilter<>));
 builder.Services.AddSingleton(typeof(AppSettings));
 builder.Services.AddSingleton(typeof(RabbitMqSettings));
 builder.Services.AddSingleton(typeof(ControlCryptoCoinAmountSettings));

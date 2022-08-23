@@ -21,22 +21,14 @@ namespace CurrencyExchange.Service.RabbitMqLogger
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.QueueDeclare(queue: queName,
-                                     durable: false,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
+                channel.QueueDeclare(queue: queName, durable: false, exclusive: false, autoDelete: false,
+                    arguments: null);
 
                 var message = logMessage;
                 var body = Encoding.UTF8.GetBytes(message);
 
-                channel.BasicPublish(exchange: "",
-                                     routingKey: queName,
-                                     basicProperties: null,
-                                     body: body);
+                channel.BasicPublish(exchange: "", routingKey: queName, basicProperties: null, body: body);
             }
-
         }
-
     }
 }

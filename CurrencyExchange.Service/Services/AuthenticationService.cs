@@ -97,7 +97,7 @@ namespace CurrencyExchange.Service.Services
             }
             logMessages = await _commonFunctions.GetLogResponseMessage("LoginSuccess", language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
-            return CustomResponseDto<TokenDto>.Succes(201, new TokenDto { Token = token });
+            return CustomResponseDto<TokenDto>.Success(201, new TokenDto { Token = token });
         }
 
         public async Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest, string ipAdress)
@@ -140,7 +140,7 @@ namespace CurrencyExchange.Service.Services
             await _unitOfWork.CommitAsync();
             logMessages = await _commonFunctions.GetLogResponseMessage("RegisterSuccess", language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
-            return CustomResponseDto<NoContentDto>.Succes(201);
+            return CustomResponseDto<NoContentDto>.Success(201);
         }
 
         public string GenerateToken(User user)

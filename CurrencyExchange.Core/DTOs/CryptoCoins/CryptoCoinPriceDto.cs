@@ -1,4 +1,4 @@
-﻿namespace CurrencyExchange.Core.DTOs
+﻿namespace CurrencyExchange.Core.DTOs.CryptoCoins
 {
     public class CryptoCoinPriceDto
     {

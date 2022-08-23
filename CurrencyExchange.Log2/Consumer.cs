@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using CurrencyExchange.Log.Concrete;
-using CurrencyExchange.Log2.Abstract;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -42,4 +37,3 @@ namespace CurrencyExchange.Log2
         }
     }
 }
-

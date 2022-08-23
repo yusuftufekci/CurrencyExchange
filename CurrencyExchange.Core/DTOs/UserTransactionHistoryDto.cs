@@ -10,7 +10,6 @@
 
         public string SoldCryptoCoin { get; set; }
 
-
         public double ChangedAmount { get; set; }
     }
 }

@@ -1,6 +1,4 @@
-﻿using CurrencyExchange.Cachgin;
-using CurrencyExchange.Caching;
-using CurrencyExchange.Core.CommonFunction;
+﻿using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.ConfigModels;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
@@ -12,8 +10,8 @@ using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
-using CurrencyExchange.Core.HelperFunctions;
 using Microsoft.Extensions.Options;
+using CurrencyExchange.Caching.CryptoCoins;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -159,7 +157,7 @@ namespace CurrencyExchange.Service.Services
             logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountSuccess", language: "en");
 
             _logSender.SenderFunction("Log", "BuyCryptoCoinByUsdt request successfully completed.");
-            return CustomResponseDto<NoContentDto>.Succes(201);
+            return CustomResponseDto<NoContentDto>.Success(201);
 
         }
 
@@ -258,7 +256,7 @@ namespace CurrencyExchange.Service.Services
             await _unitOfWork.CommitAsync();
             logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmount2Success", language: "en");
             _logSender.SenderFunction("Log", "BuyCryptoCoinByCoin request successfully completed.");
-            return CustomResponseDto<NoContentDto>.Succes(201);
+            return CustomResponseDto<NoContentDto>.Success(201);
 
         }
     }

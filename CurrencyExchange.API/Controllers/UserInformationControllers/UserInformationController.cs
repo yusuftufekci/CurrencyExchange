@@ -21,7 +21,6 @@ namespace CurrencyExchange.API.Controllers.UserInformationControllers
             return CreateActionResult(await _service.GetUserInformation(token));
         }
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        //[ServiceFilter(typeof(NotFoundFilter<User>))]
         [HttpPost("AllTransactionsOfuser")]
         public async Task<IActionResult> GetAllTransactionsOfUser( [FromHeader] string token)
         {

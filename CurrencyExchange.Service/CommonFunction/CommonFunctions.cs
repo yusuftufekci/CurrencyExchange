@@ -1,9 +1,4 @@
 ﻿using CurrencyExchange.Core.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Authentication;
@@ -20,7 +15,10 @@ namespace CurrencyExchange.Service.CommonFunction
         private readonly IAccountRepository _accountRepository;
         private readonly IResponseMessageRepository _responseMessageRepository;
         private readonly ILogMessagesRepository _logMessagesRepository;
-        public CommonFunctions(ITokenRepository tokenRepository , IUserRepository userRepository, IAccountRepository accountRepository, IResponseMessageRepository responseMessageRepository, ILogMessagesRepository logMessagesRepository)
+
+        public CommonFunctions(ITokenRepository tokenRepository, IUserRepository userRepository,
+            IAccountRepository accountRepository, IResponseMessageRepository responseMessageRepository,
+            ILogMessagesRepository logMessagesRepository)
         {
             _tokenRepository = tokenRepository;
             _userRepository = userRepository;
@@ -28,6 +26,7 @@ namespace CurrencyExchange.Service.CommonFunction
             _responseMessageRepository = responseMessageRepository;
             _logMessagesRepository = logMessagesRepository;
         }
+
         public async Task<Account> GetAccount(string token)
         {
             var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
@@ -41,24 +40,20 @@ namespace CurrencyExchange.Service.CommonFunction
             var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
             var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
             return userExist ?? null;
-
         }
 
         public async Task<ResponseMessages> GetApiResponseMessage(string key, string language)
         {
-            var responseMessage = await _responseMessageRepository.Where(p => p.Key == key && p.Language == language).SingleAsync();
+            var responseMessage = await _responseMessageRepository.Where(p => p.Key == key && p.Language == language)
+                .SingleAsync();
             return responseMessage ?? null;
-
         }
 
         public async Task<LogMessages> GetLogResponseMessage(string key, string language)
         {
-            var responseMessage = await _logMessagesRepository.Where(p => p.Key == key && p.Language == language).SingleAsync();
+            var responseMessage = await _logMessagesRepository.Where(p => p.Key == key && p.Language == language)
+                .SingleAsync();
             return responseMessage ?? null;
-
         }
-
-
-
     }
 }
