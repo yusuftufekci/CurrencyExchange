@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CurrencyExchange.Cachgin\CurrencyExchange.Caching.csproj" />
     <ProjectReference Include="..\CurrencyExchange.Repository\CurrencyExchange.Repository.csproj" />
   </ItemGroup>
 

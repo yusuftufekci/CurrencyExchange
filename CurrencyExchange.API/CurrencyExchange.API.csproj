@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CurrencyExchange.Cachgin\CurrencyExchange.Caching.csproj" />
     <ProjectReference Include="..\CurrencyExchange.Service\CurrencyExchange.Service.csproj" />
   </ItemGroup>
 

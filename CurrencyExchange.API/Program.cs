@@ -16,6 +16,8 @@ using System.Reflection;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Service.CommonFunction;
 using CurrencyExchange.Core.ConfigModels;
+using CurrencyExchange.Cachgin;
+using CurrencyExchange.Caching;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,12 @@ builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(ITokenRepository), typeof(TokenRepository));
 builder.Services.AddScoped(typeof(IResponseMessageRepository), typeof(ResponseMessageRepository));
 builder.Services.AddScoped(typeof(ILogMessagesRepository), typeof(LogMessagesRepository));
+
+
+builder.Services.AddScoped(typeof(CryptoCoinPriceServiceWithCaching));
+builder.Services.AddScoped(typeof(CryptoCoinServiceWithCaching));
+
+
 
 builder.Services.AddScoped(typeof(IUserBalanceHistoryRepository), typeof(UserBalanceHistoryRepository));
 builder.Services.AddScoped(typeof(ISellCryptoCoinService<>), typeof(SellCryptoCoinService<>));
@@ -89,7 +97,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+// app.UseAuthorization();
 
 app.UseCustomException();
 
