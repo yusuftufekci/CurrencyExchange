@@ -16,7 +16,7 @@ namespace CurrencyExchange.Core.HelperFunctions
                 var expDate = jwtToken.Claims.ToList()[2].Value;
                 if (expDate == null)
                     return null;
-                var dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(Int64.Parse(expDate));
+                var dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(Int32.Parse(expDate));
                 if (DateTime.Now > dateTimeOffset)
                 {
                     return "Token expired";
