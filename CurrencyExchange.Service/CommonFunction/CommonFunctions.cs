@@ -1,10 +1,15 @@
-﻿using CurrencyExchange.Core.Repositories;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.ConfigModels;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Authentication;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CurrencyExchange.Service.CommonFunction
 {
@@ -15,16 +20,18 @@ namespace CurrencyExchange.Service.CommonFunction
         private readonly IAccountRepository _accountRepository;
         private readonly IResponseMessageRepository _responseMessageRepository;
         private readonly ILogMessagesRepository _logMessagesRepository;
+        private readonly AppSettings _appSettings;
 
         public CommonFunctions(ITokenRepository tokenRepository, IUserRepository userRepository,
             IAccountRepository accountRepository, IResponseMessageRepository responseMessageRepository,
-            ILogMessagesRepository logMessagesRepository)
+            ILogMessagesRepository logMessagesRepository, AppSettings appSettings)
         {
             _tokenRepository = tokenRepository;
             _userRepository = userRepository;
             _accountRepository = accountRepository;
             _responseMessageRepository = responseMessageRepository;
             _logMessagesRepository = logMessagesRepository;
+            _appSettings = appSettings;
         }
 
         public async Task<Account> GetAccount(string token)
@@ -54,6 +61,28 @@ namespace CurrencyExchange.Service.CommonFunction
             var responseMessage = await _logMessagesRepository.Where(p => p.Key == key && p.Language == language)
                 .SingleAsync();
             return responseMessage ?? null;
+        }
+
+        public string GenerateToken(User user)
+        {
+
+            var mySecret = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+            var mySecurityKey = new SymmetricSecurityKey((mySecret));
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.UserEmail),
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 }

@@ -37,7 +37,6 @@ namespace CurrencyExchange.Service.Services
         }
         public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token)
         {
-            ResponseMessages responseMessage;
             LogMessages logMessages;
             var user = await _commonFunctions.GetUser(token);
             var account = await _commonFunctions.GetAccount(token);
@@ -46,7 +45,7 @@ namespace CurrencyExchange.Service.Services
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("CreateAccountAccountAlreadyExist", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
-                responseMessage = await _commonFunctions.GetApiResponseMessage("AccountAlreadyExist", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountAlreadyExist", language: "en");
                 return CustomResponseDto<NoContentDto>.Fail(401, responseMessage.Value);
             }
             var tempAccount = new Account
@@ -63,20 +62,19 @@ namespace CurrencyExchange.Service.Services
 
         public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
         {
-            ResponseMessages responseMessage;
             LogMessages logMessages;
             var account = await _commonFunctions.GetAccount(token);
             if (account == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsAccountNotFound", language: "en");
                 _logSender.SenderFunction("Log", "DepositFunds request failed. Account not found");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
                 return CustomResponseDto<NoContentDto>.Fail(404, responseMessage.Value);
             }
             var balance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == "USDT").SingleOrDefaultAsync();
             if (balance == null)
             {
-                UserBalanceHistory tempUserBalanceHistory = new UserBalanceHistory
+                var tempUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
                     MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account",

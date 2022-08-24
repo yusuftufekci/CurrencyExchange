@@ -43,11 +43,11 @@ namespace CurrencyExchange.Service.Services
         }
 
 
-        public async Task<CustomResponseDto<TokenDto>> UserLogin(UserLoginRequest userLoginRequest, string ipAdress)
+        public async Task<CustomResponseDto<TokenDto>> UserLogin(UserLoginRequest userLoginRequest, string ipAddress)
         {
             ResponseMessages responseMessage;
             LogMessages logMessages;
-            if (ipAdress is null)
+            if (ipAddress is null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("LoginIpAddressNotFound", language: "en");
                 responseMessage = await _commonFunctions.GetApiResponseMessage("IpAddressNotFound", language: "en");
@@ -70,10 +70,10 @@ namespace CurrencyExchange.Service.Services
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<TokenDto>.Fail(404, new List<string> { responseMessage.Value });
             }
-            var token = GenerateToken(user);
+            var token = _commonFunctions.GenerateToken(user);
 
             var controlToken = await _tokenRepository.Where(p => p.UserId == user.Id).SingleOrDefaultAsync();
-            user.IpAddress = ipAdress;
+            user.IpAddress = ipAddress;
             user.ModifiedDate = DateTime.UtcNow;
 
             if (controlToken == null)
@@ -129,7 +129,7 @@ namespace CurrencyExchange.Service.Services
 
             PasswordHash.CreatePasswordHash(userRegisterRequest.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            Password password = new Password
+            var password = new Password
             {
                 User = user,
                 PasswordHash = passwordHash,
@@ -142,30 +142,5 @@ namespace CurrencyExchange.Service.Services
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success(201);
         }
-
-        public string GenerateToken(User user)
-        {
-
-            var mySecret = Encoding.ASCII.GetBytes(_appSettings.Secret);
-
-            var mySecurityKey = new SymmetricSecurityKey((mySecret));
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserEmail),
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-
     }
-
 }

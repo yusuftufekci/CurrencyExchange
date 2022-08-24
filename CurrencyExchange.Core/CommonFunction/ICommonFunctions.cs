@@ -11,6 +11,7 @@ namespace CurrencyExchange.Core.CommonFunction
         Task<User> GetUser(string token);
 
         Task<ResponseMessages> GetApiResponseMessage(string key, string language);
+        public string GenerateToken(User user);
 
         Task<LogMessages> GetLogResponseMessage(string key, string language);
     }
