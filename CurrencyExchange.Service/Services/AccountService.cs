@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyExchange.Service.Services
 {
-    public class AccountService<T> : IAccount<T> where T : class
+    public class AccountService<T> : IAccountService<T> where T : class
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountRepository _accountRepository;

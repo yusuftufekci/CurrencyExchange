@@ -9,8 +9,8 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
     
     public class AccountController : CustomBaseController
     {
-        private readonly IAccount<CreateAccountRequest> _service;
-        public AccountController(IAccount<CreateAccountRequest> service)
+        private readonly IAccountService<CreateAccountRequest> _service;
+        public AccountController(IAccountService<CreateAccountRequest> service)
         {
             _service = service;
         }

@@ -13,6 +13,9 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using CurrencyExchange.API.Modules;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Service.CommonFunction;
 using CurrencyExchange.Core.ConfigModels;
@@ -29,42 +32,10 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
+
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
 builder.Services.Configure<ControlCryptoCoinAmountSettings>(builder.Configuration.GetSection("ControlCryptoCoinAmountSettings"));
-
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped(typeof(IPasswordRepository), typeof(PasswordRepository));
-builder.Services.AddScoped(typeof(IAccountRepository), typeof(AccountRepository));
-builder.Services.AddScoped(typeof(IBalanceRepository), typeof(BalanceRepository));
-builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
-builder.Services.AddScoped(typeof(ITokenRepository), typeof(TokenRepository));
-builder.Services.AddScoped(typeof(IResponseMessageRepository), typeof(ResponseMessageRepository));
-builder.Services.AddScoped(typeof(ILogMessagesRepository), typeof(LogMessagesRepository));
-
-
-builder.Services.AddScoped(typeof(CryptoCoinPriceServiceWithCaching));
-builder.Services.AddScoped(typeof(CryptoCoinServiceWithCaching));
-
-
-
-builder.Services.AddScoped(typeof(IUserBalanceHistoryRepository), typeof(UserBalanceHistoryRepository));
-builder.Services.AddScoped(typeof(ISellCryptoCoinService<>), typeof(SellCryptoCoinService<>));
-
-builder.Services.AddScoped(typeof(TokenControlFilter<>));
-builder.Services.AddSingleton(typeof(AppSettings));
-builder.Services.AddSingleton(typeof(RabbitMqSettings));
-builder.Services.AddSingleton(typeof(ControlCryptoCoinAmountSettings));
-
-
-builder.Services.AddScoped(typeof(IBuyCryptoCoinService<>), typeof(BuyCryptoCoinService<>));
-builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
-builder.Services.AddScoped(typeof(IAuthenticationService<>), typeof(AuthenticationService<>));
-builder.Services.AddScoped(typeof(IUserInformationService<>), typeof(UserInformationService<>));
-builder.Services.AddScoped(typeof(IAccount<>), typeof(AccountService<>));
-builder.Services.AddScoped(typeof(ICommonFunctions), typeof(CommonFunctions));
-builder.Services.AddSingleton(typeof(ISenderLogger), typeof(SenderLogger));
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -84,6 +55,18 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMemoryCache();
 
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Host.ConfigureContainer<ContainerBuilder>(ContainerBuilder =>
+    ContainerBuilder.RegisterModule(new ServiceModule()));
+builder.Host.ConfigureContainer<ContainerBuilder>(ContainerBuilder =>
+    ContainerBuilder.RegisterModule(new CacheModule()));
+builder.Host.ConfigureContainer<ContainerBuilder>(ContainerBuilder =>
+    ContainerBuilder.RegisterModule(new LogModule()));
+builder.Host.ConfigureContainer<ContainerBuilder>(ContainerBuilder =>
+    ContainerBuilder.RegisterModule(new RepositoryModule()));
+builder.Host.ConfigureContainer<ContainerBuilder>(ContainerBuilder =>
+    ContainerBuilder.RegisterModule(new ConfigModule()));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -94,8 +77,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// app.UseAuthorization();
 
 app.UseCustomException();
 
