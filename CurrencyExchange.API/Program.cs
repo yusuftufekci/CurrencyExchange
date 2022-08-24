@@ -1,14 +1,6 @@
 ﻿using CurrencyExchange.API.Filters;
 using CurrencyExchange.API.Middlewares;
-using CurrencyExchange.Core.RabbitMqLogger;
-using CurrencyExchange.Core.Repositories;
-using CurrencyExchange.Core.Services;
-using CurrencyExchange.Core.UnitOfWorks;
 using CurrencyExchange.Repository;
-using CurrencyExchange.Repository.Repositories;
-using CurrencyExchange.Repository.UnitOfWorks;
-using CurrencyExchange.Service.RabbitMqLogger;
-using CurrencyExchange.Service.Services;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +8,7 @@ using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CurrencyExchange.API.Modules;
-using CurrencyExchange.Core.CommonFunction;
-using CurrencyExchange.Service.CommonFunction;
 using CurrencyExchange.Core.ConfigModels;
-using CurrencyExchange.Caching.CryptoCoins;
 
 var builder = WebApplication.CreateBuilder(args);
 

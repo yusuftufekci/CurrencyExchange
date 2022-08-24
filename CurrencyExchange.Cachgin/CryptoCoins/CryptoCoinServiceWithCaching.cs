@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CurrencyExchange.Core.DTOs;
-using CurrencyExchange.Core.Entities.CryptoCoins;
-using CurrencyExchange.Core.HelperFunctions;
+﻿using CurrencyExchange.Core.Entities.CryptoCoins;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CurrencyExchange.Caching.CryptoCoins
@@ -14,8 +7,6 @@ namespace CurrencyExchange.Caching.CryptoCoins
     {
         private const string CacheCryptoKey = "CryptoCoinCache";
         private readonly IMemoryCache _memoryCache;
-
-
         public CryptoCoinServiceWithCaching(IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
