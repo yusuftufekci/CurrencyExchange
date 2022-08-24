@@ -29,17 +29,17 @@ namespace CurrencyExchange.Service.CommonFunction
 
         public async Task<Account> GetAccount(string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            var accountExist = await _accountRepository.Where(p => p.User == userExist).SingleOrDefaultAsync();
-            return accountExist ?? null;
+            var userToken = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
+            var user = await _userRepository.Where(p => p.Id == userToken.UserId).SingleAsync();
+            var account = await _accountRepository.Where(p => p.User == user).SingleOrDefaultAsync();
+            return account ?? null;
         }
 
         public async Task<User> GetUser(string token)
         {
-            var tokenExists = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
-            var userExist = await _userRepository.Where(p => p.Id == tokenExists.UserId).SingleAsync();
-            return userExist ?? null;
+            var userToken = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
+            var user = await _userRepository.Where(p => p.Id == userToken.UserId).SingleAsync();
+            return user ?? null;
         }
 
         public async Task<ResponseMessages> GetApiResponseMessage(string key, string language)
