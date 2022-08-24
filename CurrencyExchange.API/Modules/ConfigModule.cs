@@ -7,9 +7,9 @@ namespace CurrencyExchange.API.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType(typeof(AppSettings)).InstancePerMatchingLifetimeScope();
-            builder.RegisterType(typeof(RabbitMqSettings)).InstancePerMatchingLifetimeScope();
-            builder.RegisterType(typeof(ControlCryptoCoinAmountSettings)).InstancePerMatchingLifetimeScope();
+            builder.RegisterType(typeof(AppSettings)).SingleInstance();
+            builder.RegisterType(typeof(RabbitMqSettings)).SingleInstance();
+            builder.RegisterType(typeof(ControlCryptoCoinAmountSettings)).SingleInstance();
 
         }
 
