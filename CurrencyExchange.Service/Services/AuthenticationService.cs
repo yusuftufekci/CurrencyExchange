@@ -7,14 +7,11 @@ using CurrencyExchange.Core.UnitOfWorks;
 using CurrencyExchange.Core.HelperFunctions;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using CurrencyExchange.Core.ConfigModels;
 
 namespace CurrencyExchange.Service.Services
