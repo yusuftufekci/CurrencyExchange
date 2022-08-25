@@ -24,11 +24,10 @@ namespace CurrencyExchange.Service.Services
         private readonly IPasswordRepository _passwordRepository;
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
-        private readonly AppSettings _appSettings;
 
         public AuthenticationService(IUserRepository repository, IUnitOfWork unitOfWork,
             IPasswordRepository passwordRepository, ITokenRepository tokenRepository, ISenderLogger logSenderLogger,
-            ICommonFunctions commonFunctions, IOptions<AppSettings> appSettings)
+            ICommonFunctions commonFunctions)
         {
             _userRepository = repository;
             _unitOfWork = unitOfWork;
@@ -36,7 +35,6 @@ namespace CurrencyExchange.Service.Services
             _tokenRepository = tokenRepository;
             _logSender = logSenderLogger;
             _commonFunctions = commonFunctions;
-            _appSettings = appSettings.Value;
         }
 
 
