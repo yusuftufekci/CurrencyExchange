@@ -16,7 +16,7 @@ namespace CurrencyExchange.API.Controllers.TransactionControllers
         }
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        [HttpPost("BuyCryptoCoin")]
+        [HttpPost("buy-crypto-coin")]
         public async Task<IActionResult> BuyCryptoCoin(BuyCoinRequest buyCoinRequest, [FromHeader] string token)
         {
             return CreateActionResult(await _service.BuyCryptoCoinByUsdt(buyCoinRequest, token));
@@ -24,7 +24,7 @@ namespace CurrencyExchange.API.Controllers.TransactionControllers
 
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
-        [HttpPost("BuyCryptoCoinV2")]
+        [HttpPost("buy-crypto-coin2")]
         public async Task<IActionResult> BuyCryptoCoinV2(BuyCoinRequest buyCoinRequest, [FromHeader] string token)
         {
             return CreateActionResult(await _service.BuyCryptoCoinByCoin(buyCoinRequest, token));
