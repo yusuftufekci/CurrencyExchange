@@ -10,7 +10,7 @@ using CurrencyExchange.Core.HelperFunctions;
 
 namespace CurrencyExchange.Service.Services
 {
-    public class UserInformationService<T> : IUserInformationService<T> where T : class
+    public class UserInformationService : IUserInformationService
     {
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;

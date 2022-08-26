@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 
 namespace CurrencyExchange.Service.Services
 {
-    public class SellCryptoCoinService<T> : ISellCryptoCoinService<T> where T : class
+    public class SellCryptoCoinService : ISellCryptoCoinService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;

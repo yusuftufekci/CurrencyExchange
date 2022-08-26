@@ -3,7 +3,7 @@ using CurrencyExchange.Core.Requests;
 
 namespace CurrencyExchange.Core.Services
 {
-    public interface IAccountService<T> where T : class
+    public interface IAccountService
     {
         Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token);
 

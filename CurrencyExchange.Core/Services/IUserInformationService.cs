@@ -2,7 +2,7 @@
 
 namespace CurrencyExchange.Core.Services
 {
-    public interface IUserInformationService<T> where T : class
+    public interface IUserInformationService
     {
         Task<CustomResponseDto<UserInformationDto>> GetUserInformation( string token);
 

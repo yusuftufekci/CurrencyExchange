@@ -6,8 +6,8 @@ namespace CurrencyExchange.API.Controllers.AuthenticationControllers
 {
     public class AuthenticationController : CustomBaseController
     {
-        private readonly IAuthenticationService<UserRegisterRequest> _service;
-        public AuthenticationController(IAuthenticationService<UserRegisterRequest> service)
+        private readonly IAuthenticationService _service;
+        public AuthenticationController(IAuthenticationService service)
         {
             _service = service;
         }

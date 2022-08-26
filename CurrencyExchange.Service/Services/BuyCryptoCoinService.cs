@@ -15,7 +15,7 @@ using CurrencyExchange.Caching.CryptoCoins;
 
 namespace CurrencyExchange.Service.Services
 {
-    public class BuyCryptoCoinService<T> : IBuyCryptoCoinService<T> where T : class
+    public class BuyCryptoCoinService : IBuyCryptoCoinService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;

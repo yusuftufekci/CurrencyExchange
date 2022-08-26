@@ -17,12 +17,12 @@ namespace CurrencyExchange.API.Modules
             builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
 
 
-            builder.RegisterGeneric(typeof(Service<>)).As(typeof(IService<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(AccountService<>)).As(typeof(IAccountService<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(AuthenticationService<>)).As(typeof(IAuthenticationService<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(BuyCryptoCoinService<>)).As(typeof(IBuyCryptoCoinService<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(SellCryptoCoinService<>)).As(typeof(ISellCryptoCoinService<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(UserInformationService<>)).As(typeof(IUserInformationService<>)).InstancePerLifetimeScope();
+           // builder.RegisterGeneric(typeof(Service<>)).As(typeof(IService<>)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof(AccountService)).As(typeof(IAccountService)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof(AuthenticationService)).As(typeof(IAuthenticationService)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof(BuyCryptoCoinService)).As(typeof(IBuyCryptoCoinService)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof(SellCryptoCoinService)).As(typeof(ISellCryptoCoinService)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof(UserInformationService)).As(typeof(IUserInformationService)).InstancePerLifetimeScope();
 
 
             builder.RegisterType(typeof(CommonFunctions)).As(typeof(ICommonFunctions)).InstancePerLifetimeScope();

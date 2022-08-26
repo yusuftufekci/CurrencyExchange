@@ -9,8 +9,8 @@ namespace CurrencyExchange.API.Controllers.TransactionControllers
 
     public class BuyCryptoCoinController : CustomBaseController
     {
-        private readonly IBuyCryptoCoinService<BuyCoinRequest> _service;
-        public BuyCryptoCoinController(IBuyCryptoCoinService<BuyCoinRequest> service)
+        private readonly IBuyCryptoCoinService _service;
+        public BuyCryptoCoinController(IBuyCryptoCoinService service)
         {
             _service = service;
         }

@@ -14,7 +14,7 @@ using CurrencyExchange.Core.RabbitMqLogger;
 
 namespace CurrencyExchange.Service.Services
 {
-    public class AuthenticationService<T> : IAuthenticationService<T> where T : class
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly ITokenRepository _tokenRepository;
         private readonly IUserRepository _userRepository;

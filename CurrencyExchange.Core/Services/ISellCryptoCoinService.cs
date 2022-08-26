@@ -3,7 +3,7 @@ using CurrencyExchange.Core.Requests;
 
 namespace CurrencyExchange.Core.Services
 {
-    public interface ISellCryptoCoinService<T> where T : class
+    public interface ISellCryptoCoinService
     {
         Task<CustomResponseDto<NoContentDto>> SellCryptoCoin(SellCryptoCoinRequest sellCryptoCoinRequest, string token);
 

@@ -3,7 +3,7 @@ using CurrencyExchange.Core.Requests;
 
 namespace CurrencyExchange.Core.Services
 {
-    public interface IAuthenticationService<T> where T : class
+    public interface IAuthenticationService
 
     {
         Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest, string ipAdress);

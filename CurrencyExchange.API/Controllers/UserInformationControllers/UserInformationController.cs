@@ -8,8 +8,8 @@ namespace CurrencyExchange.API.Controllers.UserInformationControllers
 {
     public class UserInformationController : CustomBaseController
     {
-        private readonly IUserInformationService<UserInformationRequest> _service;
-        public UserInformationController(IUserInformationService<UserInformationRequest> service)
+        private readonly IUserInformationService _service;
+        public UserInformationController(IUserInformationService service)
         {
             _service = service;
         }
