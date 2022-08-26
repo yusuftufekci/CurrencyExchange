@@ -1,20 +1,11 @@
-﻿using System.Reflection;
-using Autofac;
+﻿using Autofac;
 using CurrencyExchange.API.Filters;
-using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
-using CurrencyExchange.Core.ConfigModels;
-using CurrencyExchange.Core.RabbitMqLogger;
-using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
-using CurrencyExchange.Repository;
-using CurrencyExchange.Repository.Repositories;
 using CurrencyExchange.Repository.UnitOfWorks;
 using CurrencyExchange.Service.CommonFunction;
-using CurrencyExchange.Service.RabbitMqLogger;
 using CurrencyExchange.Service.Services;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Module = Autofac.Module;
 
 namespace CurrencyExchange.API.Modules

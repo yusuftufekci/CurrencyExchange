@@ -1,6 +1,4 @@
-﻿using CurrencyExchange.Core.Entities.CryptoCoins;
-
-namespace CurrencyExchange.Core.Entities.Account
+﻿namespace CurrencyExchange.Core.Entities.Account
 {
     public class Balance : BaseEntity
     {

@@ -11,8 +11,6 @@ using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
-using Microsoft.Extensions.Options;
-using CurrencyExchange.Core.ConfigModels;
 
 namespace CurrencyExchange.Service.Services
 {

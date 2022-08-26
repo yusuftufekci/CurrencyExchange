@@ -5,7 +5,7 @@ namespace CurrencyExchange.Log.Concrete
 {
     public class LoggerManager : ILoggerManager
     {
-        private static NLog.ILogger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         public void LogDebug(string message)
         {

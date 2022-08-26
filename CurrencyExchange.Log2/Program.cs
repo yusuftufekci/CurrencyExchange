@@ -1,8 +1,4 @@
-﻿using CurrencyExchange.Log2.Abstract;
-using Microsoft.IdentityModel.Tokens;
-using NLog;
-
-namespace CurrencyExchange.Log2
+﻿namespace CurrencyExchange.Log2
 {
     class Program
     {

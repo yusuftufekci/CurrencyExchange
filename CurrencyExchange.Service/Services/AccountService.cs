@@ -1,7 +1,6 @@
 ﻿using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
-using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
@@ -67,10 +66,11 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsAccountNotFound", language: "en");
-                _logSender.SenderFunction("Log", "DepositFunds request failed. Account not found");
+                _logSender.SenderFunction("Log", logMessages.Value);
                 var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
                 return CustomResponseDto<NoContentDto>.Fail(404, responseMessage.Value);
             }
+
             var balance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == "USDT").SingleOrDefaultAsync();
             if (balance == null)
             {
