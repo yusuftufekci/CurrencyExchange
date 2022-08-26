@@ -15,11 +15,14 @@ namespace CurrencyExchange.Core.DTOs
             return new CustomResponseDto<T> { StatusCode = statusCode, Data = data };
         }
 
-        public static CustomResponseDto<T> Success(int statusCode)
+        public static CustomResponseDto<T> Success(T data)
         {
-            return new CustomResponseDto<T> { StatusCode = statusCode };
+            return new CustomResponseDto<T> { Data = data };
         }
-
+        public static CustomResponseDto<T> Success()
+        {
+            return new CustomResponseDto<T> { };
+        }
         public static CustomResponseDto<T> Fail(int statusCode, List<string> errors)
         {
             return new CustomResponseDto<T> { Errors = errors, StatusCode = statusCode };

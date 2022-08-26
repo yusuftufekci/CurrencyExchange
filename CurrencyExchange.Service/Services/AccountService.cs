@@ -1,8 +1,10 @@
-﻿using CurrencyExchange.Caching.CryptoCoins;
+﻿using System.Net;
+using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.LogMessages;
+using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
@@ -47,7 +49,7 @@ namespace CurrencyExchange.Service.Services
                 logMessages = await _commonFunctions.GetLogResponseMessage("CreateAccountAccountAlreadyExist", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountAlreadyExist", language: "en");
-                return CustomResponseDto<NoContentDto>.Fail(401, responseMessage.Value);
+                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
             }
             var tempAccount = new Account
             {
@@ -58,7 +60,7 @@ namespace CurrencyExchange.Service.Services
             await _unitOfWork.CommitAsync();
             logMessages = await _commonFunctions.GetLogResponseMessage("CreateAccountSuccess", language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
-            return CustomResponseDto<NoContentDto>.Success(201);
+            return CustomResponseDto<NoContentDto>.Success();
         }
 
         public async Task<CustomResponseDto<NoContentDto>> DepositFunds(DepositFundRequest createAccountRequest, string token)
@@ -70,7 +72,7 @@ namespace CurrencyExchange.Service.Services
                 logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsAccountNotFound", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
-                return CustomResponseDto<NoContentDto>.Fail(404, responseMessage.Value);
+                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
             var balance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == "USDT").SingleOrDefaultAsync();
@@ -101,7 +103,7 @@ namespace CurrencyExchange.Service.Services
                 await _unitOfWork.CommitAsync();
                 logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsSuccess", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
-                return CustomResponseDto<NoContentDto>.Success(201);
+                return CustomResponseDto<NoContentDto>.Success();
             }
             else
             {
@@ -120,7 +122,7 @@ namespace CurrencyExchange.Service.Services
                 await _unitOfWork.CommitAsync();
                 logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsSuccess", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
-                return CustomResponseDto<NoContentDto>.Success(201);
+                return CustomResponseDto<NoContentDto>.Success();
             }
         }
     }
