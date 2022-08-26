@@ -1,3 +1,4 @@
+using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
@@ -6,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
-using CurrencyExchange.Core.HelperFunctions;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -16,15 +16,18 @@ namespace CurrencyExchange.Service.Services
         private readonly IBalanceRepository _balanceRepository;
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
+        private readonly CryptoCoinServiceWithCaching _cryptoCoinServiceWithCaching;
+
 
         public UserInformationService(IUserBalanceHistoryRepository userBalanceHistoryRepository,
             IBalanceRepository balanceRepository,
-            ISenderLogger logSender  , ICommonFunctions commonFunctions)
+            ISenderLogger logSender  , ICommonFunctions commonFunctions, CryptoCoinServiceWithCaching cryptoCoinServiceWithCaching)
         {
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
             _balanceRepository = balanceRepository;
             _logSender = logSender;
             _commonFunctions = commonFunctions;
+            _cryptoCoinServiceWithCaching = cryptoCoinServiceWithCaching;
         }
         public async Task<CustomResponseDto<UserInformationDto>> GetUserInformation(string token)
         {
@@ -43,7 +46,7 @@ namespace CurrencyExchange.Service.Services
             }
             var balances = await _balanceRepository.Where(p => p.Account == account).ToListAsync();
             var userBalancesInfos = new List<BalanceDto>();
-            var cryptoCoins = await GetCryptoCoins.AsyncGetCryptoCoins();
+            var cryptoCoins = _cryptoCoinServiceWithCaching.GetCryptoCoins();
 
             foreach (var item in balances)
             {
@@ -66,20 +69,19 @@ namespace CurrencyExchange.Service.Services
             };
             logMessages = await _commonFunctions.GetLogResponseMessage("GetUserInformationSuccess", language: "en");
 
-            _logSender.SenderFunction("Log", "GetUserInformation request successfully completed");
+            _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<UserInformationDto>.Success(201, userInformations);
 
         }
 
         public async Task<CustomResponseDto<List<UserTransactionHistoryDto>>> GetUserTransactions(string token)
         {
-            ResponseMessages responseMessage;
             LogMessages logMessages;
             var account = await _commonFunctions.GetAccount(token);
             if (account == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("GetUserTransactionsAccountNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail(404, responseMessage.Value);
             }
@@ -99,25 +101,24 @@ namespace CurrencyExchange.Service.Services
             }
             logMessages = await _commonFunctions.GetLogResponseMessage("GetUserTransactionsSuccess", language: "en");
 
-            _logSender.SenderFunction("Log", "GetUserTransactions request succesfully completed");
+            _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<List<UserTransactionHistoryDto>>.Success(201, userTransactionHistories);
         }
 
         public async Task<CustomResponseDto<List<BalanceDto>>> GetUserBalanceInformation(string token)
         {
-            ResponseMessages responseMessage;
             LogMessages logMessages;
             var account = await _commonFunctions.GetAccount(token);
             if (account == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("GetUserBalanceInformationAccountNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<List<BalanceDto>>.Fail(404, responseMessage.Value);
             }
             var balances = await _balanceRepository.Where(p => p.Account == account).ToListAsync();
             var userBalancesInfos = new List<BalanceDto>();
-            var cryptoCoins = await GetCryptoCoins.AsyncGetCryptoCoins();
+            var cryptoCoins = _cryptoCoinServiceWithCaching.GetCryptoCoins();
 
             foreach (var item in balances)
             {

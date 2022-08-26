@@ -1,3 +1,5 @@
+using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.ConfigModels;
 using Microsoft.Extensions.Caching.Memory;
 using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.DTOs.CryptoCoins;
@@ -8,8 +10,10 @@ namespace CurrencyExchange.Caching.CryptoCoins
     {
         private const string CacheCryptoKey = "CryptoCoinPriceCache";
         private readonly IMemoryCache _memoryCache;
-        public CryptoCoinPriceServiceWithCaching(IMemoryCache memoryCache)
+        private readonly ICommonFunctions _commonFunctions;
+        public CryptoCoinPriceServiceWithCaching(IMemoryCache memoryCache, ICommonFunctions commonFunctions)
         {
+            _commonFunctions = commonFunctions;
             _memoryCache = memoryCache;
 
             if (!_memoryCache.TryGetValue(CacheCryptoKey, out _))
@@ -19,7 +23,7 @@ namespace CurrencyExchange.Caching.CryptoCoins
                     .SetAbsoluteExpiration(TimeSpan.FromSeconds(300))
                     .SetPriority(CacheItemPriority.Normal)
                     .SetSize(1024);
-                _memoryCache.Set(CacheCryptoKey, GetCryptoCoinPrices.AsyncGetCryptoCoinPrices().Result, cacheEntryOptions);
+                _memoryCache.Set(CacheCryptoKey, _commonFunctions.GetCryptoCoinPrices().Result, cacheEntryOptions);
             }
         }
         public List<CryptoCoinPriceDto> GetCryptoCoinPrice()

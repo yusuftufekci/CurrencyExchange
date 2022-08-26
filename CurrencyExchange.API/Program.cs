@@ -22,6 +22,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 
+builder.Services.Configure<UrlList>(builder.Configuration.GetSection("UrlList"));
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
 builder.Services.Configure<ControlCryptoCoinAmountSettings>(builder.Configuration.GetSection("ControlCryptoCoinAmountSettings"));

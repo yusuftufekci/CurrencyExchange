@@ -10,6 +10,7 @@ namespace CurrencyExchange.API.Modules
             builder.RegisterType(typeof(AppSettings)).SingleInstance();
             builder.RegisterType(typeof(RabbitMqSettings)).SingleInstance();
             builder.RegisterType(typeof(ControlCryptoCoinAmountSettings)).SingleInstance();
+            builder.RegisterType(typeof(UrlList)).SingleInstance();
 
         }
 

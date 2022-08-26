@@ -1,8 +1,8 @@
-﻿using CurrencyExchange.Core.CommonFunction;
+﻿using CurrencyExchange.Caching.CryptoCoins;
+using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.LogMessages;
-using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
@@ -20,12 +20,13 @@ namespace CurrencyExchange.Service.Services
         private readonly IBalanceRepository _balanceRepository;
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
+        private readonly CryptoCoinServiceWithCaching _cryptoCoinServiceWithCaching;
 
 
         public AccountService(IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
             IBalanceRepository balanceRepository,
-            ISenderLogger logSenderLogger , ICommonFunctions commonFunctions)
+            ISenderLogger logSenderLogger , ICommonFunctions commonFunctions, CryptoCoinServiceWithCaching cryptoCoinServiceWithCaching)
         {
             _unitOfWork = unitOfWork;
             _accountRepository = accountRepository;
@@ -33,6 +34,7 @@ namespace CurrencyExchange.Service.Services
             _balanceRepository = balanceRepository;
             _logSender = logSenderLogger;
             _commonFunctions = commonFunctions;
+            _cryptoCoinServiceWithCaching = cryptoCoinServiceWithCaching;
         }
         public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token)
         {
@@ -84,7 +86,7 @@ namespace CurrencyExchange.Service.Services
                     ChangedAmountSoldCryptoCoin = createAccountRequest.TotalBalance
                 };
 
-                var cryptoCoins = await GetCryptoCoins.AsyncGetCryptoCoins();
+                var cryptoCoins = _cryptoCoinServiceWithCaching.GetCryptoCoins();
 
                 var usdt = cryptoCoins.Single(p => p.CoinName == "USDT");
                 var tempBalance = new Balance
