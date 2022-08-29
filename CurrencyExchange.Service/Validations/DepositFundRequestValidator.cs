@@ -1,4 +1,5 @@
-﻿using CurrencyExchange.Core.Requests;
+﻿using CurrencyExchange.Core.Constants;
+using CurrencyExchange.Core.Requests;
 using FluentValidation;
 
 namespace CurrencyExchange.Service.Validations
@@ -7,7 +8,7 @@ namespace CurrencyExchange.Service.Validations
     {
         public DepositFundRequestValidator()
         {
-            RuleFor(x => x.TotalBalance).NotNull().WithMessage("{PropertyName} is required").NotEmpty().WithMessage("{PropertyName} cant be none!").InclusiveBetween(1,double.MaxValue).WithMessage("{PropertyName} must be greater than 0");
+            RuleFor(x => x.TotalBalance).NotNull().WithMessage("{PropertyName} "+ValidatorConstants.CantNull).NotEmpty().WithMessage("{PropertyName} "+ ValidatorConstants.CantEmpty).InclusiveBetween(1,double.MaxValue).WithMessage("{PropertyName} "+ValidatorConstants.GreaterThan);
 
         }
     }

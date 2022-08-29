@@ -1,4 +1,5 @@
-﻿using CurrencyExchange.Core.Requests;
+﻿using CurrencyExchange.Core.Constants;
+using CurrencyExchange.Core.Requests;
 using FluentValidation;
 
 namespace CurrencyExchange.Service.Validations
@@ -7,7 +8,7 @@ namespace CurrencyExchange.Service.Validations
     {
         public CreateAccountRequestValidator()
         {
-            RuleFor(x => x.AccountName).NotEmpty().WithMessage("{PropertyName} cant be empty").NotNull().WithMessage("{PropertyName}} cant be null");
+            RuleFor(x => x.AccountName).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstants.CantEmpty).NotNull().WithMessage("{PropertyName} "+ValidatorConstants.CantNull);
 
         }
     }

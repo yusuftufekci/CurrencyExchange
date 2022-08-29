@@ -1,5 +1,7 @@
-﻿using CurrencyExchange.Core.Requests;
+﻿using CurrencyExchange.Core.Constants;
+using CurrencyExchange.Core.Requests;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace CurrencyExchange.Service.Validations
 {
@@ -7,8 +9,8 @@ namespace CurrencyExchange.Service.Validations
     {
         public SellCryptoCoinRequestValidator()
         {
-            RuleFor(x => x.CoinToSell).NotEmpty().WithMessage("{PropertyName} cant be empty").NotNull().WithMessage("{PropertyName}} cant be null");
-            RuleFor(x => x.Amount).NotEmpty().WithMessage("{PropertyName} cant be empty").NotNull().WithMessage("{PropertyName}} cant be null").GreaterThan(0.001);
+            RuleFor(x => x.CoinToSell).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstants.CantEmpty).NotNull().WithMessage("{PropertyName} "+ValidatorConstants.CantNull);
+            RuleFor(x => x.Amount).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstants.CantEmpty).NotNull().WithMessage("{PropertyName} "+ValidatorConstants.CantEmpty).GreaterThan(0.001);
 
         }
 
