@@ -13,6 +13,7 @@ using CurrencyExchange.Core.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using CurrencyExchange.Caching.CryptoCoins;
+using CurrencyExchange.Core.ConstantsMessages;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -157,7 +158,7 @@ namespace CurrencyExchange.Service.Services
             await _unitOfWork.CommitAsync();
             logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountSuccess", language: "en");
 
-            _logSender.SenderFunction("Log", "BuyCryptoCoinByUsdt request successfully completed.");
+            _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
 
         }
@@ -214,7 +215,7 @@ namespace CurrencyExchange.Service.Services
             if (cryptoCoins == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountApiFailed", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("ApiProblem", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.ApiProblem, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
@@ -257,7 +258,7 @@ namespace CurrencyExchange.Service.Services
             }
             await _unitOfWork.CommitAsync();
             logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmount2Success", language: "en");
-            _logSender.SenderFunction("Log", "BuyCryptoCoinByCoin request successfully completed.");
+            _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
 
         }

@@ -2,6 +2,7 @@
 using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.ConfigModels;
+using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Log;
@@ -54,7 +55,7 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinAccountNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.AccountNotFound, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
@@ -62,7 +63,7 @@ namespace CurrencyExchange.Service.Services
             var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.Symbol == symbolOfCoins); if (coinTypeToBuy == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinPriceNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("BalanceNotFound", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.BalanceNotFound, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Fail(404, responseMessage.Value);
             }
@@ -70,7 +71,7 @@ namespace CurrencyExchange.Service.Services
             if (balance == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinBalanceNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("BalanceNotFound", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.BalanceNotFound, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
@@ -80,14 +81,14 @@ namespace CurrencyExchange.Service.Services
             if (totalAmount <=_controlCryptoCoinAmountSettings.TotalAmount)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinLowPrice", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmount", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.LowAmount, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
             if (sellCryptoCoinRequest.Amount > balance.TotalBalance)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("SellCryptoCoinLowPriceOfCoin", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmountOfCoin", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.LowAmountOfCoin, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }

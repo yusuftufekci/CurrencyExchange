@@ -7,8 +7,8 @@ namespace CurrencyExchange.Service.Validations
     {
         public UserLoginRequestValidator()
         {
-            RuleFor(x => x.UserEmail).EmailAddress().WithMessage("{PropertyName} "+ValidatorConstants.EmailValidatorConstant).NotNull().WithMessage("{PropertyName} "+ValidatorConstants.CantNull).NotEmpty().WithMessage("{PropertyName} "+ ValidatorConstants.CantEmpty);
-            RuleFor(x => x.Password).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstants.CantEmpty).Length(9, 15).WithMessage("{PropertyName} "+ValidatorConstants.PasswordValidatorConstant).NotNull().WithMessage("{PropertyName} "+ValidatorConstants.CantNull);
+            RuleFor(x => x.UserEmail).EmailAddress().WithMessage("{PropertyName} "+ValidatorConstantsMessages.EmailValidatorConstant).NotNull().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantNull).NotEmpty().WithMessage("{PropertyName} "+ ValidatorConstantsMessages.CantEmpty);
+            RuleFor(x => x.Password).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantEmpty).Length(9, 15).WithMessage("{PropertyName} "+ValidatorConstantsMessages.PasswordValidatorConstant).NotNull().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantNull);
 
         }
     }

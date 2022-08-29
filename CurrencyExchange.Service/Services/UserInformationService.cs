@@ -6,6 +6,7 @@ using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
 
@@ -40,7 +41,7 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("GetUserInformationAccountNotFound", language: "en");
-                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.AccountNotFound, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<UserInformationDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
@@ -81,7 +82,7 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("GetUserTransactionsAccountNotFound", language: "en");
-                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.AccountNotFound, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
@@ -112,7 +113,7 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("GetUserBalanceInformationAccountNotFound", language: "en");
-                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.AccountNotFound, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<List<BalanceDto>>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }

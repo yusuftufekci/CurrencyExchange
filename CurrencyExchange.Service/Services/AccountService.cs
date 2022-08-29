@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.LogMessages;
@@ -48,7 +49,7 @@ namespace CurrencyExchange.Service.Services
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("CreateAccountAccountAlreadyExist", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
-                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountAlreadyExist", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.AccountAlreadyExist, language: "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
             }
             var tempAccount = new Account
@@ -71,7 +72,7 @@ namespace CurrencyExchange.Service.Services
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsAccountNotFound", language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
-                var responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
+                var responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.AccountNotFound, language: "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 

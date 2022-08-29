@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
@@ -44,7 +45,7 @@ namespace CurrencyExchange.Service.Services
             if (ipAddress is null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("LoginIpAddressNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("IpAddressNotFound", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.IpAddressNotFound, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
@@ -53,14 +54,14 @@ namespace CurrencyExchange.Service.Services
             if (userParam == null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("LoginUsernameOrPasswordWrong", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("UsernameOrPasswordWrong", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.UsernameOrPasswordWrong, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, new List<string> { responseMessage.Value });
             }
             if (!PasswordHash.VerifyPasswordHash(userLoginRequest.Password, userParam.PasswordHash, userParam.PasswordSalt))
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("LoginUsernameOrPasswordWrong", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("UsernameOrPasswordWrong", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.UsernameOrPasswordWrong, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.Unauthorized, new List<string> { responseMessage.Value });
             }
@@ -101,7 +102,7 @@ namespace CurrencyExchange.Service.Services
             if (ipAdress is null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("RegisterIpAddressNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("IpAddressNotFound", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.IpAddressNotFound, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
@@ -109,7 +110,7 @@ namespace CurrencyExchange.Service.Services
             if (userExist != null)
             {
                 logMessages = await _commonFunctions.GetLogResponseMessage("RegisterUserAlreadyExist", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("UserAlreadyExist", language: "en");
+                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.UserAlreadyExist, language: "en");
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
