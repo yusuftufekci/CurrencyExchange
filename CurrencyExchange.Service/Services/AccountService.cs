@@ -5,12 +5,12 @@ using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.LogMessages;
-using CurrencyExchange.Core.HelperFunctions;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
+using CurrencyExchange.Service.LogFacade;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyExchange.Service.Services
@@ -24,12 +24,14 @@ namespace CurrencyExchange.Service.Services
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
         private readonly CryptoCoinServiceWithCaching _cryptoCoinServiceWithCaching;
+        private readonly LogResponseFacade _logResponseFacade;
+
 
 
         public AccountService(IUnitOfWork unitOfWork, IAccountRepository accountRepository,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
             IBalanceRepository balanceRepository,
-            ISenderLogger logSenderLogger , ICommonFunctions commonFunctions, CryptoCoinServiceWithCaching cryptoCoinServiceWithCaching)
+            ISenderLogger logSenderLogger , ICommonFunctions commonFunctions, CryptoCoinServiceWithCaching cryptoCoinServiceWithCaching, LogResponseFacade logResponseFacade)
         {
             _unitOfWork = unitOfWork;
             _accountRepository = accountRepository;
@@ -38,18 +40,16 @@ namespace CurrencyExchange.Service.Services
             _logSender = logSenderLogger;
             _commonFunctions = commonFunctions;
             _cryptoCoinServiceWithCaching = cryptoCoinServiceWithCaching;
+            _logResponseFacade = logResponseFacade;
         }
         public async Task<CustomResponseDto<NoContentDto>> CreateAccount(CreateAccountRequest createAccountRequest, string token)
         {
-            LogMessages logMessages;
             var user = await _commonFunctions.GetUser(token);
             var account = await _commonFunctions.GetAccount(token);
 
             if (account != null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("CreateAccountAccountAlreadyExist", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
-                var responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.AccountAlreadyExist, language: "en");
+                var responseMessage = await _logResponseFacade.GetLogAndResponseMessage("CreateAccountAccountAlreadyExist", ConstantResponseMessage.AccountAlreadyExist, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
             }
             var tempAccount = new Account
@@ -59,7 +59,7 @@ namespace CurrencyExchange.Service.Services
             };
             await _accountRepository.AddAsync(tempAccount);
             await _unitOfWork.CommitAsync();
-            logMessages = await _commonFunctions.GetLogResponseMessage("CreateAccountSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage("CreateAccountSuccess", language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
         }
@@ -70,9 +70,7 @@ namespace CurrencyExchange.Service.Services
             var account = await _commonFunctions.GetAccount(token);
             if (account == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("DepositFundsAccountNotFound", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
-                var responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.AccountNotFound, language: "en");
+                var responseMessage = await _logResponseFacade.GetLogAndResponseMessage("DepositFundsAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 

@@ -5,6 +5,7 @@ using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
 using CurrencyExchange.Repository.UnitOfWorks;
 using CurrencyExchange.Service.CommonFunction;
+using CurrencyExchange.Service.LogFacade;
 using CurrencyExchange.Service.Services;
 using Module = Autofac.Module;
 
@@ -27,7 +28,9 @@ namespace CurrencyExchange.API.Modules
 
             builder.RegisterType(typeof(CommonFunctions)).As(typeof(ICommonFunctions)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(TokenControlFilter<>)).InstancePerLifetimeScope();
-            
+            builder.RegisterType(typeof(LogResponseFacade)).InstancePerLifetimeScope();
+
+
 
         }
     }

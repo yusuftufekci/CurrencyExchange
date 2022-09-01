@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.ConstantsMessages;
+using CurrencyExchange.Service.LogFacade;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -27,12 +28,14 @@ namespace CurrencyExchange.Service.Services
         private readonly ControlCryptoCoinAmountSettings _controlCryptoCoinAmountSettings;
         private readonly CryptoCoinPriceServiceWithCaching _cryptoCoinPriceServiceWithCaching;
         private readonly CryptoCoinServiceWithCaching _cryptoCoinServiceWithCaching;
+        private readonly LogResponseFacade _logResponseFacade;
+
 
         public BuyCryptoCoinService( IUnitOfWork unitOfWork,
             IUserBalanceHistoryRepository userBalanceHistoryRepository,
            IBalanceRepository balanceRepository, ISenderLogger logSender ,
             ICommonFunctions commonFunctions, IOptions<ControlCryptoCoinAmountSettings> controlCryptoCoinAmountSettings,
-            CryptoCoinPriceServiceWithCaching cryptoCoinPriceServiceWithCaching, CryptoCoinServiceWithCaching cryptoCoinServiceWithCaching )
+            CryptoCoinPriceServiceWithCaching cryptoCoinPriceServiceWithCaching, CryptoCoinServiceWithCaching cryptoCoinServiceWithCaching, LogResponseFacade logResponseFacade)
         {
             _unitOfWork = unitOfWork;
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
@@ -42,6 +45,7 @@ namespace CurrencyExchange.Service.Services
             _controlCryptoCoinAmountSettings = controlCryptoCoinAmountSettings.Value;
             _cryptoCoinPriceServiceWithCaching = cryptoCoinPriceServiceWithCaching;
             _cryptoCoinServiceWithCaching = cryptoCoinServiceWithCaching;
+            _logResponseFacade = logResponseFacade;
         }
 
         public double CalculateTotalAmountByUsdt(string price, double amount)
@@ -65,55 +69,42 @@ namespace CurrencyExchange.Service.Services
         {
 
             ResponseMessages responseMessage;
-            LogMessages logMessages;
             var account = await _commonFunctions.GetAccount(token);
             var symbolOfCoins = buyCoinRequest.CoinToBuy + buyCoinRequest.BuyWIthThisCoin;
             if (account == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountAccountNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var balance = await _balanceRepository.Where(p => p.CryptoCoinName == buyCoinRequest.BuyWIthThisCoin && p.Account == account).SingleOrDefaultAsync();
             if (balance == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountBalanceNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("BalanceNotFound", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountBalanceNotFound", ConstantResponseMessage.BalanceNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var cryptoCoinPrices = _cryptoCoinPriceServiceWithCaching.GetCryptoCoinPrice();
             var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.Symbol == symbolOfCoins);
             if (coinTypeToBuy == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountPriceNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("BalanceNotFound", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountPriceNotFound", ConstantResponseMessage.BalanceNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var totalAmount = CalculateTotalAmountByUsdt(coinTypeToBuy.Price, buyCoinRequest.Amount);
             if (totalAmount <= _controlCryptoCoinAmountSettings.TotalAmount)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountLowPrice", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmount", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountLowPrice", ConstantResponseMessage.LowAmount, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
             if (totalAmount > balance.TotalBalance)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountLowPriceOfCoin", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmountOfCoin", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountLowPriceOfCoin", ConstantResponseMessage.LowAmountOfCoin, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
             var balanceForBuyCoin = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var cryptoCoins = _cryptoCoinServiceWithCaching.GetCryptoCoins();
             if (cryptoCoins == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountApiFailed", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("ApiProblem", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountApiFailed", ConstantResponseMessage.ApiProblem, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
 
             }
@@ -156,7 +147,7 @@ namespace CurrencyExchange.Service.Services
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             }
             await _unitOfWork.CommitAsync();
-            logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountSuccess", language: "en");
 
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
@@ -166,57 +157,44 @@ namespace CurrencyExchange.Service.Services
         public async Task<CustomResponseDto<NoContentDto>> BuyCryptoCoinByCoin(BuyCoinRequest buyCoinRequest, string token)
         {
             ResponseMessages responseMessage;
-            LogMessages logMessages;
             var account = await _commonFunctions.GetAccount(token);
             var symbolOfCoins = buyCoinRequest.CoinToBuy + buyCoinRequest.BuyWIthThisCoin;
             if (account == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountAccountNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("AccountNotFound", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var balance = await _balanceRepository.Where(p => p.CryptoCoinName == buyCoinRequest.BuyWIthThisCoin && p.Account == account).SingleOrDefaultAsync();
             if (balance == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountBalanceNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("BalanceNotFound", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountBalanceNotFound", ConstantResponseMessage.BalanceNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var cryptoCoinPrices = _cryptoCoinPriceServiceWithCaching.GetCryptoCoinPrice();
             var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.Symbol == symbolOfCoins);
             if (coinTypeToBuy == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountPriceNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("BalanceNotFound", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountPriceNotFound", ConstantResponseMessage.BalanceNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
             var totalAmount = CalculateTotalAmountByCoin(coinTypeToBuy.Price, buyCoinRequest.Amount);
             if (totalAmount <= _controlCryptoCoinAmountSettings.TotalAmount)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountLowPrice", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmount", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountLowPrice", ConstantResponseMessage.LowAmount, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
 
             if (totalAmount > balance.TotalBalance)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountLowPriceOfCoin", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage("LowAmountOfCoin", language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountLowPriceOfCoin", ConstantResponseMessage.LowAmountOfCoin, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
             var balanceForBuyCoin = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var cryptoCoins = _cryptoCoinServiceWithCaching.GetCryptoCoins();
             if (cryptoCoins == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmountApiFailed", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.ApiProblem, language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("BuyCoinWithAmountApiFailed", ConstantResponseMessage.ApiProblem, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var coinToBuy = cryptoCoins.SingleOrDefault(p => p.CoinName == buyCoinRequest.CoinToBuy); if (balanceForBuyCoin == null)
@@ -257,7 +235,7 @@ namespace CurrencyExchange.Service.Services
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             }
             await _unitOfWork.CommitAsync();
-            logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmount2Success", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage("BuyCoinWithAmount2Success", language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
 

@@ -13,6 +13,7 @@ using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
+using CurrencyExchange.Service.LogFacade;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -24,10 +25,12 @@ namespace CurrencyExchange.Service.Services
         private readonly IPasswordRepository _passwordRepository;
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
+        private readonly LogResponseFacade _logResponseFacade;
+
 
         public AuthenticationService(IUserRepository repository, IUnitOfWork unitOfWork,
             IPasswordRepository passwordRepository, ITokenRepository tokenRepository, ISenderLogger logSenderLogger,
-            ICommonFunctions commonFunctions)
+            ICommonFunctions commonFunctions, LogResponseFacade logResponseFacade)
         {
             _userRepository = repository;
             _unitOfWork = unitOfWork;
@@ -35,34 +38,28 @@ namespace CurrencyExchange.Service.Services
             _tokenRepository = tokenRepository;
             _logSender = logSenderLogger;
             _commonFunctions = commonFunctions;
+            _logResponseFacade = logResponseFacade;
         }
 
 
         public async Task<CustomResponseDto<TokenDto>> UserLogin(UserLoginRequest userLoginRequest, string ipAddress)
         {
             ResponseMessages responseMessage;
-            LogMessages logMessages;
             if (ipAddress is null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("LoginIpAddressNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.IpAddressNotFound, language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("LoginIpAddressNotFound", ConstantResponseMessage.IpAddressNotFound, "en");
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var user = await _userRepository.Where(p => p.UserEmail == userLoginRequest.UserEmail).SingleOrDefaultAsync();
             var userParam = await _passwordRepository.Where(p => p.User == user).SingleOrDefaultAsync();
             if (userParam == null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("LoginUsernameOrPasswordWrong", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.UsernameOrPasswordWrong, language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("LoginUsernameOrPasswordWrong", ConstantResponseMessage.UsernameOrPasswordWrong, "en");
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, new List<string> { responseMessage.Value });
             }
             if (!PasswordHash.VerifyPasswordHash(userLoginRequest.Password, userParam.PasswordHash, userParam.PasswordSalt))
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("LoginUsernameOrPasswordWrong", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.UsernameOrPasswordWrong, language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("LoginUsernameOrPasswordWrong", ConstantResponseMessage.UsernameOrPasswordWrong, "en");
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.Unauthorized, new List<string> { responseMessage.Value });
             }
             var token = _commonFunctions.GenerateToken(user);
@@ -90,7 +87,7 @@ namespace CurrencyExchange.Service.Services
                
                 await _unitOfWork.CommitAsync();
             }
-            logMessages = await _commonFunctions.GetLogResponseMessage("LoginSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage("LoginSuccess", language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<TokenDto>.Success(new TokenDto { Token = token });
         }
@@ -98,20 +95,15 @@ namespace CurrencyExchange.Service.Services
         public async Task<CustomResponseDto<NoContentDto>> UserRegister(UserRegisterRequest userRegisterRequest, string ipAdress)
         {
             ResponseMessages responseMessage;
-            LogMessages logMessages;
             if (ipAdress is null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("RegisterIpAddressNotFound", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.IpAddressNotFound, language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("RegisterIpAddressNotFound", ConstantResponseMessage.IpAddressNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var userExist = await _userRepository.Where(p => p.UserEmail == userRegisterRequest.UserEmail).SingleOrDefaultAsync();
             if (userExist != null)
             {
-                logMessages = await _commonFunctions.GetLogResponseMessage("RegisterUserAlreadyExist", language: "en");
-                responseMessage = await _commonFunctions.GetApiResponseMessage(ConstantResponseMessage.UserAlreadyExist, language: "en");
-                _logSender.SenderFunction("Log", logMessages.Value);
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("RegisterUserAlreadyExist", ConstantResponseMessage.UserAlreadyExist, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var user = new User
@@ -133,7 +125,7 @@ namespace CurrencyExchange.Service.Services
             await _userRepository.AddAsync(user);
             await _passwordRepository.AddAsync(password);
             await _unitOfWork.CommitAsync();
-            logMessages = await _commonFunctions.GetLogResponseMessage("RegisterSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage("RegisterSuccess", language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
         }

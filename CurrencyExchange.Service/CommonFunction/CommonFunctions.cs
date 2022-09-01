@@ -31,14 +31,14 @@ namespace CurrencyExchange.Service.CommonFunction
 
         public CommonFunctions(ITokenRepository tokenRepository, IUserRepository userRepository,
             IAccountRepository accountRepository, IResponseMessageRepository responseMessageRepository,
-            ILogMessagesRepository logMessagesRepository, AppSettings appSettings, IOptions<UrlList> urlList)
+            ILogMessagesRepository logMessagesRepository, IOptions<AppSettings>  appSettings, IOptions<UrlList> urlList)
         {
             _tokenRepository = tokenRepository;
             _userRepository = userRepository;
             _accountRepository = accountRepository;
             _responseMessageRepository = responseMessageRepository;
             _logMessagesRepository = logMessagesRepository;
-            _appSettings = appSettings;
+            _appSettings = appSettings.Value;
             _urlList = urlList.Value;
         }
 
@@ -107,6 +107,7 @@ namespace CurrencyExchange.Service.CommonFunction
 
         public string GenerateToken(User user)
         {
+            var a = _appSettings.Secret;
             var mySecret = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
             var mySecurityKey = new SymmetricSecurityKey((mySecret));
