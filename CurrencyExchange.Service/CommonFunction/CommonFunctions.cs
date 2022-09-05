@@ -47,7 +47,7 @@ namespace CurrencyExchange.Service.CommonFunction
             var userToken = await _tokenRepository.Where(p => p.Token == token).SingleAsync();
             var user = await _userRepository.Where(p => p.Id == userToken.UserId).SingleAsync();
             var account = await _accountRepository.Where(p => p.User == user).SingleOrDefaultAsync();
-            return account ?? null;
+            return (account ?? null)!;
         }
 
         public async Task<User> GetUser(string token)

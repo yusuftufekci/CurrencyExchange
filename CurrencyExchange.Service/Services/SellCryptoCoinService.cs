@@ -6,7 +6,6 @@ using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Log;
-using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
@@ -94,9 +93,11 @@ namespace CurrencyExchange.Service.Services
             {
                 Account = account,
                 MessageForChanging = sellCryptoCoinRequest.Amount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + totalAmount + " USDT",
-                ChangedAmount = sellCryptoCoinRequest.Amount,
+                ChangedAmount = totalAmount,
                 BoughtCryptoCoin = "USDT",
-                SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell
+                SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell,
+                ChangedAmountSoldCryptoCoin = sellCryptoCoinRequest.Amount
+                
             };
             await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             await _unitOfWork.CommitAsync();
@@ -155,7 +156,9 @@ namespace CurrencyExchange.Service.Services
                 MessageForChanging = totalAmount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + sellCryptoCoinRequest.Amount + " USDT",
                 ChangedAmount = sellCryptoCoinRequest.Amount,
                 BoughtCryptoCoin = "USDT",
-                SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell
+                SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell,
+                ChangedAmountSoldCryptoCoin = totalAmount
+
             };
             await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
             await _unitOfWork.CommitAsync();

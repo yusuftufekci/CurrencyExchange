@@ -24,7 +24,7 @@ namespace CurrencyExchange.API.Modules
             builder.RegisterType(typeof(BuyCryptoCoinService)).As(typeof(IBuyCryptoCoinService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof(SellCryptoCoinService)).As(typeof(ISellCryptoCoinService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof(UserInformationService)).As(typeof(IUserInformationService)).InstancePerLifetimeScope();
-
+            builder.RegisterType(typeof(CancellationService)).As(typeof(ICancellationService)).InstancePerLifetimeScope();
 
             builder.RegisterType(typeof(CommonFunctions)).As(typeof(ICommonFunctions)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(TokenControlFilter<>)).InstancePerLifetimeScope();
