@@ -39,21 +39,21 @@ namespace CurrencyExchange.Service.Services
             var account = await _commonFunctions.GetAccount(token);
             if (account == null)
             {
-                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("GetUserTransactionsAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var userTransaction = await _userBalanceHistoryRepository.Where(p => p.Id == cancellationRequest.TransactionHistoryId).SingleAsync();
             if (userTransaction == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
-                    "RollBackAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
+                    ConstantLogMessages.RollBackAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
             if (userTransaction.Account != account)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
-                    "GetUserTransactionsAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
+                    ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
@@ -88,7 +88,7 @@ namespace CurrencyExchange.Service.Services
             };
             await _userBalanceHistoryRepository.AddAsync(coinUserBalanceHistory);
             await _unitOfWork.CommitAsync(); ;
-            var logMessages = await _commonFunctions.GetLogResponseMessage("RollBackSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RollBackSuccess, language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
         }

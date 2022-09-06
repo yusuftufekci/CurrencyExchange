@@ -41,7 +41,7 @@ namespace CurrencyExchange.Service.Services
 
             if (account == null)
             {
-                var responseMessage = await _logResponseFacade.GetLogAndResponseMessage("GetUserInformationAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
+                var responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserInformationAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<UserInformationDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var balances = await _balanceRepository.Where(p => p.Account == account).ToListAsync();
@@ -67,7 +67,7 @@ namespace CurrencyExchange.Service.Services
                 UserAccountName = account.AccountName,
                 UserEmail = user.UserEmail
             };
-            var logMessages = await _commonFunctions.GetLogResponseMessage("GetUserInformationSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.GetUserInformationSuccess, language: "en");
 
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<UserInformationDto>.Success(userInformations);
@@ -79,7 +79,7 @@ namespace CurrencyExchange.Service.Services
             var account = await _commonFunctions.GetAccount(token);
             if (account == null)
             {
-                var responseMessage = await _logResponseFacade.GetLogAndResponseMessage("GetUserTransactionsAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
+                var responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var userTransactionHistories = new List<UserTransactionHistoryDto>();
@@ -96,7 +96,7 @@ namespace CurrencyExchange.Service.Services
                 };
                 userTransactionHistories.Add(userTransactions);
             }
-            var logMessages = await _commonFunctions.GetLogResponseMessage("GetUserTransactionsSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.GetUserTransactionsSuccess, language: "en");
 
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<List<UserTransactionHistoryDto>>.Success(userTransactionHistories);
@@ -107,7 +107,7 @@ namespace CurrencyExchange.Service.Services
             var account = await _commonFunctions.GetAccount(token);
             if (account == null)
             {
-                var responseMessage = await _logResponseFacade.GetLogAndResponseMessage("GetUserBalanceInformationAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
+                var responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserBalanceInformationAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<List<BalanceDto>>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var balances = await _balanceRepository.Where(p => p.Account == account).ToListAsync();
@@ -124,7 +124,7 @@ namespace CurrencyExchange.Service.Services
                 };
                 userBalancesInfos.Add(userBalancesInfo);
             }
-            var logMessages = await _commonFunctions.GetLogResponseMessage("GetUserBalanceInformationSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.GetUserBalanceInformationSuccess, language: "en");
 
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<List<BalanceDto>>.Success(userBalancesInfos);

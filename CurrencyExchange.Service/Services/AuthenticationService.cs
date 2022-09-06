@@ -47,19 +47,19 @@ namespace CurrencyExchange.Service.Services
             ResponseMessages responseMessage;
             if (ipAddress is null)
             {
-                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("LoginIpAddressNotFound", ConstantResponseMessage.IpAddressNotFound, "en");
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.LoginIpAddressNotFound, ConstantResponseMessage.IpAddressNotFound, "en");
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var user = await _userRepository.Where(p => p.UserEmail == userLoginRequest.UserEmail).SingleOrDefaultAsync();
             var userParam = await _passwordRepository.Where(p => p.User == user).SingleOrDefaultAsync();
             if (userParam == null)
             {
-                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("LoginUsernameOrPasswordWrong", ConstantResponseMessage.UsernameOrPasswordWrong, "en");
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.LoginUsernameOrPasswordWrong, ConstantResponseMessage.UsernameOrPasswordWrong, "en");
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, new List<string> { responseMessage.Value });
             }
             if (!PasswordHash.VerifyPasswordHash(userLoginRequest.Password, userParam.PasswordHash, userParam.PasswordSalt))
             {
-                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("LoginUsernameOrPasswordWrong", ConstantResponseMessage.UsernameOrPasswordWrong, "en");
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.LoginUsernameOrPasswordWrong, ConstantResponseMessage.UsernameOrPasswordWrong, "en");
                 return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.Unauthorized, new List<string> { responseMessage.Value });
             }
             var token = _commonFunctions.GenerateToken(user);
@@ -87,7 +87,7 @@ namespace CurrencyExchange.Service.Services
                
                 await _unitOfWork.CommitAsync();
             }
-            var logMessages = await _commonFunctions.GetLogResponseMessage("LoginSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.LoginSuccess, language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<TokenDto>.Success(new TokenDto { Token = token });
         }
@@ -97,13 +97,13 @@ namespace CurrencyExchange.Service.Services
             ResponseMessages responseMessage;
             if (ipAdress is null)
             {
-                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("RegisterIpAddressNotFound", ConstantResponseMessage.IpAddressNotFound, "en");
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.RegisterIpAddressNotFound, ConstantResponseMessage.IpAddressNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var userExist = await _userRepository.Where(p => p.UserEmail == userRegisterRequest.UserEmail).SingleOrDefaultAsync();
             if (userExist != null)
             {
-                responseMessage = await _logResponseFacade.GetLogAndResponseMessage("RegisterUserAlreadyExist", ConstantResponseMessage.UserAlreadyExist, "en");
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.RegisterUserAlreadyExist, ConstantResponseMessage.UserAlreadyExist, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var user = new User
@@ -125,7 +125,7 @@ namespace CurrencyExchange.Service.Services
             await _userRepository.AddAsync(user);
             await _passwordRepository.AddAsync(password);
             await _unitOfWork.CommitAsync();
-            var logMessages = await _commonFunctions.GetLogResponseMessage("RegisterSuccess", language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RegisterSuccess, language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
         }
