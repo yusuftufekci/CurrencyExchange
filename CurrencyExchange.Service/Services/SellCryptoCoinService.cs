@@ -52,7 +52,7 @@ namespace CurrencyExchange.Service.Services
             ResponseMessages responseMessage;
             var account = await _commonFunctions.GetAccount(token);
 
-            var symbolOfCoins = sellCryptoCoinRequest.CoinToSell + "USDT";
+            var symbolOfCoins = sellCryptoCoinRequest.CoinToSell + Usdt.Name;
             if (account == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage("SellCryptoCoinAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
@@ -85,7 +85,7 @@ namespace CurrencyExchange.Service.Services
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage("SellCryptoCoinLowPriceOfCoin", ConstantResponseMessage.LowAmountOfCoin, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
-            var balanceForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoinName == "USDT" && p.Account == account).SingleOrDefaultAsync();
+            var balanceForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoinName == Usdt.Name && p.Account == account).SingleOrDefaultAsync();
             balanceForBuyCoin.TotalBalance += totalAmount;
             balance.TotalBalance -= sellCryptoCoinRequest.Amount;
             balance.ModifiedDate = DateTime.UtcNow;
@@ -94,7 +94,7 @@ namespace CurrencyExchange.Service.Services
                 Account = account,
                 MessageForChanging = sellCryptoCoinRequest.Amount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + totalAmount + " USDT",
                 ChangedAmount = totalAmount,
-                BoughtCryptoCoin = "USDT",
+                BoughtCryptoCoin = Usdt.Name,
                 SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell,
                 ChangedAmountSoldCryptoCoin = sellCryptoCoinRequest.Amount
                 
@@ -114,7 +114,7 @@ namespace CurrencyExchange.Service.Services
             */
             ResponseMessages responseMessage;
             var account = await _commonFunctions.GetAccount(token);
-            var symbolOfCoins = sellCryptoCoinRequest.CoinToSell + "USDT";
+            var symbolOfCoins = sellCryptoCoinRequest.CoinToSell + Usdt.Name;
             if (account == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage("SellCryptoCoinAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
@@ -146,7 +146,7 @@ namespace CurrencyExchange.Service.Services
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage("SellCryptoCoinLowPriceOfCoin", ConstantResponseMessage.LowAmountOfCoin, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
-            var balanceForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoinName == "USDT" && p.Account == account).SingleOrDefaultAsync();
+            var balanceForBuyCoin = await _balanceRepository.Where(p => p.CryptoCoinName == Usdt.Name && p.Account == account).SingleOrDefaultAsync();
             balanceForBuyCoin.TotalBalance += sellCryptoCoinRequest.Amount;
             balance.TotalBalance -= totalAmount;
             balance.ModifiedDate = DateTime.UtcNow;
@@ -155,7 +155,7 @@ namespace CurrencyExchange.Service.Services
                 Account = account,
                 MessageForChanging = totalAmount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + sellCryptoCoinRequest.Amount + " USDT",
                 ChangedAmount = sellCryptoCoinRequest.Amount,
-                BoughtCryptoCoin = "USDT",
+                BoughtCryptoCoin = Usdt.Name,
                 SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell,
                 ChangedAmountSoldCryptoCoin = totalAmount
 

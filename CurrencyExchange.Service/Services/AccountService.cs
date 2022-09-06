@@ -74,7 +74,7 @@ namespace CurrencyExchange.Service.Services
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
-            var balance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == "USDT").SingleOrDefaultAsync();
+            var balance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == Usdt.Name).SingleOrDefaultAsync();
             if (balance == null)
             {
                 var tempUserBalanceHistory = new UserBalanceHistory
@@ -82,14 +82,14 @@ namespace CurrencyExchange.Service.Services
                     Account = account,
                     MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account",
                     ChangedAmount = createAccountRequest.TotalBalance,
-                    BoughtCryptoCoin = "USDT",
-                    SoldCryptoCoin = "USDT",
+                    BoughtCryptoCoin = Usdt.Name,
+                    SoldCryptoCoin = Usdt.Name,
                     ChangedAmountSoldCryptoCoin = createAccountRequest.TotalBalance
                 };
 
                 var cryptoCoins = _cryptoCoinServiceWithCaching.GetCryptoCoins();
 
-                var usdt = cryptoCoins.Single(p => p.CoinName == "USDT");
+                var usdt = cryptoCoins.Single(p => p.CoinName == Usdt.Name);
                 var tempBalance = new Balance
                 {
                     CryptoCoinName = usdt.CoinName,
@@ -111,8 +111,8 @@ namespace CurrencyExchange.Service.Services
                     Account = account,
                     MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account",
                     ChangedAmount = createAccountRequest.TotalBalance,
-                    BoughtCryptoCoin = "USDT",
-                    SoldCryptoCoin = "USDT",
+                    BoughtCryptoCoin = Usdt.Name,
+                    SoldCryptoCoin = Usdt.Name,
                     ChangedAmountSoldCryptoCoin = createAccountRequest.TotalBalance
                 };
                 balance.TotalBalance += createAccountRequest.TotalBalance;

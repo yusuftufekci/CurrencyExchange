@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.ConstantsMessages;
@@ -23,22 +18,18 @@ namespace CurrencyExchange.Service.Services
     public class CancellationService : ICancellationService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IAccountRepository _accountRepository;
         private readonly IUserBalanceHistoryRepository _userBalanceHistoryRepository;
         private readonly IBalanceRepository _balanceRepository;
         private readonly ISenderLogger _logSender;
         private readonly ICommonFunctions _commonFunctions;
-        private readonly CryptoCoinServiceWithCaching _cryptoCoinServiceWithCaching;
         private readonly LogResponseFacade _logResponseFacade;
 
-        public CancellationService(IUnitOfWork unitOfWork, IAccountRepository accountRepository, IUserBalanceHistoryRepository userBalanceHistoryRepository, IBalanceRepository balanceRepository, ISenderLogger logSender, CryptoCoinServiceWithCaching cryptoCoinServiceWithCaching, LogResponseFacade logResponseFacade, ICommonFunctions commonFunctions)
+        public CancellationService(IUnitOfWork unitOfWork , IUserBalanceHistoryRepository userBalanceHistoryRepository, IBalanceRepository balanceRepository, ISenderLogger logSender, CryptoCoinServiceWithCaching cryptoCoinServiceWithCaching, LogResponseFacade logResponseFacade, ICommonFunctions commonFunctions)
         {
             _unitOfWork = unitOfWork;
-            _accountRepository = accountRepository;
             _userBalanceHistoryRepository = userBalanceHistoryRepository;
             _balanceRepository = balanceRepository;
             _logSender = logSender;
-            _cryptoCoinServiceWithCaching = cryptoCoinServiceWithCaching;
             _logResponseFacade = logResponseFacade;
             _commonFunctions = commonFunctions;
         }
@@ -55,22 +46,29 @@ namespace CurrencyExchange.Service.Services
             if (userTransaction == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
+                    "RollBackAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
+                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+            }
+
+            if (userTransaction.Account != account)
+            {
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
                     "GetUserTransactionsAccountNotFound", ConstantResponseMessage.AccountNotFound, "en");
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
-            if (userTransaction.BoughtCryptoCoin == "USDT" && userTransaction.SoldCryptoCoin == "USDT")
+            if (userTransaction.BoughtCryptoCoin == Usdt.Name && userTransaction.SoldCryptoCoin == Usdt.Name)
             {
                 var usdtUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
                     MessageForChanging = "The transaction with id number" + cancellationRequest.TransactionHistoryId + " has been rolled back.",
                     ChangedAmount = -Math.Abs(userTransaction.ChangedAmount),
-                    BoughtCryptoCoin = "USDT",
-                    SoldCryptoCoin = "USDT",
+                    BoughtCryptoCoin = Usdt.Name,
+                    SoldCryptoCoin = Usdt.Name,
                     ChangedAmountSoldCryptoCoin = Math.Abs(userTransaction.ChangedAmount)
                 };
-                var usdtBalance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == "USDT").SingleOrDefaultAsync();
+                var usdtBalance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == Usdt.Name).SingleOrDefaultAsync();
 
                 usdtBalance.TotalBalance -= userTransaction.ChangedAmount;
                 await _userBalanceHistoryRepository.AddAsync(usdtUserBalanceHistory);
@@ -90,6 +88,8 @@ namespace CurrencyExchange.Service.Services
             };
             await _userBalanceHistoryRepository.AddAsync(coinUserBalanceHistory);
             await _unitOfWork.CommitAsync(); ;
+            var logMessages = await _commonFunctions.GetLogResponseMessage("RollBackSuccess", language: "en");
+            _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
         }
     }

@@ -7,7 +7,6 @@ using CurrencyExchange.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.ConstantsMessages;
-using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Service.LogFacade;
 
 namespace CurrencyExchange.Service.Services
