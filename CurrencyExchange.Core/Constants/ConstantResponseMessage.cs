@@ -11,6 +11,7 @@
         public const string LowAmount = "LowAmount";
         public const string LowAmountOfCoin = "LowAmountOfCoin";
         public const string ApiProblem = "ApiProblem";
+        public const string ConflictAcount = "ConflictAcount";
 
     }
 }

@@ -6,6 +6,7 @@ using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
 using CurrencyExchange.Core.Entities.Log;
+using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
@@ -54,10 +55,10 @@ namespace CurrencyExchange.Service.Services
             if (userTransaction.Account != account)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
-                    ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                    ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.ConflictAcount, "en");
+                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
             }
-
+            LogMessages logMessages;
             if (userTransaction.BoughtCryptoCoin == Usdt.Name && userTransaction.SoldCryptoCoin == Usdt.Name)
             {
                 var usdtUserBalanceHistory = new UserBalanceHistory
@@ -73,6 +74,10 @@ namespace CurrencyExchange.Service.Services
 
                 usdtBalance.TotalBalance -= userTransaction.ChangedAmount;
                 await _userBalanceHistoryRepository.AddAsync(usdtUserBalanceHistory);
+                logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RollBackSuccess, language: "en");
+                _logSender.SenderFunction("Log", logMessages.Value);
+                return CustomResponseDto<NoContentDto>.Success();
+
             }
             var soldCoinBalance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == userTransaction.SoldCryptoCoin).SingleOrDefaultAsync();
             var boughtCoinBalance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == userTransaction.BoughtCryptoCoin).SingleOrDefaultAsync();
@@ -89,7 +94,7 @@ namespace CurrencyExchange.Service.Services
             };
             await _userBalanceHistoryRepository.AddAsync(coinUserBalanceHistory);
             await _unitOfWork.CommitAsync(); ;
-            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RollBackSuccess, language: "en");
+            logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RollBackSuccess, language: "en");
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
         }
