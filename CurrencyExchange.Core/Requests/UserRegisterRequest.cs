@@ -1,4 +1,6 @@
-﻿namespace CurrencyExchange.Core.Requests
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CurrencyExchange.Core.Requests
 {
     public class UserRegisterRequest
     {

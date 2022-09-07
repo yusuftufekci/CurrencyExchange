@@ -8,8 +8,7 @@ namespace CurrencyExchange.Service.Validations
     {
         public CreateAccountRequestValidator()
         {
-            RuleFor(x => x.AccountName).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantEmpty).NotNull().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantNull);
-
+            RuleFor(x => x.AccountName).Length(3, 30).WithMessage("{PropertyName} " + ValidatorConstantsMessages.AccountName);
         }
     }
 }

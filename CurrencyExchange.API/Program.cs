@@ -9,16 +9,17 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CurrencyExchange.API.Modules;
 using CurrencyExchange.Core.ConfigModels;
+using CurrencyExchange.Service.Validations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddControllers(options => { options.Filters.Add(new ValidateFilterAttribute()); })
-    .AddFluentValidation(x => x.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
+builder.Services.AddControllers(options => options.Filters.Add(new ValidateFilterAttribute()))
+    .AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<BuyCoinRequestValidator>());
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
-    options.SuppressModelStateInvalidFilter = true;
+    options.SuppressModelStateInvalidFilter = false;
 });
 
 
@@ -37,7 +38,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 

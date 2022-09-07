@@ -8,7 +8,7 @@ namespace CurrencyExchange.Service.Validations
     {
         public DepositFundRequestValidator()
         {
-            RuleFor(x => x.TotalBalance).NotNull().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantNull).NotEmpty().WithMessage("{PropertyName} "+ ValidatorConstantsMessages.CantEmpty).InclusiveBetween(1,double.MaxValue).WithMessage("{PropertyName} "+ValidatorConstantsMessages.GreaterThan);
+            RuleFor(x => x.TotalBalance).InclusiveBetween(1,double.MaxValue).WithMessage("{PropertyName} " + ValidatorConstantsMessages.GreaterThan);
 
         }
     }

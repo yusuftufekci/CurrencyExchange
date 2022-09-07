@@ -11,7 +11,6 @@ using System.Net;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.Entities.Log;
-using CurrencyExchange.Core.Entities.LogMessages;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Service.LogFacade;
 

@@ -9,9 +9,8 @@ namespace CurrencyExchange.Service.Validations
     {
         public SellCryptoCoinRequestValidator()
         {
-            RuleFor(x => x.CoinToSell).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantEmpty).NotNull().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantNull);
-            RuleFor(x => x.Amount).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantEmpty).NotNull().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantEmpty).GreaterThan(0.001);
-
+            RuleFor(x => x.CoinToSell).Matches(@"\b[A-Z]+(?:\s+[A-Z]+)*\b").WithMessage("{PropertyName} " + ValidatorConstantsMessages.CoinNameConstant);
+            RuleFor(x => x.Amount).GreaterThan(0.001).WithMessage("{PropertyName} " + ValidatorConstantsMessages.CoinBuyAmount);
         }
 
     }

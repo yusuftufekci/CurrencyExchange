@@ -8,10 +8,9 @@ namespace CurrencyExchange.Service.Validations
     {
         public BuyCoinRequestValidator()
         {
-            RuleFor(x => x.BuyWIthThisCoin).NotEmpty().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantEmpty).NotNull().WithMessage("{PropertyName} "+ ValidatorConstantsMessages.CantNull);
-            RuleFor(x => x.CoinToBuy).NotEmpty().WithMessage("{PropertyName} " + ValidatorConstantsMessages.CantEmpty).NotNull().WithMessage("{PropertyName}} cant be null "+ ValidatorConstantsMessages.CantNull);
-            RuleFor(x => x.Amount).NotEmpty().WithMessage("{PropertyName} " + ValidatorConstantsMessages.CantEmpty).NotNull().WithMessage("{PropertyName} "+ValidatorConstantsMessages.CantNull).GreaterThan(0.001);
-
+            RuleFor(x => x.BuyWIthThisCoin).Matches(@"\b[A-Z]+(?:\s+[A-Z]+)*\b").WithMessage("{PropertyName} " + ValidatorConstantsMessages.CoinNameConstant);
+            RuleFor(x => x.CoinToBuy).Matches(@"\b[A-Z]+(?:\s+[A-Z]+)*\b").WithMessage("{PropertyName} " + ValidatorConstantsMessages.CoinNameConstant);
+            RuleFor(x => x.Amount).GreaterThan(0.001).WithMessage("{PropertyName} " + ValidatorConstantsMessages.CoinBuyAmount);
         }
     }
 }
