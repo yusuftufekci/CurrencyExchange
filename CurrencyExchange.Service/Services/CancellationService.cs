@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.Constants;
 using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
@@ -62,7 +63,7 @@ namespace CurrencyExchange.Service.Services
                 var usdtUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
-                    MessageForChanging = "The transaction with id number" + cancellationRequest.TransactionHistoryId + " has been rolled back.",
+                    MessageForChanging = TransactionHistoryMessages.TransactionRollBackMessage(cancellationRequest.TransactionHistoryId),
                     ChangedAmount = -Math.Abs(userTransaction.ChangedAmount),
                     BoughtCryptoCoin = Usdt.Name,
                     SoldCryptoCoin = Usdt.Name,
@@ -80,7 +81,7 @@ namespace CurrencyExchange.Service.Services
             var coinUserBalanceHistory = new UserBalanceHistory
             {
                 Account = account,
-                MessageForChanging = "The transaction with id number" + cancellationRequest.TransactionHistoryId + " has been rolled back.",
+                MessageForChanging = TransactionHistoryMessages.TransactionRollBackMessage(cancellationRequest.TransactionHistoryId),
                 ChangedAmount = userTransaction.ChangedAmountSoldCryptoCoin,
                 BoughtCryptoCoin = userTransaction.SoldCryptoCoin,
                 SoldCryptoCoin = userTransaction.BoughtCryptoCoin,

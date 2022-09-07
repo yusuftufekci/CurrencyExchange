@@ -107,7 +107,6 @@ namespace CurrencyExchange.Service.CommonFunction
 
         public string GenerateToken(User user)
         {
-            var a = _appSettings.Secret;
             var mySecret = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
             var mySecurityKey = new SymmetricSecurityKey((mySecret));

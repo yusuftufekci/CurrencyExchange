@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
+using CurrencyExchange.Core.Constants;
 using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
@@ -80,7 +81,7 @@ namespace CurrencyExchange.Service.Services
                 var tempUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
-                    MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account",
+                    MessageForChanging = TransactionHistoryMessages.DepositCoinMessage(createAccountRequest.TotalBalance,Usdt.Name),
                     ChangedAmount = createAccountRequest.TotalBalance,
                     BoughtCryptoCoin = Usdt.Name,
                     SoldCryptoCoin = Usdt.Name,
@@ -109,14 +110,13 @@ namespace CurrencyExchange.Service.Services
                 var tempUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
-                    MessageForChanging = createAccountRequest.TotalBalance + " USDT deposit into the account",
+                    MessageForChanging = TransactionHistoryMessages.DepositCoinMessage(createAccountRequest.TotalBalance,Usdt.Name),
                     ChangedAmount = createAccountRequest.TotalBalance,
                     BoughtCryptoCoin = Usdt.Name,
                     SoldCryptoCoin = Usdt.Name,
                     ChangedAmountSoldCryptoCoin = createAccountRequest.TotalBalance
                 };
                 balance.TotalBalance += createAccountRequest.TotalBalance;
-                // tempBalance.CryptoCoinId = 3;
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _unitOfWork.CommitAsync();
                 logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.DepositFundsSuccess, language: "en");

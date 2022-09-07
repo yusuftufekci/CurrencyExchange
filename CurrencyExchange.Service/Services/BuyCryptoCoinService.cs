@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Service.LogFacade;
+using CurrencyExchange.Core.Constants;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -121,7 +122,7 @@ namespace CurrencyExchange.Service.Services
                 var tempUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
-                    MessageForChanging = buyCoinRequest.Amount + " " + buyCoinRequest.CoinToBuy + " deposit into the account",
+                    MessageForChanging = TransactionHistoryMessages.DepositCoinMessage(buyCoinRequest.Amount, buyCoinRequest.CoinToBuy) ,
                     ChangedAmount = buyCoinRequest.Amount,
                     BoughtCryptoCoin = buyCoinRequest.CoinToBuy,
                     SoldCryptoCoin = buyCoinRequest.BuyWIthThisCoin,
@@ -135,7 +136,7 @@ namespace CurrencyExchange.Service.Services
                 var tempUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
-                    MessageForChanging = buyCoinRequest.Amount + " " + buyCoinRequest.CoinToBuy + " deposit into the account",
+                    MessageForChanging = TransactionHistoryMessages.DepositCoinMessage(buyCoinRequest.Amount, buyCoinRequest.CoinToBuy),
                     ChangedAmount = buyCoinRequest.Amount,
                     BoughtCryptoCoin = buyCoinRequest.CoinToBuy,
                     SoldCryptoCoin = buyCoinRequest.BuyWIthThisCoin,
@@ -208,7 +209,7 @@ namespace CurrencyExchange.Service.Services
                 var tempUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
-                    MessageForChanging = totalAmount + " " + buyCoinRequest.CoinToBuy + " deposit into the account",
+                    MessageForChanging = TransactionHistoryMessages.DepositCoinMessage(buyCoinRequest.Amount, buyCoinRequest.CoinToBuy),
                     ChangedAmount = totalAmount,
                     BoughtCryptoCoin = buyCoinRequest.CoinToBuy,
                     SoldCryptoCoin = buyCoinRequest.BuyWIthThisCoin,
@@ -225,7 +226,7 @@ namespace CurrencyExchange.Service.Services
                 var tempUserBalanceHistory = new UserBalanceHistory
                 {
                     Account = account,
-                    MessageForChanging = totalAmount + " " + buyCoinRequest.CoinToBuy + " deposit into the account",
+                    MessageForChanging = TransactionHistoryMessages.DepositCoinMessage(buyCoinRequest.Amount, buyCoinRequest.CoinToBuy),
                     ChangedAmount = totalAmount,
                     BoughtCryptoCoin = buyCoinRequest.CoinToBuy,
                     SoldCryptoCoin = buyCoinRequest.BuyWIthThisCoin,

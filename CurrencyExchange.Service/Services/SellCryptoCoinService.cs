@@ -2,6 +2,7 @@
 using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.ConfigModels;
+using CurrencyExchange.Core.Constants;
 using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Account;
@@ -92,7 +93,7 @@ namespace CurrencyExchange.Service.Services
             var tempUserBalanceHistory = new UserBalanceHistory
             {
                 Account = account,
-                MessageForChanging = sellCryptoCoinRequest.Amount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + totalAmount + " USDT",
+                MessageForChanging = TransactionHistoryMessages.SoldCoinMessage(sellCryptoCoinRequest.Amount, sellCryptoCoinRequest.CoinToSell, totalAmount),
                 ChangedAmount = totalAmount,
                 BoughtCryptoCoin = Usdt.Name,
                 SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell,
@@ -153,7 +154,7 @@ namespace CurrencyExchange.Service.Services
             var tempUserBalanceHistory = new UserBalanceHistory
             {
                 Account = account,
-                MessageForChanging = totalAmount + " " + sellCryptoCoinRequest.CoinToSell + " sold. It's equal to = " + sellCryptoCoinRequest.Amount + " USDT",
+                MessageForChanging = TransactionHistoryMessages.SoldCoinMessage(totalAmount, sellCryptoCoinRequest.CoinToSell, sellCryptoCoinRequest.Amount),
                 ChangedAmount = sellCryptoCoinRequest.Amount,
                 BoughtCryptoCoin = Usdt.Name,
                 SoldCryptoCoin = sellCryptoCoinRequest.CoinToSell,
