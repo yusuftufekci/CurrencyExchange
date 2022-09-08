@@ -16,6 +16,7 @@ using CurrencyExchange.Caching.CryptoCoins;
 using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Service.LogFacade;
 using CurrencyExchange.Core.Constants;
+using CurrencyExchange.Service.Exceptions;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -75,38 +76,44 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var balance = await _balanceRepository.Where(p => p.CryptoCoinName == buyCoinRequest.BuyWIthThisCoin && p.Account == account).SingleOrDefaultAsync();
             if (balance == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountBalanceNotFound, ConstantResponseMessage.BalanceNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var cryptoCoinPrices = _cryptoCoinPriceServiceWithCaching.GetCryptoCoinPrice();
             var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.Symbol == symbolOfCoins);
             if (coinTypeToBuy == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountPriceNotFound, ConstantResponseMessage.BalanceNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var totalAmount = CalculateTotalAmountByUsdt(coinTypeToBuy.Price, buyCoinRequest.Amount);
             if (totalAmount <= _controlCryptoCoinAmountSettings.TotalAmount)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountLowPrice, ConstantResponseMessage.LowAmount, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
+                throw new ClientSideException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
             if (totalAmount > balance.TotalBalance)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountLowPriceOfCoin, ConstantResponseMessage.LowAmountOfCoin, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
+                throw new ClientSideException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
             var balanceForBuyCoin = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var cryptoCoins = _cryptoCoinServiceWithCaching.GetCryptoCoins();
             if (cryptoCoins == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountApiFailed, ConstantResponseMessage.ApiProblem, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
 
             }
             var coinToBuy = cryptoCoins.SingleOrDefault(p => p.CoinName == buyCoinRequest.CoinToBuy);
@@ -162,40 +169,51 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var balance = await _balanceRepository.Where(p => p.CryptoCoinName == buyCoinRequest.BuyWIthThisCoin && p.Account == account).SingleOrDefaultAsync();
             if (balance == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountBalanceNotFound, ConstantResponseMessage.BalanceNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var cryptoCoinPrices = _cryptoCoinPriceServiceWithCaching.GetCryptoCoinPrice();
             var coinTypeToBuy = cryptoCoinPrices.SingleOrDefault(p => p.Symbol == symbolOfCoins);
             if (coinTypeToBuy == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountPriceNotFound, ConstantResponseMessage.BalanceNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
             var totalAmount = CalculateTotalAmountByCoin(coinTypeToBuy.Price, buyCoinRequest.Amount);
             if (totalAmount <= _controlCryptoCoinAmountSettings.TotalAmount)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountLowPrice, ConstantResponseMessage.LowAmount, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
+                throw new ClientSideException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
 
             if (totalAmount > balance.TotalBalance)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountLowPriceOfCoin, ConstantResponseMessage.LowAmountOfCoin, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
+                throw new ClientSideException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.BadRequest, responseMessage.Value);
             }
             var balanceForBuyCoin = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == buyCoinRequest.CoinToBuy).SingleOrDefaultAsync();
             var cryptoCoins = _cryptoCoinServiceWithCaching.GetCryptoCoins();
             if (cryptoCoins == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.BuyCoinWithAmountApiFailed, ConstantResponseMessage.ApiProblem, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var coinToBuy = cryptoCoins.SingleOrDefault(p => p.CoinName == buyCoinRequest.CoinToBuy); if (balanceForBuyCoin == null)
             {

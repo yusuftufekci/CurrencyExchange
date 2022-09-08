@@ -20,6 +20,7 @@ namespace CurrencyExchange.API.Middlewares
                     {
                         ClientSideException => 400,
                         NotFoundException => 404,
+                        ConflictException => 409,
                         _ => 500
                     };
                     context.Response.StatusCode = statusCode;

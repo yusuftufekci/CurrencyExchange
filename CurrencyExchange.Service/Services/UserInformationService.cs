@@ -9,6 +9,7 @@ using CurrencyExchange.Core.CommonFunction;
 using CurrencyExchange.Core.ConstantsMessages;
 using CurrencyExchange.Service.LogFacade;
 using CurrencyExchange.Core.Constants;
+using CurrencyExchange.Service.Exceptions;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -43,7 +44,9 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 var responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserInformationAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
-                return CustomResponseDto<UserInformationDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<UserInformationDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var balances = await _balanceRepository.Where(p => p.Account == account).ToListAsync();
             var userBalancesInfos = new List<BalanceDto>();
@@ -81,7 +84,9 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 var responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
-                return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<List<UserTransactionHistoryDto>>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var userTransactionHistories = new List<UserTransactionHistoryDto>();
             var transactions = await _userBalanceHistoryRepository.Where(p => p.Account == account).ToListAsync();
@@ -109,7 +114,8 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 var responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserBalanceInformationAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
-                return CustomResponseDto<List<BalanceDto>>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+                //return CustomResponseDto<List<BalanceDto>>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var balances = await _balanceRepository.Where(p => p.Account == account).ToListAsync();
             var userBalancesInfos = new List<BalanceDto>();

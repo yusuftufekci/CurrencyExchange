@@ -12,6 +12,7 @@ using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
+using CurrencyExchange.Service.Exceptions;
 using CurrencyExchange.Service.LogFacade;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,21 +43,27 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var userTransaction = await _userBalanceHistoryRepository.Where(p => p.Id == cancellationRequest.TransactionHistoryId).SingleAsync();
             if (userTransaction == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
                     ConstantLogMessages.RollBackAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
             if (userTransaction.Account != account)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
                     ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.ConflictAcount, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
+                throw new ConflictException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
             }
             LogMessages logMessages;
             if (userTransaction.BoughtCryptoCoin == Usdt.Name && userTransaction.SoldCryptoCoin == Usdt.Name)

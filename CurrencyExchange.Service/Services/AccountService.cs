@@ -11,6 +11,7 @@ using CurrencyExchange.Core.Repositories;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using CurrencyExchange.Core.UnitOfWorks;
+using CurrencyExchange.Service.Exceptions;
 using CurrencyExchange.Service.LogFacade;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,7 +52,8 @@ namespace CurrencyExchange.Service.Services
             if (account != null)
             {
                 var responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.CreateAccountAccountAlreadyExist, ConstantResponseMessage.AccountAlreadyExist, "en");
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
+                throw new ConflictException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
             }
             var tempAccount = new Account
             {
@@ -72,7 +74,8 @@ namespace CurrencyExchange.Service.Services
             if (account == null)
             {
                 var responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.DepositFundsAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
             var balance = await _balanceRepository.Where(p => p.Account == account && p.CryptoCoinName == Usdt.Name).SingleOrDefaultAsync();

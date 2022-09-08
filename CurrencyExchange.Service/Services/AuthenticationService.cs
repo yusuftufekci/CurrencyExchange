@@ -14,6 +14,7 @@ using CurrencyExchange.Core.Entities.Log;
 using CurrencyExchange.Core.RabbitMqLogger;
 using CurrencyExchange.Service.LogFacade;
 using CurrencyExchange.Core.Constants;
+using CurrencyExchange.Service.Exceptions;
 
 namespace CurrencyExchange.Service.Services
 {
@@ -48,19 +49,24 @@ namespace CurrencyExchange.Service.Services
             if (ipAddress is null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.LoginIpAddressNotFound, ConstantResponseMessage.IpAddressNotFound, Language.English);
-                return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                // return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var user = await _userRepository.Where(p => p.UserEmail == userLoginRequest.UserEmail).SingleOrDefaultAsync();
             var userParam = await _passwordRepository.Where(p => p.User == user).SingleOrDefaultAsync();
             if (userParam == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.LoginUsernameOrPasswordWrong, ConstantResponseMessage.UsernameOrPasswordWrong, Language.English);
-                return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, new List<string> { responseMessage.Value });
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.NotFound, new List<string> { responseMessage.Value });
             }
             if (!PasswordHash.VerifyPasswordHash(userLoginRequest.Password, userParam.PasswordHash, userParam.PasswordSalt))
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.LoginUsernameOrPasswordWrong, ConstantResponseMessage.UsernameOrPasswordWrong, Language.English);
-                return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.Unauthorized, new List<string> { responseMessage.Value });
+                throw new NotFoundException(responseMessage.Value);
+                //return CustomResponseDto<TokenDto>.Fail((int)HttpStatusCode.Unauthorized, new List<string> { responseMessage.Value });
             }
             var token = _commonFunctions.GenerateToken(user);
 
@@ -98,14 +104,18 @@ namespace CurrencyExchange.Service.Services
             if (ipAdress is null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.RegisterIpAddressNotFound, ConstantResponseMessage.IpAddressNotFound, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new NotFoundException(responseMessage.Value);
+
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
             var userExist = await _userRepository.Where(p => p.UserEmail == userRegisterRequest.UserEmail).SingleOrDefaultAsync();
             if (userExist != null)
             {
+                
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.RegisterUserAlreadyExist, ConstantResponseMessage.UserAlreadyExist, Language.English);
-                return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
+                throw new ConflictException(responseMessage.Value);
+                //return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var user = new User
             {
