@@ -41,21 +41,21 @@ namespace CurrencyExchange.Service.Services
             var account = await _commonFunctions.GetAccount(token);
             if (account == null)
             {
-                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
+                responseMessage = await _logResponseFacade.GetLogAndResponseMessage(ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
             var userTransaction = await _userBalanceHistoryRepository.Where(p => p.Id == cancellationRequest.TransactionHistoryId).SingleAsync();
             if (userTransaction == null)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
-                    ConstantLogMessages.RollBackAccountNotFound, ConstantResponseMessage.AccountNotFound, "en");
+                    ConstantLogMessages.RollBackAccountNotFound, ConstantResponseMessage.AccountNotFound, Language.English);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.NotFound, responseMessage.Value);
             }
 
             if (userTransaction.Account != account)
             {
                 responseMessage = await _logResponseFacade.GetLogAndResponseMessage(
-                    ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.ConflictAcount, "en");
+                    ConstantLogMessages.GetUserTransactionsAccountNotFound, ConstantResponseMessage.ConflictAcount, Language.English);
                 return CustomResponseDto<NoContentDto>.Fail((int)HttpStatusCode.Conflict, responseMessage.Value);
             }
             LogMessages logMessages;
@@ -74,7 +74,7 @@ namespace CurrencyExchange.Service.Services
 
                 usdtBalance.TotalBalance -= userTransaction.ChangedAmount;
                 await _userBalanceHistoryRepository.AddAsync(usdtUserBalanceHistory);
-                logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RollBackSuccess, language: "en");
+                logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RollBackSuccess, language: Language.English);
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Success();
 
@@ -94,7 +94,7 @@ namespace CurrencyExchange.Service.Services
             };
             await _userBalanceHistoryRepository.AddAsync(coinUserBalanceHistory);
             await _unitOfWork.CommitAsync(); ;
-            logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RollBackSuccess, language: "en");
+            logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.RollBackSuccess, language: Language.English);
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
         }

@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using CurrencyExchange.Core.Constants;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace CurrencyExchange.Core.HelperFunctions
 {
@@ -14,7 +15,7 @@ namespace CurrencyExchange.Core.HelperFunctions
                 var dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(Int32.Parse(expDate));
                 if (DateTime.Now > dateTimeOffset)
                 {
-                    return "Token expired";
+                    return TokenMessages.TokenExpired;
                 }
 
                 var userEmail = jwtToken.Claims.ToList()[0].Value;

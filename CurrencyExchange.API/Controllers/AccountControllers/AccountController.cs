@@ -21,6 +21,7 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
         {
             return CreateActionResult(await _service.CreateAccount(createAccountRequest,token));
         }
+
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("deposit-fund")]
         public async Task<IActionResult> DepositFund(DepositFundRequest depositFundRequest, [FromHeader] string token)

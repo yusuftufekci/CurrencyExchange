@@ -60,7 +60,7 @@ namespace CurrencyExchange.Service.Services
             };
             await _accountRepository.AddAsync(tempAccount);
             await _unitOfWork.CommitAsync();
-            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.CreateAccountSuccess, language: "en");
+            var logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.CreateAccountSuccess, language: Language.English);
             _logSender.SenderFunction("Log", logMessages.Value);
             return CustomResponseDto<NoContentDto>.Success();
         }
@@ -101,7 +101,7 @@ namespace CurrencyExchange.Service.Services
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _balanceRepository.AddAsync(tempBalance);
                 await _unitOfWork.CommitAsync();
-                logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.DepositFundsSuccess, language: "en");
+                logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.DepositFundsSuccess, language: Language.English);
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Success();
             }
@@ -119,7 +119,7 @@ namespace CurrencyExchange.Service.Services
                 balance.TotalBalance += createAccountRequest.TotalBalance;
                 await _userBalanceHistoryRepository.AddAsync(tempUserBalanceHistory);
                 await _unitOfWork.CommitAsync();
-                logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.DepositFundsSuccess, language: "en");
+                logMessages = await _commonFunctions.GetLogResponseMessage(ConstantLogMessages.DepositFundsSuccess, language: Language.English);
                 _logSender.SenderFunction("Log", logMessages.Value);
                 return CustomResponseDto<NoContentDto>.Success();
             }
