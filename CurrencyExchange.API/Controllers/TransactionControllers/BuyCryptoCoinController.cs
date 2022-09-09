@@ -1,4 +1,5 @@
 ﻿using CurrencyExchange.API.Filters;
+using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Authentication;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CurrencyExchange.API.Controllers.TransactionControllers
 {
 
-    public class BuyCryptoCoinController : CustomBaseController
+    public class BuyCryptoCoinController : ControllerBase
     {
         private readonly IBuyCryptoCoinService _service;
         public BuyCryptoCoinController(IBuyCryptoCoinService service)
@@ -17,17 +18,17 @@ namespace CurrencyExchange.API.Controllers.TransactionControllers
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("buy-crypto-coin")]
-        public async Task<IActionResult> BuyCryptoCoin(BuyCoinRequest buyCoinRequest, [FromHeader] string token)
+        public async Task<CustomResponseDto<NoContentDto>> BuyCryptoCoin(BuyCoinRequest buyCoinRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.BuyCryptoCoinByUsdt(buyCoinRequest, token));
+            return await _service.BuyCryptoCoinByUsdt(buyCoinRequest, token);
         }
 
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("buy-crypto-coin2")]
-        public async Task<IActionResult> BuyCryptoCoinV2(BuyCoinRequest buyCoinRequest, [FromHeader] string token)
+        public async Task<CustomResponseDto<NoContentDto>> BuyCryptoCoinV2(BuyCoinRequest buyCoinRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.BuyCryptoCoinByCoin(buyCoinRequest, token));
+            return await _service.BuyCryptoCoinByCoin(buyCoinRequest, token);
         }
 
 

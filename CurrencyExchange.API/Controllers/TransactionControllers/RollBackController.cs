@@ -1,13 +1,13 @@
 ﻿using CurrencyExchange.API.Filters;
+using CurrencyExchange.Core.DTOs;
 using CurrencyExchange.Core.Entities.Authentication;
 using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers.TransactionControllers
 {
-    public class RollBackController : CustomBaseController
+    public class RollBackController : ControllerBase
     {
         private readonly ICancellationService _service;
         public RollBackController(ICancellationService service)
@@ -17,9 +17,9 @@ namespace CurrencyExchange.API.Controllers.TransactionControllers
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("roll-back-transaction")]
-        public async Task<IActionResult> BuyCryptoCoin(CancellationRequest cancellationRequest, [FromHeader] string token)
+        public async Task<CustomResponseDto<NoContentDto>> BuyCryptoCoin(CancellationRequest cancellationRequest, [FromHeader] string token)
         {
-            return CreateActionResult(await _service.RollBack(cancellationRequest, token));
+            return await _service.RollBack(cancellationRequest, token);
         }
     }
 }

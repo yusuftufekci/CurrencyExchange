@@ -1,10 +1,11 @@
-﻿using CurrencyExchange.Core.Requests;
+﻿using CurrencyExchange.Core.DTOs;
+using CurrencyExchange.Core.Requests;
 using CurrencyExchange.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.API.Controllers.AuthenticationControllers
 {
-    public class AuthenticationController : CustomBaseController
+    public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationService _service;
         public AuthenticationController(IAuthenticationService service)
@@ -13,17 +14,17 @@ namespace CurrencyExchange.API.Controllers.AuthenticationControllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> CreateUser(UserRegisterRequest userRegisterRequest)
+        public async Task<CustomResponseDto<NoContentDto>> CreateUser(UserRegisterRequest userRegisterRequest)
         { 
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-            return CreateActionResult(await _service.UserRegister(userRegisterRequest, ipAddress));
+            return await _service.UserRegister(userRegisterRequest, ipAddress);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserLoginRequest userLoginRequest)
+        public async Task<CustomResponseDto<TokenDto>> Login(UserLoginRequest userLoginRequest)
         {
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-            return CreateActionResult(await _service.UserLogin(userLoginRequest, ipAddress));
+            return await _service.UserLogin(userLoginRequest, ipAddress);
         }
 
     }
