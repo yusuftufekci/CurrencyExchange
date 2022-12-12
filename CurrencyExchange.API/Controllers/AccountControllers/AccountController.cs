@@ -18,16 +18,16 @@ namespace CurrencyExchange.API.Controllers.AccountControllers
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("create-account")]
-        public async Task<CustomResponseDto<NoContentDto>> CreateUser(CreateAccountRequest createAccountRequest, [FromHeader] string token)
+        public async Task<ActionResult<CustomResponseDto<NoContentDto>>> CreateUser(CreateAccountRequest createAccountRequest, [FromHeader] string token)
         {
-            return (await _service.CreateAccount(createAccountRequest,token));
+            return await _service.CreateAccount(createAccountRequest,token);
         }
 
         [ServiceFilter(typeof(TokenControlFilter<UserToken>))]
         [HttpPost("deposit-fund")]
-        public async Task<CustomResponseDto<NoContentDto>> DepositFund(DepositFundRequest depositFundRequest, [FromHeader] string token)
+        public async Task<ActionResult<CustomResponseDto<NoContentDto>>> DepositFund(DepositFundRequest depositFundRequest, [FromHeader] string token)
         {
-            return (await _service.DepositFunds(depositFundRequest, token));
+            return await _service.DepositFunds(depositFundRequest, token);
         }
     }
 }
